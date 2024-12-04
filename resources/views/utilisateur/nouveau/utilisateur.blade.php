@@ -194,7 +194,7 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Date fin contrat</label>
-                                                <input type="date" class="form-control" id="date_fin" min="{{ date('Y-m-d') }}">
+                                                <input disabled type="date" class="form-control" id="date_fin" min="{{ date('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -236,7 +236,7 @@
                                 <div class="card-body">
                                     <div class="">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover table-sm">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
@@ -264,12 +264,12 @@
     </div>
 </div>
 
-<div class="modal fade" id="Detail" tabindex="-1" aria-modal="true" role="dialog">
+<div class="modal fade" id="Detail" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    Détail Patient
+                    Détail Utilisateur
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -302,7 +302,7 @@
 </div>
 
 <div class="modal fade" id="Mmodif" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
@@ -312,50 +312,50 @@
                 <form id="updateForm">
                     <input type="hidden" id="Id">
                     <div class="row gx-3">
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Civilité</label>
                                 <select class="form-select select2" id="civilite_idModif">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Nom</label>
                                 <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Prénoms</label>
                                 <input type="text" class="form-control" id="prenomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Contact</label>
                                 <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Contact en cas d'urgence</label>
                                 <input type="tel" class="form-control" id="tel2Modif" placeholder="Saisie Obligatoire" maxlength="10">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Date de naissance</label>
                                 <input type="date" class="form-control" id="datenaisModif" max="{{ date('Y-m-d') }}">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Type de pièce</label>
                                 <select class="form-select select2" id="typepieceModif">
@@ -375,7 +375,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Niveau d'étude</label>
                                 <select class="form-select select2" id="niveauModif">
@@ -394,7 +394,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Diplôme</label>
                                 <select class="form-select select2" id="diplomeModif">
@@ -410,52 +410,52 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Résidence</label>
                                 <input type="text" class="form-control" id="residenceModif" placeholder="Saisie Obligatoire">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Profession</label>
                                 <select class="form-select select2" id="service_idModif">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Profil</label>
                                 <select class="form-select select2" id="profil_idModif">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Type de contrat</label>
                                 <select class="form-select select2" id="contrat_idModif">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Date début contrat</label>
                                 <input type="date" class="form-control" id="date_debutModif" min="{{ date('Y-m-d') }}">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Date fin contrat</label>
                                 <input type="date" class="form-control" id="date_finModif" min="{{ date('Y-m-d') }}">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Login</label>
                                 <input type="text" class="form-control" id="loginModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                             </div>
                         </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Mot de passe</label>
                                 <div class="input-group">
@@ -481,16 +481,19 @@
 
 <script>
     $('#Mmodif').on('shown.bs.modal', function () {
-        $('#profil_idModif').select2({
-            theme: 'bootstrap',
-            placeholder: 'Selectionner',
-            language: {
-                noResults: function() {
-                    return "Aucun résultat trouvé";
-                }
-            },
-            width: '100%',
-            dropdownParent: $('#Mmodif'),
+        var select = ['#profil_idModif', '#civilite_idModif', '#typepieceModif', '#niveauModif', '#diplomeModif', '#service_idModif', '#contrat_idModif'];
+        select.forEach(function(id) {
+            $(id).select2({
+                theme: 'bootstrap',
+                placeholder: 'Selectionner',
+                language: {
+                    noResults: function() {
+                        return "Aucun résultat trouvé";
+                    }
+                },
+                width: '100%',
+                dropdownParent: $('#Mmodif'),
+            });
         });
     });
 </script>
@@ -516,6 +519,56 @@
             $("#" + id).on("input", function() {
                 this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
             });
+        });
+
+        $('#contrat_id').on('change', function() {
+
+            if ($('#contrat_id option:selected').text() === 'CDI') {
+                $('#date_fin').val('');
+                $('#date_fin').prop('disabled', true);
+            }
+        });
+
+        $('#date_debut').on('change', function() {
+            const date1 = $(this).val();
+
+            if ($('#contrat_id option:selected').text() === 'CDI') {
+                $('#date_fin').val('');
+                $('#date_fin').prop('disabled', true);
+            } else {
+                if (date1) {
+                    $('#date_fin').prop('disabled', false);
+                    $('#date_fin').attr('min', date1);
+                }else{
+                    $('#date_fin').val('');
+                    $('#date_fin').prop('disabled', true);
+                }
+            }
+        });
+
+        $('#date_debutModif').on('change', function() {
+            const date1 = $(this).val();
+            
+            if ($('#contrat_idModif option:selected').text() === 'CDI') {
+                $('#date_finModif').val('');
+                $('#date_finModif').prop('disabled', true);
+            } else {
+                if (date1) {
+                    $('#date_finModif').prop('disabled', false);
+                    $('#date_finModif').attr('min', date1);
+                }else{
+                    $('#date_finModif').val('');
+                    $('#date_finModif').prop('disabled', true);
+                }
+            }
+        });
+
+        $('#contrat_idModif').on('change', function() {
+            
+            if ($('#contrat_idModif option:selected').text() === 'CDI') {
+                $('#date_finModif').val('');
+                $('#date_finModif').prop('disabled', true);
+            }
         });
 
         $("#btn_hidden_mpd").on("click", function(event) 
@@ -578,6 +631,9 @@
                 text: 'Selectionner',
             }));
 
+            const selectElement3 = $('#civilite_idModif');
+            selectElement3.empty();
+
             $.ajax({
                 url: '/api/select_civilite',
                 method: 'GET',
@@ -586,7 +642,12 @@
 
                     data.forEach(function(item) {
                         selectElement2.append($('<option>', {
-                            value: item.libelle_civilite,
+                            value: item.abreviation,
+                            text: item.libelle_civilite,
+                        }));
+
+                        selectElement3.append($('<option>', {
+                            value: item.abreviation,
                             text: item.libelle_civilite,
                         }));
                     });
@@ -606,6 +667,9 @@
                 text: 'Selectionner',
             }));
 
+            const selectElement3 = $('#service_idModif');
+            selectElement3.empty();
+
             $.ajax({
                 url: '/api/select_service',
                 method: 'GET',
@@ -614,6 +678,11 @@
 
                     data.forEach(function(item) {
                         selectElement2.append($('<option>', {
+                            value: item.code,
+                            text: item.libelle,
+                        }));
+
+                        selectElement3.append($('<option>', {
                             value: item.code,
                             text: item.libelle,
                         }));
@@ -634,6 +703,9 @@
                 text: 'Selectionner',
             }));
 
+            const selectElement3 = $('#contrat_idModif');
+            selectElement3.empty();
+
             $.ajax({
                 url: '/api/select_contrat',
                 method: 'GET',
@@ -642,6 +714,11 @@
 
                     data.forEach(function(item) {
                         selectElement2.append($('<option>', {
+                            value: item.code,
+                            text: item.libelle,
+                        }));
+
+                        selectElement3.append($('<option>', {
                             value: item.code,
                             text: item.libelle,
                         }));
@@ -859,6 +936,24 @@
                             </a>
                             <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif" 
                                 data-id="${row.id}"
+
+                                data-civilite="${row.civilite}"
+                                data-nom="${row.nom}"
+                                data-prenom="${row.prenom}"
+                                data-email="${row.email}"
+                                data-tel="${row.cel}"
+                                data-tel2="${row.contacturgence}"
+                                data-datenais="${row.datenais}"
+                                data-typepiece="${row.typepiece}"
+                                data-niveau="${row.niveau}"
+                                data-diplome="${row.diplome}"
+                                data-residence="${row.residence}"
+                                data-service_id="${row.service}"
+                                data-profil_id="${row.profil_id}"
+                                data-contrat_id="${row.typecontrat}"
+                                data-date_debut="${row.datecontrat}"
+                                data-date_fin="${row.datefincontrat}"
+                                data-login="${row.login}"
                             >
                                 <i class="ri-edit-box-line"></i>
                             </a>
@@ -899,7 +994,7 @@
                                 <div class="card-body">
                                     <div class="text-center">
                                         <a href="doctors-profile.html" class="d-flex align-items-center flex-column">
-                                            <img src="{{asset('assets/images/user7.png')}}" class="img-7x rounded-circle mb-3 border border-3">
+                                            <img src="{{asset('assets/images/user8.png')}}" class="img-7x rounded-circle mb-3 border border-3">
                                             <h5>${row.civilite}. ${row.nomprenom}</h5>
                                             <h6 class="text-truncate">+225 ${row.cel}</h6>
                                             <p>Date création : ${formatDate(row.dateenregistre)} </p>
@@ -921,6 +1016,78 @@
                                         <li class="list-group-item">
                                             Nom et Prénoms : ${row.nomprenom}
                                         </li>
+                                        <li class="list-group-item">
+                                            Email : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Téléphone : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Téléphone en cas d'urgence : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Date de Naissance : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Résidence : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Profil : 
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations intelectuelles
+                                        </li>
+                                        <li class="list-group-item">
+                                            Niveau d'étude : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Diplôme : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Profession : 
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations Contract
+                                        </li>
+                                        <li class="list-group-item">
+                                            Type de contrat : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Du : 
+                                        </li>
+                                        <li class="list-group-item">
+                                            Au : 
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations Sécurité
+                                        </li>
+                                        <li class="list-group-item">
+                                            Login : 
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -933,34 +1100,51 @@
 
             $('#Table_day').on('click', '#modif', function() {
 
-                const civilite_id = $(this).data('#civilite_id');
-                const nom = $(this).data('#nom');
-                const prenom = $(this).data('#prenom');
-                const email = $(this).data('#email');
-                const tel = $(this).data('#tel');
-                const tel2 = $(this).data('#tel2');
-                const datenais = $(this).data('#datenais');
-                const typepiece = $(this).data('#typepiece');
-                const niveau = $(this).data('#niveau');
-                const diplome = $(this).data('#diplome');
-                const residence = $(this).data('#residence');
-                const service_id = $(this).data('#service_id');
-                const profil_id = $(this).data('#profil_id');
-                const contrat_id = $(this).data('#contrat_id');
-                const date_debut = $(this).data('#date_debut');
-                const date_fin = $(this).data('#date_fin');
-                const login = $(this).data('#login');
-                const password = $(this).data('#password');
+                const id = $(this).data('id');
+                const civilite = $(this).data('civilite');
+                const nom = $(this).data('nom');
+                const prenom = $(this).data('prenom');
+                const email = $(this).data('email');
+                const tel = $(this).data('tel');
+                const tel2 = $(this).data('tel2');
+                const datenais = $(this).data('datenais');
+                const typepiece = $(this).data('typepiece');
+                const niveau = $(this).data('niveau');
+                const diplome = $(this).data('diplome');
+                const residence = $(this).data('residence');
+                const service_id = $(this).data('service_id');
+                const profil_id = $(this).data('profil_id');
+                const contrat_id = $(this).data('contrat_id');
+                const date_debut = $(this).data('date_debut');
+                const date_fin = $(this).data('date_fin');
+                const login = $(this).data('login');
+                const password = $(this).data('password');
 
                 $('#Id').val(id);
-                $('#loginModif').val(login);
-                $('#firstModif').val(first);
-                $('#lastModif').val(last);
+                $('#nomModif').val(nom);
+                $('#prenomModif').val(prenom);
                 $('#emailModif').val(email);
                 $('#telModif').val(tel);
+                $('#tel2Modif').val(tel2);
+                $('#datenaisModif').val(datenais);
+                $('#residenceModif').val(residence);
+                $('#date_debutModif').val(date_debut);
+                $('#date_finModif').val(date_fin);
+                $('#loginModif').val(login);
+                $('#passwordModif').val('');
 
-                $('#profil_idModif').val(null).trigger('change');
+                if (date_fin == null) {
+                    $('#date_finModif').val('');
+                    $('#date_finModif').prop('disabled', true);
+                }
+
+                $('#civilite_idModif').val(civilite).trigger('change');
+                $('#typepieceModif').val(typepiece).trigger('change');
                 $('#profil_idModif').val(profil_id).trigger('change');
+                $('#niveauModif').val(niveau).trigger('change');
+                $('#diplomeModif').val(diplome).trigger('change');
+                $('#service_idModif').val(service_id).trigger('change');
+                $('#contrat_idModif').val(contrat_id).trigger('change');
             });
 
             $('#Table_day').on('click', '#delete', function() {
