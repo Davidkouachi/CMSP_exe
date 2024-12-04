@@ -1,0 +1,21 @@
+email : emslp24@gmail.com
+mot de passe : EspaceSante@24.
+email recuperation : davidkouachi01@gmail.com
+tel : 0585782723
+
+
+code secours : 
+
+7393 2375
+8015 0055
+3417 2316
+5116 3247
+9564 0437
+7009 6359
+4486 8116
+1698 6000
+4345 7236
+2566 8463
+
+nom Appli : PHPMailer
+mot de passe : mdtr mqyl mvty uljl

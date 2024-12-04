@@ -1,0 +1,18 @@
+INSERT IGNORE INTO `roles` (`id`, `nom`) VALUES
+(1, 'Directeur Général'),
+(2, 'DIRECTEUR MÉDICAL '),
+(3, 'Médecin'),
+(4, 'Réception'),
+(5, 'Caisse'),
+(6, 'Pharmacie'),
+(7, 'Informatique'),
+(8, 'Laboratoire'),
+(9, 'Infirmerie'),
+(10, 'Comptabilité'),
+(11, 'Ressources Humaines'),
+(12, 'Assurance & Recouvrement'),
+(13, 'Facturation '),
+(14, 'RÉCEPTION 2'),
+(15, 'RÉCEPTION 3'),
+(16, 'RÉCEPTION 4'),
+(17, 'RÉCEPTION 5');

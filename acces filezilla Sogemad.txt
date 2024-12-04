@@ -1,0 +1,8 @@
+- Connexion au compte FTP : 
+
+Serveur FTP : ftp.sogemad.net                       
+
+Login : cp979676
+mot de passe : @Sogemad2024@
+
+Port : 21

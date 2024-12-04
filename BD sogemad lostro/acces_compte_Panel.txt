@@ -1,0 +1,5 @@
+CPANEL
+https://secure300.inmotionhosting.com:2083/
+Username: sogema5
+Password: ^Fe*qKxCIV[z
+BASE DE DONNEE : sogema5_lostro

@@ -1,0 +1,22 @@
+URL : https://api-public-2.mtarget.fr/messages?username=espacemedicosoc&password=v8h2LAkNDoB3espace@&msisdn=%2b2250585782723&msg=test+api
+
+Login : espacemedicosoc
+
+Password : v8h2LAkNDoB3espace@
+
+Serviceid : 33783
+
+Accès Portal : https://portal.mtarget.fr
+
+Login Portal : espacemsp@gmail.com
+
+---------------------------------------------------------------------
+
+URL : https://api-public-2.mtarget.fr/messages?username=espacemedicosoc&password=xxxxx&msisdn=%2b33xxxxxx&msg=test+api
+
+Login : espacemedicosoc
+
+Password : v8h2LAkNDoB3
+
+Serviceid : 33783
+
