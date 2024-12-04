@@ -57,6 +57,65 @@ use App\Models\portecaisse;
 
 class ApiinsertController extends Controller
 {
+
+    private function generateUniqueMatricule()
+    {
+        do {
+            // Generate a random 9-digit number
+            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
+        } while (patient::where('matricule', $matricule)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $matricule;
+    }
+    private function generateUniqueFacture()
+    {
+        do {
+            // Generate a random 9-digit number
+            $code = time().'_'.random_int(1000, 9999); // Generates a number between 100000000 and 999999999
+        } while (facture::where('code', $code)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $code;
+    }
+    private function formatWithPeriods($number) {
+        return number_format($number, 0, '', '.');
+    }
+    private function generateUniqueMatriculeEmploye()
+    {
+        do {
+            // Generate a random 9-digit number
+            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
+        } while (DB::table('employes')->where('matricule', '=', 'P'.$matricule)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $matricule;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function societe_new(Request $request)
     {
 
@@ -227,17 +286,6 @@ class ApiinsertController extends Controller
         } else {
             return response()->json(['error' => true]);
         }
-    }
-
-    private function generateUniqueMatricule()
-    {
-        do {
-            // Generate a random 9-digit number
-            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
-        } while (patient::where('matricule', $matricule)->exists()); // Ensure uniqueness
-
-        // Return matricule with prefix
-        return $matricule;
     }
 
     public function chambre_new(Request $request)
@@ -421,7 +469,6 @@ class ApiinsertController extends Controller
             DB::rollback();
             return response()->json(['error' => true]);
         }
-
     }
 
     public function new_consultation(Request $request)
@@ -520,18 +567,6 @@ class ApiinsertController extends Controller
             DB::rollback();
             return response()->json(['error' => true]);
         }
-
-    }
-
-    private function generateUniqueFacture()
-    {
-        do {
-            // Generate a random 9-digit number
-            $code = time().'_'.random_int(1000, 9999); // Generates a number between 100000000 and 999999999
-        } while (facture::where('code', $code)->exists()); // Ensure uniqueness
-
-        // Return matricule with prefix
-        return $code;
     }
 
     public function new_typeadmission(Request $request)
@@ -1184,10 +1219,6 @@ class ApiinsertController extends Controller
         }
     }
 
-    private function formatWithPeriods($number) {
-        return number_format($number, 0, '', '.');
-    }
-
     public function new_depot_fac(Request $request)
     {
         $date1 = Carbon::createFromFormat('Y-m-d', $request->date1)->startOfDay();
@@ -1547,59 +1578,111 @@ class ApiinsertController extends Controller
     {
         $verifications = [
             'tel' => $request->tel,
+            'tel2' => $request->tel2,
             'email' => $request->email ?? null,
         ];
 
-        $Exist = user::where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
+        $Exist = DB::table('employes')->where(function ($query) use ($verifications) {
+            $query->where('cel', $verifications['tel'])
+                  ->orWhere(function ($query) use ($verifications) {
                       if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
+                          $query->where('contacturgence', $verifications['tel2']);
                       }
                   })
-                  ->orWhere(function($query) use ($verifications) {
+                  ->orWhere(function ($query) use ($verifications) {
                       if (!is_null($verifications['email'])) {
                           $query->where('email', $verifications['email']);
                       }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['nom'])) {
-                          $query->where('name', $verifications['nom']);
-                      }
                   });
         })->first();
+
 
         if ($Exist) {
             if ($Exist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $Exist->tel2 === $verifications['tel2'])) {
                 return response()->json(['tel_existe' => true]);
             } elseif ($Exist->email === $verifications['email']) {
                 return response()->json(['email_existe' => true]);
-            } elseif ($Exist->nom === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
             }
         }
 
-        $matricule = $this->generateUniqueMatricule();
+        DB::beginTransaction();
 
-        $role = role::find($request->role_id);
+            try {
 
-        $add = new user();
-        $add->name = $request->nom;
-        $add->email = $request->email;
-        $add->sexe = $request->sexe;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->password = bcrypt($request->password);
-        $add->adresse = $request->adresse;
-        $add->matricule = $matricule;
-        $add->role_id = $role->id;
-        $add->role = $role->nom;
+                $matricule = $this->generateUniqueMatriculeEmploye();
 
-        if ($add->save()) {
-            return response()->json(['success' => true]);
-        }
+                $profil = DB::table('profile')->where('idprofile', '=', $request->profil_id)->first();
+                $service = DB::table('service')->where('code', '=', $request->service_id)->first();
 
-        return response()->json(['error' => true]);
+                if (!$profil || !$service) {
+                    throw new Exception('Profil ou Service introuvable');
+                }
+
+                $employeInserted = DB::table('employes')->insert([
+                    'matricule' => 'P'.$matricule,
+                    'typepiece' => $request->typepiece,
+                    'nopiece' => null,
+                    'civilite' => $request->civilite,
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'nomprenom' => $request->nom.' '.$request->prenom,
+                    'datenais' => $request->datenais,
+                    'profession' => $service->libelle,
+                    'niveau' => $request->niveau,
+                    'diplome' => $request->diplome,
+                    'residence' => $request->residence,
+                    'dateenregistre' => now()->format('Y-m-d'),
+                    'cel' => $request->tel,
+                    'contacturgence' => $request->tel2,
+                    'email' => $request->email,
+                    'service' => $request->service_id,
+                    'typecontrat' => $request->contrat_id,
+                    'datecontrat' => $request->date_debut,
+                    'datefincontrat' => $request->date_fin,
+                    'paye' => '0',
+
+                ]);
+
+                log::info($employeInserted);
+
+                if ($employeInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table employes');
+                }
+
+                $userInserted = DB::table('users')->insert([
+                    'api_token' => Null, 
+                    'login' => $request->login,  //Pour le login
+                    'user_first_name' => $request->nom,
+                    'user_last_name' => $request->prenom,
+                    'tel' => $request->tel,
+                    'user_profil_id' => $request->profil_id,
+                    'email' => $request->email,
+                    'password' => password_hash($request->password, PASSWORD_BCRYPT),
+                    'user_rights' => Null,
+                    'user_make_date' => Null,
+                    'user_revised_date' => Null,
+                    'user_ip' => Null,
+                    'user_history' => Null,
+                    'user_logs' => Null,
+                    'user_lang' => Null,
+                    'user_photo' => Null,
+                    'user_actif' => Null,
+                    'user_actions' => Null,
+                    'code_personnel' => 'P'.$matricule,
+                    'photo' => Null,
+                ]);
+
+                if (!$userInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table users');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
 
     }
 

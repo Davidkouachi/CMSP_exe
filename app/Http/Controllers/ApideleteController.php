@@ -292,17 +292,34 @@ class ApideleteController extends Controller
         }
     }
 
-    public function delete_user($id)
+    public function delete_user($matricule)
     {
-        $put = user::find($id);
+        DB::beginTransaction();
 
-        if ($put) {
-            if ($put->delete()) {
+            try {
+
+                $userDelete = DB::table('users')
+                                ->where('code_personnel', '=', $matricule)
+                                ->delete();
+
+                if (!$userDelete === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table users');
+                }
+
+                $employeDelete = DB::table('employes')
+                                    ->where('matricule', '=', $matricule)
+                                    ->delete();
+
+                if ($employeDelete === 0) {
+                    throw new Exception('Erreur lors de la suppression dans la table employes');
+                }
+
+                DB::commit();
                 return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
 
         return response()->json(['error' => true]);
     }

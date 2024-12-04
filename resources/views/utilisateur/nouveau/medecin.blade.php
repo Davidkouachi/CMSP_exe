@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Médecins</h5>
+                        <h6>MEDECINS</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Accueil / Configuration / Nouveau Médécin</p>
                     </div>
                 </div>
             </div>
@@ -110,7 +110,7 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Spécialité</label>
-                                                <select class="form-select select2" id="typeacte_id">
+                                                <select class="form-select select2" id="specialite_id">
                                                 </select>
                                             </div>
                                         </div>
@@ -235,7 +235,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Specialité</label>
-                        <select class="form-select select2" id="typeacte_idModif"></select>
+                        <select class="form-select select2" id="specialite_idModif"></select>
                     </div>
                 </form>
             </div>
@@ -251,7 +251,7 @@
 
 <script>
     $('#Mmodif').on('shown.bs.modal', function () {
-        $('#typeacte_idModif').select2({
+        $('#specialite_idModif').select2({
             theme: 'bootstrap',
             placeholder: 'Selectionner',
             language: {
@@ -287,21 +287,25 @@
         });
 
         function select() {
-            const $selectElement = $('#typeacte_id');
-
-            // Clear existing options
+            const $selectElement = $('#specialite_id');
             $selectElement.empty();
-
-            // Add default option
             $selectElement.append('<option value="">Sélectionner une spécialité</option>');
+
+            const $selectElement2 = $('#specialite_idModif');
 
             $.ajax({
                 url: '/api/select_specialite',
                 method: 'GET',
                 success: function(response) {
-                    const data = response.typeacte;
-                    data.forEach(typeacte => {
-                        $selectElement.append(`<option value="${typeacte.id}">${typeacte.nom}</option>`);
+                    const data = response.specialite;
+
+                    data.forEach(item => {
+                        $selectElement.append(`
+                            <option value="${item.codespecialitemed}">${item.nomspecialite}</option>
+                        `);
+                        $selectElement2.append(`
+                            <option value="${item.codespecialitemed}">${item.nomspecialite}</option>
+                        `);
                     });
                 },
                 error: function() {
@@ -311,7 +315,7 @@
         }
 
         function select_modif() {
-            const $selectElement = $('#typeacte_idModif');
+            const $selectElement = $('#specialite_idModif');
 
             // Clear existing options
             $selectElement.empty();
@@ -346,9 +350,9 @@
             const tel2 = $('#tel2');
             const sexe = $('#sexe');
             const adresse = $('#adresse');
-            const typeacte_id = $('#typeacte_id');
+            const specialite_id = $('#specialite_id');
 
-            if (!nom.val().trim() || !email.val().trim() || !tel.val().trim() || !sexe.val().trim() || !adresse.val().trim() || !typeacte_id.val().trim()) {
+            if (!nom.val().trim() || !email.val().trim() || !tel.val().trim() || !sexe.val().trim() || !adresse.val().trim() || !specialite_id.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
@@ -382,7 +386,7 @@
                     tel2: tel2.val() || null,
                     adresse: adresse.val(),
                     sexe: sexe.val(),
-                    typeacte_id: typeacte_id.val()
+                    specialite_id: specialite_id.val()
                 },
                 success: function(response) {
                     $('#preloader_ch').remove();
@@ -401,7 +405,7 @@
                         tel2.val('');
                         adresse.val('');
                         sexe.val('');
-                        typeacte_id.val('').trigger('change');
+                        specialite_id.val('').trigger('change');
                         
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
@@ -468,7 +472,7 @@
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm edit-btn" data-id="${row.id}" data-name="${row.name}" data-email="${row.email}" data-tel="${row.tel}" data-tel2="${row.tel2}" data-adresse="${row.adresse}" data-sexe="${row.sexe}" data-typeacte_id="${row.typeacte_id}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
+                            <a class="btn btn-outline-info btn-sm edit-btn" data-id="${row.id}" data-name="${row.name}" data-email="${row.email}" data-tel="${row.tel}" data-tel2="${row.tel2}" data-adresse="${row.adresse}" data-sexe="${row.sexe}" data-specialite_id="${row.specialite_id}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
                                 <i class="ri-edit-box-line"></i>
                             </a>
                             <a class="btn btn-outline-danger btn-sm delete-btn" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete">
@@ -496,7 +500,7 @@
                 const tel2 = $(this).data('tel2');
                 const adresse = $(this).data('adresse');
                 const sexe = $(this).data('sexe');
-                const typeacte_id = $(this).data('typeacte_id');
+                const specialite_id = $(this).data('specialite_id');
                 
                 $('#Id').val(id);
                 $('#nomModif').val(name);
@@ -506,8 +510,8 @@
                 $('#adresseModif').val(adresse);
                 $('#sexeModif').val(sexe);
 
-                $('#typeacte_idModif').val(null).trigger('change');
-                $('#typeacte_idModif').val(typeacte_id).trigger('change');
+                $('#specialite_idModif').val(null).trigger('change');
+                $('#specialite_idModif').val(specialite_id).trigger('change');
             });
 
             $('#Table_day').on('click', '#delete', function() {
@@ -525,10 +529,10 @@
             const tel2 = $("#tel2Modif").val().trim();
             const sexe = $("#sexeModif").val().trim();
             const adresse = $("#adresseModif").val().trim();
-            const typeacte_id = $("#typeacte_idModif").val().trim();
+            const specialite_id = $("#specialite_idModif").val().trim();
 
             // Field validation
-            if (!nom || !email || !tel || !sexe || !adresse || !typeacte_id) {
+            if (!nom || !email || !tel || !sexe || !adresse || !specialite_id) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
@@ -566,7 +570,7 @@
                     tel2: tel2 || null,
                     adresse: adresse,
                     sexe: sexe,
-                    typeacte_id: typeacte_id
+                    specialite_id: specialite_id
                 },
                 success: function(response) {
                     $("#preloader_ch").remove();

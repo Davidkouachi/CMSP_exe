@@ -289,7 +289,7 @@
             </div>
             <div class="modal-body">
                 Voulez-vous vraiment supprimé cet Utilisateur ?
-                <input type="hidden" id="Iddelete">
+                <input type="hidden" id="Matricule_del">
             </div>
             <div class="modal-footer">
                 <div class="d-flex justify-content-end gap-2">
@@ -310,7 +310,7 @@
             </div>
             <div class="modal-body">
                 <form id="updateForm">
-                    <input type="hidden" id="Id">
+                    <input type="hidden" id="Matricule_up">
                     <div class="row gx-3">
                         <div class="col-12">
                             <div class="mb-3">
@@ -460,8 +460,8 @@
                                 <label class="form-label">Mot de passe</label>
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="passwordModif" placeholder="Saisie Obligatoire" value="0000">
-                                    <a class="btn btn-white" id="btn_hidden_mpd">
-                                        <i id="toggleIcon" class="ri-eye-line text-primary"></i>
+                                    <a class="btn btn-white" id="btn_hidden_mpdModif">
+                                        <i id="toggleIconModif" class="ri-eye-line text-primary"></i>
                                     </a>
                                 </div>
                             </div>
@@ -526,6 +526,11 @@
             if ($('#contrat_id option:selected').text() === 'CDI') {
                 $('#date_fin').val('');
                 $('#date_fin').prop('disabled', true);
+            } else{
+                if ($('#date_debut').val() !== null ) {
+                    $('#date_fin').val('');
+                    $('#date_fin').prop('disabled', false);
+                }
             }
         });
 
@@ -568,7 +573,12 @@
             if ($('#contrat_idModif option:selected').text() === 'CDI') {
                 $('#date_finModif').val('');
                 $('#date_finModif').prop('disabled', true);
-            }
+            } else{
+                if ($('#date_debutModif').val() !== null ) {
+                    $('#date_finModif').val('');
+                    $('#date_finModif').prop('disabled', false);
+                }
+            } 
         });
 
         $("#btn_hidden_mpd").on("click", function(event) 
@@ -576,6 +586,21 @@
             event.preventDefault();
             const passwordField = $('#password');
             const toggleIcon = $('#toggleIcon');
+
+            if (passwordField.attr("type") === 'password') {
+                passwordField.attr("type", "text");
+                toggleIcon.removeClass('ri-eye-line').addClass('ri-eye-off-line');
+            } else {
+                passwordField.attr("type", "password");
+                toggleIcon.removeClass('ri-eye-off-line').addClass('ri-eye-line');
+            }
+        });
+
+        $("#btn_hidden_mpdModif").on("click", function(event) 
+        {
+            event.preventDefault();
+            const passwordField = $('#passwordModif');
+            const toggleIcon = $('#toggleIconModif');
 
             if (passwordField.attr("type") === 'password') {
                 passwordField.attr("type", "text");
@@ -641,15 +666,17 @@
                     const data = response.civilite;
 
                     data.forEach(function(item) {
-                        selectElement2.append($('<option>', {
-                            value: item.abreviation,
-                            text: item.libelle_civilite,
-                        }));
+                        if (item.abreviation == 'Mr' || item.abreviation == 'Mme' || item.abreviation == 'Mlle') {
+                            selectElement2.append($('<option>', {
+                                value: item.abreviation,
+                                text: item.libelle_civilite,
+                            }));
 
-                        selectElement3.append($('<option>', {
-                            value: item.abreviation,
-                            text: item.libelle_civilite,
-                        }));
+                            selectElement3.append($('<option>', {
+                                value: item.abreviation,
+                                text: item.libelle_civilite,
+                            }));
+                        }
                     });
                 },
                 error: function() {
@@ -765,9 +792,52 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function calculateDuration(date_debut) {
+            const now = new Date();
+            const startDate = new Date(date_debut);
+
+            // Si la date de début est dans le passé par rapport à aujourd'hui, retourne 0
+            if (startDate > now) {
+                return '0';
+            }
+
+            const diffTime = Math.abs(now - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
+
+            if (diffDays < 7) {
+                return `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            } else if (diffDays < 30) {
+                const weeks = Math.floor(diffDays / 7);
+                return `${weeks} semaine${weeks > 1 ? 's' : ''}`;
+            } else if (diffDays < 365) {
+                const months = Math.floor(diffDays / 30);
+                return `${months} mois`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                return `${years} an${years > 1 ? 's' : ''}`;
+            }
+        }
+
         function eng() 
         {
-            const civilite_id = $("#civilite_id");
+            const civilite = $("#civilite_id");
             const nom = $("#nom");
             const prenom = $("#prenom");
             const email = $("#email");
@@ -786,7 +856,7 @@
             const login = $("#login");
             const password = $("#password");
 
-            if (!civilite_id.val().trim() || !nom.val().trim() || !prenom.val().trim() || !email.val().trim() || !tel.val().trim() || !tel2.val().trim() || !datenais.val().trim() || !typepiece.val().trim() || !niveau.val().trim() || !diplome.val().trim() || !residence.val().trim() || !service_id.val().trim() || !profil_id.val().trim() || !contrat_id.val().trim() || !date_debut.val().trim() || !date_fin.val().trim() || !contrat_id.val().trim() || !login.val().trim() || !password.val().trim()) {
+            if (!civilite.val().trim() || !nom.val().trim() || !prenom.val().trim() || !email.val().trim() || !tel.val().trim() || !tel2.val().trim() || !datenais.val().trim() || !typepiece.val().trim() || !niveau.val().trim() || !diplome.val().trim() || !residence.val().trim() || !service_id.val().trim() || !profil_id.val().trim() || !contrat_id.val().trim() || !date_debut.val().trim() || !contrat_id.val().trim() || !login.val().trim() || !password.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
@@ -803,6 +873,11 @@
                 return false;
             }
 
+            if ($('#contrat_id option:selected').text() !== 'CDI' && !date_fin.val().trim()) {
+                showAlert('Alert', 'Veuillez vérifier les dates du contrat.', 'warning');
+                return false;
+            }
+
             // Show preloader
             const preloader_ch = `
                 <div id="preloader_ch">
@@ -816,7 +891,7 @@
                 url: '/api/new_user',
                 method: 'GET',
                 data: {
-                    civilite_id: civilite_id.val(),
+                    civilite: civilite.val(),
                     nom: nom.val(),
                     prenom: prenom.val(),
                     email: email.val(),
@@ -844,18 +919,29 @@
                         showAlert('Alert', 'Veuillez saisir autre email s\'il vous plaît', 'warning');
                     } else if (response.success) {
 
-                        first.val('');
-                        last.val('');
-                        login.val('');
-                        email.val('');
-                        tel.val('');
+                        civilite.val('').trigger('change');
+                        nom.val('')
+                        prenom.val('')
+                        email.val('')
+                        tel.val('')
+                        tel2.val('')
+                        datenais.val('')
+                        typepiece.val('').trigger('change');
+                        niveau.val('').trigger('change');
+                        diplome.val('').trigger('change');
+                        residence.val('')
+                        service_id.val('').trigger('change');
                         profil_id.val('').trigger('change');
-                        password.val('0000');
+                        contrat_id.val('').trigger('change');
+                        date_debut.val('')
+                        date_fin.val('')
+                        login.val('')
+                        password.val('0000')
 
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
+                        showAlert('Erreur', reponse.message, 'error');
                     }
                 },
                 error: function() {
@@ -931,12 +1017,29 @@
                                 data-nomprenom="${row.nomprenom}"
                                 data-cel="${row.cel}"
                                 data-matricule="${row.matricule}"
+
+                                data-email="${row.email}"
+                                data-tel="${row.cel}"
+                                data-tel2="${row.contacturgence}"
+                                data-datenais="${row.datenais}"
+                                data-residence="${row.residence}"
+                                data-profil="${row.profil}"
+
+                                data-niveau="${row.niveau}"
+                                data-diplome="${row.diplome}"
+                                data-profession="${row.profession}"
+
+                                data-contrat="${row.contrat}"
+                                data-date_debut="${row.datecontrat}"
+                                data-date_fin="${row.datefincontrat}"
+
+                                data-login="${row.login}"
+
                             >
                                 <i class="ri-eye-line"></i>
                             </a>
                             <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif" 
-                                data-id="${row.id}"
-
+                                data-matricule="${row.matricule}"
                                 data-civilite="${row.civilite}"
                                 data-nom="${row.nom}"
                                 data-prenom="${row.prenom}"
@@ -957,7 +1060,9 @@
                             >
                                 <i class="ri-edit-box-line"></i>
                             </a>
-                            <a class="btn btn-outline-danger btn-sm delete-btn" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete">
+                            <a class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete"
+                                data-matricule="${row.matricule}"
+                            >
                                 <i class="ri-delete-bin-line"></i>
                             </a>
                         </div>
@@ -981,6 +1086,23 @@
                     nomprenom: $(this).data('nomprenom'),
                     cel: $(this).data('cel'),
                     matricule: $(this).data('matricule'),
+
+                    email: $(this).data('email'),
+                    tel: $(this).data('tel'),
+                    tel2: $(this).data('tel2'),
+                    datenais: $(this).data('datenais'),
+                    residence: $(this).data('residence'),
+                    profil: $(this).data('profil'),
+
+                    niveau: $(this).data('niveau'),
+                    diplome: $(this).data('diplome'),
+                    profession: $(this).data('profession'),
+
+                    contrat: $(this).data('contrat'),
+                    date_debut: $(this).data('date_debut'),
+                    date_fin: $(this).data('date_fin'),
+
+                    login: $(this).data('login'),
                 };
 
                 const modal = document.getElementById('modal_detail');
@@ -993,7 +1115,7 @@
                             <div class=" mb-3">
                                 <div class="card-body">
                                     <div class="text-center">
-                                        <a href="doctors-profile.html" class="d-flex align-items-center flex-column">
+                                        <a class="d-flex align-items-center flex-column">
                                             <img src="{{asset('assets/images/user8.png')}}" class="img-7x rounded-circle mb-3 border border-3">
                                             <h5>${row.civilite}. ${row.nomprenom}</h5>
                                             <h6 class="text-truncate">+225 ${row.cel}</h6>
@@ -1017,22 +1139,25 @@
                                             Nom et Prénoms : ${row.nomprenom}
                                         </li>
                                         <li class="list-group-item">
-                                            Email : 
+                                            Email : ${row.email}
                                         </li>
                                         <li class="list-group-item">
-                                            Téléphone : 
+                                            Téléphone : ${row.tel}
+                                        </li>
+                                        <li class="list-group-item text-danger">
+                                            Téléphone en cas d'urgence : ${row.tel2}
                                         </li>
                                         <li class="list-group-item">
-                                            Téléphone en cas d'urgence : 
+                                            Date de Naissance : ${formatDate(row.datenais)}
                                         </li>
                                         <li class="list-group-item">
-                                            Date de Naissance : 
+                                            Âge : ${calculateAge(row.datenais)} ans
                                         </li>
                                         <li class="list-group-item">
-                                            Résidence : 
+                                            Résidence : ${row.residence}
                                         </li>
                                         <li class="list-group-item">
-                                            Profil : 
+                                            Profil : ${row.profil}
                                         </li>
                                     </ul>
                                 </div>
@@ -1043,16 +1168,16 @@
                                 <div class="card-body">
                                     <ul class="list-group">
                                         <li class="list-group-item active text-center" aria-current="true">
-                                            Informations intelectuelles
+                                            Parcours académique
                                         </li>
                                         <li class="list-group-item">
-                                            Niveau d'étude : 
+                                            Niveau d'étude : ${row.niveau}
                                         </li>
                                         <li class="list-group-item">
-                                            Diplôme : 
+                                            Diplôme : ${row.diplome}
                                         </li>
                                         <li class="list-group-item">
-                                            Profession : 
+                                            Profession : ${row.profession}
                                         </li>
                                     </ul>
                                 </div>
@@ -1066,13 +1191,23 @@
                                             Informations Contract
                                         </li>
                                         <li class="list-group-item">
-                                            Type de contrat : 
+                                            Type de contrat : ${row.contrat}
                                         </li>
+                                        ${row.date_fin != null ? `
+                                            <li class="list-group-item">
+                                                Du : ${formatDate(row.date_debut)}
+                                            </li>
+                                            <li class="list-group-item">
+                                                Au :  ${formatDate(row.date_fin)}
+                                            </li>
+                                        ` : 
+                                        `
+                                            <li class="list-group-item">
+                                                Depuis Le : ${formatDate(row.date_debut)}
+                                            </li>
+                                        ` }
                                         <li class="list-group-item">
-                                            Du : 
-                                        </li>
-                                        <li class="list-group-item">
-                                            Au : 
+                                            Temps passés : ${calculateDuration(row.date_debut)}
                                         </li>
                                     </ul>
                                 </div>
@@ -1086,7 +1221,7 @@
                                             Informations Sécurité
                                         </li>
                                         <li class="list-group-item">
-                                            Login : 
+                                            Login : ${row.login}
                                         </li>
                                     </ul>
                                 </div>
@@ -1100,7 +1235,7 @@
 
             $('#Table_day').on('click', '#modif', function() {
 
-                const id = $(this).data('id');
+                const matricule = $(this).data('matricule');
                 const civilite = $(this).data('civilite');
                 const nom = $(this).data('nom');
                 const prenom = $(this).data('prenom');
@@ -1120,7 +1255,7 @@
                 const login = $(this).data('login');
                 const password = $(this).data('password');
 
-                $('#Id').val(id);
+                $('#Matricule_up').val(matricule);
                 $('#nomModif').val(nom);
                 $('#prenomModif').val(prenom);
                 $('#emailModif').val(email);
@@ -1148,42 +1283,56 @@
             });
 
             $('#Table_day').on('click', '#delete', function() {
-                const id = $(this).data('id');
+                const matricule = $(this).data('matricule');
                 // Handle the 'Delete' button click
-                $('#Iddelete').val(id);
+                $('#Matricule_del').val(matricule);
             });
         }
 
         function updatee() 
         {
 
-            const id = $('#Id').val().trim();
-            const nom = $('#nomModif').val().trim();
-            const email = $('#emailModif').val().trim();
-            const tel = $('#telModif').val().trim();
-            const tel2 = $('#tel2Modif').val().trim();
-            const sexe = $('#sexeModif').val().trim();
-            const adresse = $('#adresseModif').val().trim();
-            const role_id = $('#role_idModif').val().trim();
+            const matricule = $('#Matricule_up').val().trim();
+            const civilite = $("#civilite_idModif");
+            const nom = $("#nomModif");
+            const prenom = $("#prenomModif");
+            const email = $("#emailModif");
+            const tel = $("#telModif");
+            const tel2 = $("#tel2Modif");
+            const datenais = $("#datenaisModif");
+            const typepiece = $("#typepieceModif");
+            const niveau = $("#niveauModif");
+            const diplome = $("#diplomeModif");
+            const residence = $("#residenceModif");
+            const service_id = $("#service_idModif");
+            const profil_id = $("#profil_idModif");
+            const contrat_id = $("#contrat_idModif");
+            const date_debut = $("#date_debutModif");
+            const date_fin = $("#date_finModif");
+            const login = $("#loginModif");
+            const password = $("#passwordModif");
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            // Field validation
-            if (!nom || !email || !tel || !sexe || !adresse) {
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
+            if (!civilite.val().trim() || !nom.val().trim() || !prenom.val().trim() || !email.val().trim() || !tel.val().trim() || !tel2.val().trim() || !datenais.val().trim() || !typepiece.val().trim() || !niveau.val().trim() || !diplome.val().trim() || !residence.val().trim() || !service_id.val().trim() || !profil_id.val().trim() || !contrat_id.val().trim() || !date_debut.val().trim() || !contrat_id.val().trim() || !login.val().trim()) {
+                showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
             // Email validation
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showAlert('Alert', 'Email incorrect.','warning');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email.val().trim() && !emailRegex.test(email.val().trim())) { 
+                showAlert('Alert', 'Email incorrect.', 'warning');
                 return false;
             }
 
-            // Phone validation
-            if (tel.length !== 10 || (tel2 && tel2.length !== 10)) {
+            if (tel.val().length !== 10 || tel2.val().length !== 10) {
                 showAlert('Alert', 'Contact incomplet.', 'warning');
+                return false;
+            }
+
+            if ($('#contrat_idModif option:selected').text() !== 'CDI' && !date_fin.val().trim()) {
+                showAlert('Alert', 'Veuillez vérifier les dates du contrat.', 'warning');
                 return false;
             }
 
@@ -1207,19 +1356,30 @@
                     // console.log("Nouveau token CSRF:", response_crsf.csrf_token);
 
                     $.ajax({
-                        url: '/api/update_user/' + id,
+                        url: '/api/update_user/' + matricule,
                         method: 'PUT',
                         headers: {
                             'X-CSRF-TOKEN': response_crsf.csrf_token,
                         },
                         data: {
-                            nom: nom, 
-                            email: email, 
-                            tel: tel, 
-                            tel2: tel2 || null, 
-                            adresse: adresse || null, 
-                            sexe: sexe, 
-                            role_id: role_id,
+                            civilite: civilite.val(),
+                            nom: nom.val(),
+                            prenom: prenom.val(),
+                            email: email.val(),
+                            tel: tel.val(),
+                            tel2: tel2.val(),
+                            datenais: datenais.val(),
+                            typepiece: typepiece.val(),
+                            niveau: niveau.val(),
+                            diplome: diplome.val(),
+                            residence: residence.val(),
+                            service_id: service_id.val(),
+                            profil_id: profil_id.val(),
+                            contrat_id: contrat_id.val(),
+                            date_debut: date_debut.val(),
+                            date_fin: date_fin.val() || null,
+                            login: login.val(),
+                            password: password.val() || null,
                         },
                         success: function(response) {
 
@@ -1233,11 +1393,7 @@
 
                                 showAlert('Alert', 'Veuillez saisir autre email s\'il vous plaît','warning');
 
-                            }else if (response.nom_existe) {
-
-                                showAlert('Alert', 'Cet Utilisateur existe déjà.','warning');
-
-                            } else if (response.success) {
+                            }  else if (response.success) {
 
                                 $('#Table_day').DataTable().ajax.reload();
 
@@ -1267,7 +1423,7 @@
         function deletee() 
         {
 
-            const id = $('#Iddelete').val();
+            const matricule = $('#Matricule_del').val();
 
             var modal = bootstrap.Modal.getInstance($('#Mdelete')[0]);
             modal.hide();
@@ -1281,7 +1437,7 @@
             $('body').append(preloader_ch);
 
             $.ajax({
-                url: '/api/delete_user/' + id,
+                url: '/api/delete_user/' + matricule,
                 method: 'GET',  // Use 'POST' for data creation
                 success: function(response) {
                     $('#preloader_ch').remove(); // Remove preloader

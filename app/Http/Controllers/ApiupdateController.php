@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 use App\Models\assurance;
 use App\Models\taux;
@@ -51,9 +52,53 @@ use App\Models\depotfacture;
 
 class ApiupdateController extends Controller
 {
+    private function generateUniqueMatricule()
+    {
+        do {
+            // Generate a random 9-digit number
+            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
+        } while (patient::where('matricule', $matricule)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $matricule;
+    }
+    private function generateUniqueFacture()
+    {
+        do {
+            // Generate a random 9-digit number
+            $code = time().'_'.random_int(1000, 9999); // Generates a number between 100000000 and 999999999
+        } while (facture::where('code', $code)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $code;
+    }
     private function formatWithPeriods($number) {
         return number_format($number, 0, '', '.');
     }
+    private function generateUniqueMatriculeEmploye()
+    {
+        do {
+            // Generate a random 9-digit number
+            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
+        } while (DB::table('employes')->where('matricule', '=', 'P'.$matricule)->exists()); // Ensure uniqueness
+
+        // Return matricule with prefix
+        return $matricule;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function update_chambre(Request $request, $id)
     {
@@ -558,34 +603,27 @@ class ApiupdateController extends Controller
         return response()->json(['error' => true]);
     }
 
-    public function update_user(Request $request, $id)
+    public function update_user(Request $request, $matricule)
     {
         $verifications = [
             'tel' => $request->tel,
             'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
             'email' => $request->email ?? null,
-            'nom' => $request->nom,
         ];
 
-        // Check if the user exists except for the current user being updated
-        $Exist = user::where(function($query) use ($verifications) {
-                $query->where('tel', $verifications['tel'])
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['tel2'])) {
-                              $query->where('tel2', $verifications['tel2']);
-                          }
-                      })
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['email'])) {
-                              $query->where('email', $verifications['email']);
-                          }
-                      })
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['nom'])) {
-                              $query->where('name', $verifications['nom']);
-                          }
-                      });
-            })->where('id', '!=', $id)->first();
+        $Exist = DB::table('employes')->where(function ($query) use ($verifications) {
+            $query->where('cel', $verifications['tel'])
+                  ->orWhere(function ($query) use ($verifications) {
+                      if (!is_null($verifications['tel2'])) {
+                          $query->where('contacturgence', $verifications['tel2']);
+                      }
+                  })
+                  ->orWhere(function ($query) use ($verifications) {
+                      if (!is_null($verifications['email'])) {
+                          $query->where('email', $verifications['email']);
+                      }
+                  });
+        })->where('matricule', '!=', $matricule)->first();
 
         // Return appropriate response based on existing data
         if ($Exist) {
@@ -593,40 +631,78 @@ class ApiupdateController extends Controller
                 return response()->json(['tel_existe' => true]);
             } elseif ($Exist->email === $verifications['email']) {
                 return response()->json(['email_existe' => true]);
-            } elseif ($Exist->name === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
             }
         }
 
         DB::beginTransaction();
 
-        try {
-            $role = role::find($request->role_id);
-            // Update the user
-            $user = user::find($id);
-            $user->name = $request->nom;
-            $user->email = $request->email;
-            $user->sexe = $request->sexe;
-            $user->tel = $request->tel;
-            $user->tel2 = $request->tel2;
-            $user->adresse = $request->adresse;
-            $user->role_id = $role->id;
-            $user->role = $role->nom;
+            try {
 
-            if (!$user->save()) {
-                throw new \Exception('Erreur lors de la mise à jour de l\'utilisateur.');
+                $profil = DB::table('profile')->where('idprofile', '=', $request->profil_id)->first();
+                $service = DB::table('service')->where('code', '=', $request->service_id)->first();
+
+                if (!$profil || !$service) {
+                    throw new Exception('Profil ou Service introuvable');
+                }
+
+                $updateData_employes =[
+                    'typepiece' => $request->typepiece,
+                    'civilite' => $request->civilite,
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'nomprenom' => $request->nom.' '.$request->prenom,
+                    'datenais' => $request->datenais,
+                    'profession' => $service->libelle,
+                    'niveau' => $request->niveau,
+                    'diplome' => $request->diplome,
+                    'residence' => $request->residence,
+                    'cel' => $request->tel,
+                    'contacturgence' => $request->tel2,
+                    'email' => $request->email,
+                    'service' => $request->service_id,
+                    'typecontrat' => $request->contrat_id,
+                    'datecontrat' => $request->date_debut,
+                    'datefincontrat' => $request->date_fin,
+                ];
+
+                $employeUpdate = DB::table('employes')
+                                    ->where('matricule', '=', $matricule)
+                                    ->update($updateData_employes);
+
+                if ($employeUpdate === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table employes');
+                }
+
+                $updateData_users = [
+                    'login' => $request->login,  // Pour le login
+                    'user_first_name' => $request->nom,
+                    'user_last_name' => $request->prenom,
+                    'tel' => $request->tel,
+                    'user_profil_id' => $request->profil_id,
+                    'email' => $request->email,
+                ];
+
+                if ($request->password !== null) {
+                    $updateData_users['password'] = password_hash($request->password, PASSWORD_BCRYPT);
+                }
+
+                $userDelete = DB::table('users')
+                                ->where('code_personnel', '=', $matricule)
+                                ->update($updateData_users);
+
+                if (!$userDelete === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table users');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-
-            DB::commit();
-            return response()->json(['success' => true]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => true, 'message' => $e->getMessage()]);
-        }
     }
-
-    public function update_mdp(Request $request, $id)
+    public function update_mdp(Request $request, $matricule)
     {
         $put = user::find($id);
 

@@ -1011,7 +1011,8 @@ class ApilistController extends Controller
     {
         $users = DB::table('employes')
             ->join('users', 'users.code_personnel', '=', 'employes.matricule')
-            ->select('employes.*','users.user_profil_id as user_profil_id','users.login as login')
+            ->join('contrat', 'contrat.code', '=', 'employes.typecontrat')
+            ->select('employes.*','contrat.libelle as contrat','users.user_profil_id as user_profil_id','users.login as login')
             ->orderBy('employes.dateenregistre', 'desc')
             ->get();
 

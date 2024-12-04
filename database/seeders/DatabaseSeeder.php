@@ -100,14 +100,15 @@ class DatabaseSeeder extends Seeder
         $profil = DB::table('profile')->where('libprofile', 'RÉCEPTION 2')->first();
 
         $user = DB::table('users')->insert([
-                    'user_username' => 'TEST',  //Pour le login
+                    'api_token' => Null, 
+                    'login' => 'TEST',  //Pour le login
                     'user_first_name' => 'Test',
                     'user_last_name' => 'test',
-                    'user_phone' => Null,
+                    'tel' => Null,
                     'user_profil_id' => $profil->idprofile,
-                    'user_email' => 'test@gmail.com',
-                    'user_password' => password_hash('0000', PASSWORD_BCRYPT),
-                    'user_rights' => 'SuperAdmin',
+                    'email' => 'test@gmail.com',
+                    'password' => password_hash('0000', PASSWORD_BCRYPT),
+                    'user_rights' => Null,
                     'user_make_date' => Null,
                     'user_revised_date' => Null,
                     'user_ip' => Null,
@@ -115,8 +116,8 @@ class DatabaseSeeder extends Seeder
                     'user_logs' => Null,
                     'user_lang' => Null,
                     'user_photo' => Null,
-                    'user_actif' => '0',
-                    'user_actions' => '0',
+                    'user_actif' => Null,
+                    'user_actions' => Null,
                     'code_personnel' => Null,
                     'photo' => Null,
                 ]);

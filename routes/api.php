@@ -31,8 +31,8 @@ Route::middleware(['web'])->group(function () {
 	// Login debut
 
 	// update debut
-	Route::put('/update_user/{id}', [ApiupdateController::class, 'update_user']);
-	Route::put('/update_mdp/{id}', [ApiupdateController::class, 'update_mdp']);
+	Route::put('/update_user/{matricule}', [ApiupdateController::class, 'update_user']);
+	Route::put('/update_mdp/{matricule}', [ApiupdateController::class, 'update_mdp']);
 	// update fin
 });
 
@@ -154,7 +154,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/delete_specialite/{id}', [ApideleteController::class, 'delete_specialite']);
 	Route::get('/delete_depotfacture/{id}', [ApideleteController::class, 'delete_depotfacture']);
 	Route::get('/delete_Cons/{id}', [ApideleteController::class, 'delete_Cons']);
-	Route::get('/delete_user/{id}', [ApideleteController::class, 'delete_user']);
+	Route::get('/delete_user/{matricule}', [ApideleteController::class, 'delete_user']);
 	// delete debut
 
 	// liste debut

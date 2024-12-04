@@ -153,11 +153,9 @@ class ApisearchController extends Controller
 
     public function select_specialite()
     {
-        $acte = acte::where('nom', '=', 'CONSULTATION')->first();
+        $specialite = DB::table('specialitemed')->get();
 
-        $typeacte = typeacte::where('acte_id', '=', $acte->id )->select('id','nom')->get();
-
-        return response()->json(['typeacte' => $typeacte]); 
+        return response()->json(['specialite' => $specialite]); 
     }
 
     public function select_typeacte($id)
