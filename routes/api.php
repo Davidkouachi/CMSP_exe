@@ -42,6 +42,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/taux_select_patient_new', [ApiController::class, 'taux_select_patient_new']);
 	Route::get('/societe_select_patient_new', [ApiController::class, 'societe_select_patient_new']);
 	Route::get('/assurance_select_patient_new', [ApiController::class, 'assurance_select_patient_new']);
+	Route::get('/filiation_select_patient_new', [ApiController::class, 'filiation_select_patient_new']);
 	Route::get('/select_medecin', [ApiController::class, 'select_medecin']);
 	Route::get('/select_assureur', [ApiController::class, 'select_assureur']);
 	// recherche fin

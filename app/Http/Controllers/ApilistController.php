@@ -304,26 +304,38 @@ class ApilistController extends Controller
     public function list_patient_all()
     {
 
-        $patient = patient::leftJoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-                       ->leftJoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-                       ->leftJoin('societes', 'societes.id', '=', 'patients.societe_id')
-                       ->select(
-                            'patients.*', 
-                            'assurances.nom as assurance', 
-                            'tauxes.taux as taux', 
-                            'societes.nom as societe')
-                       ->orderBy('patients.created_at', 'desc')
-                       ->get();
+        $patients = DB::table('patient')
+            ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->leftJoin('filiation', 'patient.codefiliation', '=', 'filiation.codefiliation')
+            ->select(
+                'patient.*', 
+                'societeassure.nomsocieteassure as societe',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+                'filiation.libellefiliation as filiation',
+            )
+            ->get();
 
-        foreach ($patient as $value) {
-            $value->age = $value->datenais ? Carbon::parse($value->datenais)->age : 0;
+        foreach ($patients as $value) {
+            $dossierC = DB::table('dossierpatient')
+                ->where('idenregistremetpatient', '=', $value->idenregistremetpatient)
+                ->where('codetypedossier', '=', 'DC')
+                ->first();
 
-            $value->nbre_hos = detailhopital::where('patient_id', '=', $value->id)->count() ?: 0;
-            $value->nbre_cons = consultation::where('patient_id', '=', $value->id)->count() ?: 0;
+            $value->dossierDC = $dossierC->numdossier ?? null;
+
+            $dossierH= DB::table('dossierpatient')
+                ->where('idenregistremetpatient', '=', $value->idenregistremetpatient)
+                ->where('codetypedossier', '=', 'DH')
+                ->first();
+
+            $value->dossierDH = $dossierH->numdossier ?? null;
         }
 
         return response()->json([
-            'data' => $patient,
+            'data' => $patients,
         ]);
     }
 

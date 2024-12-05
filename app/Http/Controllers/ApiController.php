@@ -26,14 +26,17 @@ class ApiController extends Controller
 {
     public function taux_select_patient_new()
     {
-        $taux = taux::select('id','taux')->get(); // Récupère toutes les assurances
-        return response()->json($taux);
+        $taux = DB::table('tauxcouvertureassure')->select('idtauxcouv','valeurtaux')->orderBy('valeurtaux', 'asc')->get();
+
+        return response()->json(['taux' => $taux]); 
     }
 
     public function societe_select_patient_new()
     {
-        $societe = societe::select('id','nom')->get(); // Récupère toutes les assurances
-        return response()->json($societe);
+        $societe = DB::table('societeassure')->select('codesocieteassure','nomsocieteassure')->get();
+
+        return response()->json(['societe' => $societe]); 
+
     }
 
     public function assurance_select_patient_new()
@@ -41,6 +44,13 @@ class ApiController extends Controller
         $assurance = DB::table('assurance')->where('codeassurance', '!=', 'NONAS')->select('codeassurance','libelleassurance')->get();
 
         return response()->json(['assurance' => $assurance]); 
+    }
+
+    public function filiation_select_patient_new()
+    {
+        $filiation = DB::table('filiation')->select('codefiliation','libellefiliation')->get();
+
+        return response()->json(['filiation' => $filiation]); 
     }
 
     public function select_medecin()

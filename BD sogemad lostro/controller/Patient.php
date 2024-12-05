@@ -112,6 +112,7 @@ class Patient extends Admin_Controller {
     {
 		if(!empty($_POST))
 		{
+			
 			$nom = $this->input->post('nomPatient');
 			$prenoms = $this->input->post('prenomsPatient');
 			

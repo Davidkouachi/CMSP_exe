@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body " style="background: rgba(0, 0, 0, 0.7);" >
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Patients.</h5>
+                        <h6>PATIENTS</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Récéption / Patients</p>
                     </div>
                 </div>
             </div>
@@ -91,12 +91,31 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="card-body" >
+                                <div class="card-body border border-1 rounded-2 mb-3">
                                     <div class="row gx-3">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">Informations personnelles</h5>
+                                        </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Nom et Prénoms</label>
-                                                <input type="text" class="form-control" id="patient_np_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                <label class="form-label">Sexe</label>
+                                                <select class="form-select select2" id="patient_sexe_new">
+                                                    <option value=""></option>
+                                                    <option value="H">Homme</option>
+                                                    <option value="F">Femme</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="patient_nom_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Prénoms</label>
+                                                <input type="text" class="form-control" id="patient_prenom_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -104,13 +123,7 @@
                                                 <label class="form-label">
                                                     Date de naissance
                                                 </label>
-                                                <input type="date" class="form-control" placeholder="Selectionner une date" id="patient_datenaiss_new">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" id="patient_email_new" placeholder="facultatif">
+                                                <input type="date" class="form-control" placeholder="Selectionner une date" id="patient_datenaiss_new" max="{{ date('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -127,48 +140,39 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Adresse</label>
-                                                <input type="text" class="form-control" id="patient_adresse_new" placeholder="facultatif">
+                                                <label class="form-label">Résidence</label>
+                                                <input type="text" class="form-control" id="patient_residence_new" placeholder="Saisie obligatoire">
                                             </div>
                                         </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Sexe</label>
-                                                <select class="form-select" id="patient_sexe_new">
-                                                    <option value="">Selectionner</option>
-                                                    <option value="Mr">Homme</option>
-                                                    <option value="Mme">Femme</option>
-                                                </select>
-                                            </div>
+                                    </div>
+                                </div>
+                                <div class="card-body border border-1 rounded-2 mb-3">
+                                    <div class="row gx-3 align-items-center justify-content-center">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">Informations Assurance</h5>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Assurer</label>
-                                                <select class="form-select" id="assurer">
-                                                    <option selected value="non">Non</option>
-                                                    <option value="oui">Oui</option>
+                                                <select class="form-select" id="assure">
+                                                    <option value="">Selectionner</option>
+                                                    <option value="0">Non</option>
+                                                    <option value="1">Oui</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="row gx-3" id="div_assurer" style="display: none;">
-                                            <div class="card-header">
-                                                <h5 class="card-title text-center">Informations Assurance</h5>
-                                            </div>
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Filiation</label>
-                                                    <select class="form-select" id="patient_filiation_new">
-                                                        <option value="">Selectionner</option>
-                                                        <option value="Adhérent(e)">Adhérent(e)</option>
-                                                        <option value="Bénéficiaire">Bénéficiaire</option>
-                                                        <option value="Conjoint(e)">Conjoint(e)</option>
+                                                    <select class="form-select select2" id="patient_codefiliation_new">
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Assurance</label>
-                                                    <select class="form-select select2" id="patient_assurance_id_new">
+                                                    <select class="form-select select2" id="patient_codeassurance_new">
                                                     </select>
                                                 </div>
                                             </div>
@@ -181,7 +185,7 @@
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Taux</label>
-                                                    <select class="form-select select2" id="patient_taux_id_new">
+                                                    <select class="form-select select2" id="patient_idtauxcouv_new">
                                                         <option value="">Sélectionner un taux</option>
                                                     </select>
                                                 </div>
@@ -189,11 +193,40 @@
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Société</label>
-                                                    <select class="form-select select2" id="patient_societe_id_new">
+                                                    <select class="form-select select2" id="patient_codesocieteassure_new">
                                                     </select>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="card-body border border-1 rounded-2 mb-3">
+                                    <div class="row gx-3">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">En Cas d'urgence</h5>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="patient_nomu_new" placeholder="facultatif" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Contact</label>
+                                                <input type="tel" class="form-control" id="patient_telu_new" placeholder="facultatif" maxlength="10">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Contact 2</label>
+                                                <input type="tel" class="form-control" id="patient_telu2_new" placeholder="facultatif" maxlength="10">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body mb-3">
+                                    <div class="row gx-3">
                                         <div class="col-sm-12 mb-3">
                                             <div class="d-flex gap-2 justify-content-center">
                                                 <button id="btn_eng_patient" class="btn btn-success">
@@ -209,9 +242,11 @@
                                     <h5 class="card-title">
                                         Liste des Patients
                                     </h5>
-                                    {{-- <div class="d-flex">
-                                        <input type="text" id="searchInputP" placeholder="Recherche" class="form-control me-1">
-                                    </div> --}}
+                                    <div class="d-flex">
+                                        <a id="btn_refresh_table" class="btn btn-outline-info ms-auto">
+                                            <i class="ri-loop-left-line"></i>
+                                        </a>
+                                    </div>
                                 </div>
                                 {{-- <div class="card-header d-flex align-items-center justify-content-between">
                                     <div class="w-100">
@@ -237,7 +272,7 @@
                                     </div>
                                     <div class="">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover table-sm">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
@@ -260,7 +295,7 @@
                             </div>
                             <div class="tab-pane fade" id="twoRech" role="tabpanel" aria-labelledby="tab-twoRech">
                                 <div class="row gx-3">
-                                    <div class="row gx-3 justify-content-center align-items-center" >
+                                    {{-- <div class="row gx-3 justify-content-center align-items-center" >
                                         <div class="col-xxl-4 col-lg-4 col-sm-6">
                                             <div class=" mb-1">
                                                 <div class="card-body">
@@ -278,6 +313,14 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-12 mt-5" id="div_info_patient" style="margin-bottom: 120px;">
+                                    </div> --}}
+                                    <div class="error-container">
+                                        <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
+                                        <h5 class="fw-light mb-4">
+                                            Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
+                                            <br>
+                                            Merci de votre patience !
+                                        </h5>
                                     </div>
                                 </div>
                             </div>
@@ -527,47 +570,86 @@
             </div>
             <div class="modal-body">
                 <form id="updateForm">
-                    <input type="hidden" id="patient_idM">
-                    <div class="mb-3">
-                        <label class="form-label">Nom et Prenoms</label>
-                        <input type="text" class="form-control" id="nameM" placeholder="Saisie Obligatoire">
+                    <input type="hidden" id="MatriculeModif">
+                    <div class="card-body border border-1 rounded-2 mb-3 p-2">
+                        <div class="row gx-3">
+                            <div class="card-header">
+                                <h5 class="card-title text-center">Informations personnelles</h5>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Sexe</label>
+                                    <select class="form-select select2" id="patient_sexe_Modif">
+                                        <option value=""></option>
+                                        <option value="H">Homme</option>
+                                        <option value="F">Femme</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="patient_nom_Modif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Prénoms</label>
+                                    <input type="text" class="form-control" id="patient_prenom_Modif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Date de naissance
+                                    </label>
+                                    <input type="date" class="form-control" placeholder="Selectionner une date" id="patient_datenaiss_Modif" max="{{ date('Y-m-d') }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Contact</label>
+                                    <input type="tel" class="form-control" id="patient_tel_Modif" placeholder="Saisie Obligatoire" maxlength="10">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Contact 2</label>
+                                    <input type="tel" class="form-control" id="patient_tel2_Modif" placeholder="facultatif" maxlength="10">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Résidence</label>
+                                    <input type="text" class="form-control" id="patient_residence_Modif" placeholder="Saisie obligatoire">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Sexe</label>
-                        <select class="form-select" id="sexeM">
-                            <option value="Mr">Homme</option>
-                            <option value="Mme">Femme</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailM" placeholder="facultatif">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact 1</label>
-                        <input type="tel" class="form-control" id="telM" placeholder="Saisie Obligatoire" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact 2</label>
-                        <input type="tel" class="form-control" id="tel2M" placeholder="facultatif" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">
-                            Date de naissance
-                        </label>
-                        <input type="date" class="form-control" placeholder="Selectionner une date" id="datenaisM" max="{{ date('Y-m-d') }}">
-                    </div>
-                    <div class="mb-3" id="div_filiationM" style="display: none;">
-                        <label class="form-label">Filiation</label>
-                        <select class="form-select" id="filiationM">
-                            <option value="Adhérent(e)">Adhérent(e)</option>
-                            <option value="Bénéficiaire">Bénéficiaire</option>
-                            <option value="Conjoint(e)">Conjoint(e)</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse</label>
-                        <input type="text" class="form-control" id="adresseM" placeholder="facultatif">
+                    <div class="card-body border border-1 rounded-2 mb-3 p-2">
+                        <div class="row gx-3">
+                            <div class="card-header">
+                                <h5 class="card-title text-center">En Cas d'urgence</h5>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="patient_nomu_Modif" placeholder="facultatif" oninput="this.value = this.value.toUpperCase()">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Contact</label>
+                                    <input type="tel" class="form-control" id="patient_telu_Modif" placeholder="facultatif" maxlength="10">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Contact 2</label>
+                                    <input type="tel" class="form-control" id="patient_telu2_Modif" placeholder="facultatif" maxlength="10">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -586,12 +668,32 @@
 @include('select2')
 
 <script>
+    $('#ModifP').on('shown.bs.modal', function () {
+        var select = ['#patient_sexe_Modif'];
+        select.forEach(function(id) {
+            $(id).select2({
+                theme: 'bootstrap',
+                placeholder: 'Selectionner',
+                language: {
+                    noResults: function() {
+                        return "Aucun résultat trouvé";
+                    }
+                },
+                width: '100%',
+                dropdownParent: $('#ModifP'),
+            });
+        });
+    });
+</script>
+
+<script>
     $(document).ready(function() {
 
-        select_taux();
+        select_taux_patient();
         select_societe_patient();
         select_assurance_patient();
-        select_patient();
+        select_filiation_patient();
+        // select_patient();
 
         $("#btn_eng_patient").on("click", eng_patient);
         $("#btn_eng_modif").on("click", eng_patient_modif);
@@ -600,24 +702,24 @@
             $('#Table_day').DataTable().ajax.reload(null, false);
         });
 
-        $('#btn_affiche_stat').on('click', function() {
-            $('#div_btn_affiche_stat').hide(); // Masque le bouton d'affichage
-            $('#div_btn_cache_stat').show();  // Affiche le bouton de cache
-            Statistique(); // Appelle la fonction Statistique
-        });
+        // $('#btn_affiche_stat').on('click', function() {
+        //     $('#div_btn_affiche_stat').hide(); // Masque le bouton d'affichage
+        //     $('#div_btn_cache_stat').show();  // Affiche le bouton de cache
+        //     Statistique(); // Appelle la fonction Statistique
+        // });
 
-        $('#btn_cache_stat').on('click', function() {
-            $('#div_btn_affiche_stat').show(); // Affiche le bouton d'affichage
-            $('#div_btn_cache_stat').hide();  // Masque le bouton de cache
-            $('#stat').empty(); // Vide le contenu de l'élément avec l'ID "stat"
-        });
+        // $('#btn_cache_stat').on('click', function() {
+        //     $('#div_btn_affiche_stat').show(); // Affiche le bouton d'affichage
+        //     $('#div_btn_cache_stat').hide();  // Masque le bouton de cache
+        //     $('#stat').empty(); // Vide le contenu de l'élément avec l'ID "stat"
+        // });
 
-        $('#patient_id').on('change', function() {
-            const id = $(this).val();
-            rech_dosier(id);
-        });
+        // $('#patient_id').on('change', function() {
+        //     const id = $(this).val();
+        //     rech_dosier(id);
+        // });
 
-        var inputs = ['patient_tel_new', 'patient_tel2_new','telM','tel2M']; // Array of element IDs
+        var inputs = ['patient_tel_new', 'patient_tel2_new', 'patient_telu_new', 'patient_telu2_new']; // Array of element IDs
         inputs.forEach(function(id) {
             var inputElement = document.getElementById(id); // Get each element by its ID
 
@@ -636,13 +738,38 @@
             });
         });
 
-        $('#assurer').on('change', function() {
-            if ($(this).val() === 'oui') {
+        $('#assure').on('change', function() {
+            if ($(this).val() === '1') {
                 $('#div_assurer').css('display', 'flex');
             } else {
                 $('#div_assurer').css('display', 'none');
             }
         });
+
+        function formatDate(dateString) {
+
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+        }
+
+        function formatDateHeure(dateString) {
+
+            const date = new Date(dateString);
+                
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
+        }
 
         function formatPrice(price) {
 
@@ -666,6 +793,49 @@
 
             // Format the number with dot as thousands separator
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function calculateDuration(date_debut) {
+            const now = new Date();
+            const startDate = new Date(date_debut);
+
+            // Si la date de début est dans le passé par rapport à aujourd'hui, retourne 0
+            if (startDate > now) {
+                return '0';
+            }
+
+            const diffTime = Math.abs(now - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
+
+            if (diffDays < 7) {
+                return `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            } else if (diffDays < 30) {
+                const weeks = Math.floor(diffDays / 7);
+                return `${weeks} semaine${weeks > 1 ? 's' : ''}`;
+            } else if (diffDays < 365) {
+                const months = Math.floor(diffDays / 30);
+                return `${months} mois`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                return `${years} an${years > 1 ? 's' : ''}`;
+            }
         }
 
         function addGroup(data) {
@@ -772,213 +942,259 @@
             });
         }
 
-        function select_taux()
+        // function select_patient()
+        // {
+        //     const selectElement = document.getElementById('patient_id');
+        //     selectElement.innerHTML = '';
+        //     const defaultOption = document.createElement('option');
+        //     defaultOption.value = '';
+        //     defaultOption.textContent = 'Selectionner';
+        //     selectElement.appendChild(defaultOption);
+
+        //     if (selectElement) {
+
+        //         fetch('/api/name_patient_reception')
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 data.name.forEach(item => {
+        //                     const option = document.createElement('option');
+        //                     option.value = item.id; // Assure-toi que 'id' est la clé correcte
+        //                     option.textContent = item.np; // Assure-toi que 'nom' est la clé correcte
+        //                     selectElement.appendChild(option);
+        //                 });
+        //             })
+        //             .catch(error => console.error('Erreur lors du chargement des patients:', error));
+        //     }
+        // }
+
+        function select_assurance_patient() 
         {
-            const selectElement = document.getElementById('patient_taux_id_new');
-            selectElement.innerHTML = '';
+            const selectElement2 = $('#patient_codeassurance_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner un taux';
-            selectElement.appendChild(defaultOption);
-            // Vérifie que l'élément select existe
-            if (selectElement) {
-                // Effectuer une requête pour récupérer les taux
-                fetch('/api/taux_select_patient_new')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(taux => {
-                            const option = document.createElement('option');
-                            option.value = taux.id; // Assure-toi que 'id' est la clé correcte
-                            option.textContent = taux.taux+'%'; // Assure-toi que 'nom' est la clé correcte
-                            selectElement.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des taux:', error));
-            }
-        }
+            $.ajax({
+                url: '/api/assurance_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assurance;
 
-        function select_patient()
-        {
-            const selectElement = document.getElementById('patient_id');
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Selectionner';
-            selectElement.appendChild(defaultOption);
-
-            if (selectElement) {
-
-                fetch('/api/name_patient_reception')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.name.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.id; // Assure-toi que 'id' est la clé correcte
-                            option.textContent = item.np; // Assure-toi que 'nom' est la clé correcte
-                            selectElement.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des patients:', error));
-            }
-        }
-
-        function select_societe_patient()
-        {
-            const selectElement = document.getElementById('patient_societe_id_new');
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner une société';
-            selectElement.appendChild(defaultOption);
-            // Vérifie que l'élément select existe
-            if (selectElement) {
-                // Effectuer une requête pour récupérer les taux
-                fetch('/api/societe_select_patient_new')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(societe => {
-                            const option = document.createElement('option');
-                            option.value = societe.id; // Assure-toi que 'id' est la clé correcte
-                            option.textContent = societe.nom; // Assure-toi que 'nom' est la clé correcte
-                            selectElement.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des societes:', error));
-            }
-        }
-
-        function select_assurance_patient()
-        {
-            const selectElement = document.getElementById('patient_assurance_id_new');
-            // Clear existing options
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner une Assurance';
-            selectElement.appendChild(defaultOption);
-
-            fetch('/api/assurance_select_patient_new')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(assurance => {
-                        const option = document.createElement('option');
-                        option.value = assurance.id; // Ensure 'id' is the correct key
-                        option.textContent = assurance.nom; // Ensure 'nom' is the correct key
-                        selectElement.appendChild(option);
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
                     });
-                })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
         }
 
-        function eng_patient()
+        function select_taux_patient() 
         {
-            const divAssurer = document.getElementById("div_assurer");
+            const selectElement2 = $('#patient_idtauxcouv_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-            var nom = document.getElementById("patient_np_new");
-            var email = document.getElementById("patient_email_new");
-            var phone = document.getElementById("patient_tel_new");
-            var phone2 = document.getElementById("patient_tel2_new");
-            var adresse = document.getElementById("patient_adresse_new");
-            var assurer = document.getElementById('assurer');
+            $.ajax({
+                url: '/api/taux_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.taux;
 
-            var datenais = document.getElementById("patient_datenaiss_new");
-            var sexe = document.getElementById("patient_sexe_new");
-            var filiation = document.getElementById("patient_filiation_new");
-            var matricule_assurance = document.getElementById("patient_matriculeA_new");
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.idtauxcouv,
+                            text: item.valeurtaux + '%',
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
 
-            var assurance_id = document.getElementById("patient_assurance_id_new");
-            var taux_id = document.getElementById("patient_taux_id_new");
-            var societe_id = document.getElementById("patient_societe_id_new");
+        function select_societe_patient() 
+        {
+            const selectElement2 = $('#patient_codesocieteassure_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-            if (!nom.value.trim() || !phone.value.trim() || !datenais.value.trim() || !sexe.value.trim()) {
-                showAlert('Alert', 'Tous les champs sont obligatoires.','warning');
-                return false; 
-            }
+            $.ajax({
+                url: '/api/societe_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.societe;
 
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value.trim() && !emailRegex.test(email.value.trim())) {
-                showAlert('Alert', 'Email incorrect.','warning');
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codesocieteassure,
+                            text: item.nomsocieteassure,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_filiation_patient() 
+        {
+            const selectElement2 = $('#patient_codefiliation_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/filiation_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.filiation;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codefiliation,
+                            text: item.libellefiliation,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function eng_patient() {
+            const divAssurer = $("#div_assurer");
+
+            let nom = $("#patient_nom_new");
+            let prenom = $("#patient_prenom_new");
+            let sexe = $("#patient_sexe_new");
+            let datenais = $("#patient_datenaiss_new");
+            let phone = $("#patient_tel_new");
+            let phone2 = $("#patient_tel2_new");
+            let residence = $("#patient_residence_new");
+            let assurer = $("#assure");
+
+            let filiation = $("#patient_codefiliation_new");
+            let matricule_assurance = $("#patient_matriculeA_new");
+            let assurance_id = $("#patient_codeassurance_new");
+            let taux_id = $("#patient_idtauxcouv_new");
+            let societe_id = $("#patient_codesocieteassure_new");
+
+            // Validation des champs obligatoires
+            if (!nom.val().trim() || !phone.val().trim() || !datenais.val().trim() || !sexe.val().trim()) {
+                showAlert("Alert", "Tous les champs sont obligatoires.", "warning");
                 return false;
             }
 
-            if (phone.value.length !== 10 || (phone2.value !== '' && phone2.value.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.','warning');
+            // Validation de l'email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email.val().trim() && !emailRegex.test(email.val().trim())) {
+                showAlert("Alert", "Email incorrect.", "warning");
                 return false;
             }
 
-            if (assurer.value == 'oui') {
-                if (assurance_id.value !== '' && taux_id.value !== '' && societe_id.value !== '' || filiation.value !== '' || matricule_assurance.value !== '') {
-                } else {
-                    showAlert('Alert', 'Veuillez remplir tous les champs relatifs à l\'assurance','warning');
+            // Validation des numéros de téléphone
+            if (phone.val().length !== 10 || (phone2.val() && phone2.val().length !== 10)) {
+                showAlert("Alert", "Contact incomplet.", "warning");
+                return false;
+            }
+
+            // Validation des champs relatifs à l'assurance
+            if (assurer.val() === "oui") {
+                if (!assurance_id.val() || !taux_id.val() || !societe_id.val() || !filiation.val() || !matricule_assurance.val()) {
+                    showAlert("Alert", "Veuillez remplir tous les champs relatifs à l'assurance.", "warning");
                     return false;
                 }
             }
 
-            var preloader_ch = `
+            // Préchargement
+            const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
+            // Envoi AJAX
             $.ajax({
-                url: '/api/patient_new',
-                method: 'GET',  // Use 'POST' for data creation
-                data: { nom: nom.value, email: email.value || null , tel: phone.value, tel2: phone2.value || null, adresse: adresse.value || null, assurer: assurer.value, assurance_id: assurance_id.value || null, taux_id: taux_id.value || null, societe_id: societe_id.value || null, datenais: datenais.value, sexe: sexe.value, filiation: filiation.value || null, matricule_assurance: matricule_assurance.value || null
+                url: "/api/patient_new",
+                method: "POST", // POST pour créer les données
+                data: {
+                    nom: nom.val(),
+                    email: email.val() || null,
+                    tel: phone.val(),
+                    tel2: phone2.val() || null,
+                    adresse: adresse.val() || null,
+                    assurer: assurer.val(),
+                    assurance_id: assurance_id.val() || null,
+                    taux_id: taux_id.val() || null,
+                    societe_id: societe_id.val() || null,
+                    datenais: datenais.val(),
+                    sexe: sexe.val(),
+                    filiation: filiation.val() || null,
+                    matricule_assurance: matricule_assurance.val() || null
                 },
-                success: function(response) {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    
+                success: function (response) {
+                    // Supprimer le préchargement
+                    $("#preloader_ch").remove();
+
                     if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a un patient.','warning');
-                    }else if (response.email_existe) {
-                        showAlert('Alert', 'Cet email appartient déjà a un patient.','warning');
-                    }else if (response.nom_existe) {
-                        showAlert('Alert', 'Cet patient existe déjà.','warning');
+                        showAlert("Alert", "Ce numéro de téléphone appartient déjà à un patient.", "warning");
+                    } else if (response.email_existe) {
+                        showAlert("Alert", "Cet email appartient déjà à un patient.", "warning");
+                    } else if (response.nom_existe) {
+                        showAlert("Alert", "Ce patient existe déjà.", "warning");
                     } else if (response.success) {
+                        // Réinitialisation des champs
+                        nom.val("");
+                        email.val("");
+                        phone.val("");
+                        phone2.val("");
+                        adresse.val("");
+                        datenais.val("");
+                        sexe.val("");
+                        filiation.val("");
+                        matricule_assurance.val("");
+                        assurance_id.val("");
+                        taux_id.val("");
+                        societe_id.val("");
+                        assurer.val("non");
+                        divAssurer.hide();
 
-                        nom.value = '';
-                        email.value = '';
-                        phone.value = '';
-                        phone2.value = '';
-                        adresse.value = '';
-                        datenais.value = '';
-                        sexe.value = '';
-                        filiation.value = '';
-                        matricule_assurance.value = '';
-                        assurance_id.value = "";
-                        taux_id.value = "";
-                        societe_id.value = "";
-
-                        assurer.value = 'non';
-
-                        divAssurer.style.display = "none";
-
-                        $('#Table_day').DataTable().ajax.reload(null, false);
+                        // Recharger le tableau et les données
+                        $("#Table_day").DataTable().ajax.reload(null, false);
                         select_patient();
 
-                        showAlert('Succès', 'Patient Enregistrée.','success');
+                        showAlert("Succès", "Patient enregistré.", "success");
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.','error');
+                        showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
                     }
-
                 },
-                error: function() {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.','error');
+                error: function () {
+                    // Supprimer le préchargement en cas d'erreur
+                    $("#preloader_ch").remove();
+                    showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
                 }
             });
         }
+
 
         $('#Table_day').DataTable({
 
@@ -997,47 +1213,47 @@
                     orderable: false,
                 },
                 { 
-                    data: 'np', 
+                    data: 'nomprenomspatient', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
                             <img src="{{ asset('/assets/images/user8.png') }}" class="img-2x rounded-circle border border-1">
                         </a>
-                        ${row.sexe}. ${data}
+                        ${data}
                     </div>`,
                     searchable: true, 
                 },
                 { 
-                    data: 'matricule',
+                    data: 'idenregistremetpatient',
                     searchable: true, 
                 },
                 { 
-                    data: 'datenais',
+                    data: 'datenaispatient',
                     render: formatDate,
                     searchable: true, 
                 },
                 { 
-                    data: 'age', 
-                    render: (data) => `${data} Ans`,
+                    data: null, 
+                    render: (data, type, row) => `${calculateAge(row.datenaispatient)} Ans`,
                     searchable: true, 
                 },
                 {
-                    data: 'assurer',
+                    data: 'assure',
                     render: (data, type, row) => `
-                        <span class="badge ${data === 'oui' ? 'bg-success' : 'bg-danger'}">
-                            ${data === 'oui' ? 'Oui' : 'Non'}
+                        <span class="badge ${data === 1 ? 'bg-success' : 'bg-danger'}">
+                            ${data === 1 ? 'Assurer' : 'Non-assurer'}
                         </span>
                     `,
                     searchable: true,
                 },
                 { 
-                    data: 'tel', 
-                    render: (data) => `+225 ${data}`,
+                    data: 'telpatient', 
+                    render: (data) => `${data}`,
                     searchable: true, 
                 },
                 { 
-                    data: 'created_at',
-                    render: formatDateHeure,
+                    data: 'dateenregistrement',
+                    render: formatDate,
                     searchable: true, 
                 },
                 {
@@ -1045,47 +1261,51 @@
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
                             <a class="btn btn-outline-warning btn-sm" 
-                               data-id="${row.id}" 
-                               data-name="${row.np}"
-                               data-matricule="${row.matricule}" 
-                               data-email="${row.email}" 
-                               data-tel="${row.tel}" 
-                               data-tel2="${row.tel2}" 
-                               data-adresse="${row.adresse}" 
+                               data-bs-toggle="modal" 
+                               data-bs-target="#DetailP" 
+                               id="detailP"
+                               data-nom="${row.nompatient}"
+                               data-prenom="${row.prenomspatient}"
+                               data-matricule="${row.idenregistremetpatient}"
+                               data-tel="${row.telpatient}" 
+                               data-tel2="${row.telpatient_2}" 
+                               data-telu="${row.telurgence_1}" 
+                               data-telu2="${row.telurgence_2}" 
+                               data-nomu="${row.nomurgence}"
                                data-sexe="${row.sexe}" 
-                               data-role_id="${row.role_id}"
-                               data-created_at="${row.created_at}" 
-                               data-datenais="${row.datenais}" 
-                               data-age="${row.age}" 
-                               data-assurer="${row.assurer}"
+                               data-residence="${row.lieuderesidencepat}" 
+                               data-filiation="${row.filiation}"
+                               data-created_at="${row.dateenregistrement}" 
+                               data-datenais="${row.datenaispatient}" 
+                               data-assurer="${row.assure}"
                                data-assurance="${row.assurance}"
                                data-societe="${row.societe}" 
                                data-taux="${row.taux}"
                                data-filiation="${row.filiation}"
-                               data-matricule_assurance="${row.matricule_assurance}"
-                               data-nbre_cons="${row.nbre_cons}"
-                               data-nbre_hos="${row.nbre_hos}"
-                               data-bs-toggle="modal" 
-                               data-bs-target="#DetailP" 
-                               id="detailP">
+                               data-matricule_assurance="${row.matriculeassure}"
+                               data-dossierDC="${row.dossierDC}"
+                               data-dossierDH="${row.dossierDH}"
+                            >
                                 <i class="ri-eye-line"></i>
                             </a>
                         </div>
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm" 
-                               data-id="${row.id}" 
-                               data-name="${row.np}" 
-                               data-email="${row.email}" 
-                               data-tel="${row.tel}" 
-                               data-tel2="${row.tel2}" 
-                               data-adresse="${row.adresse}" 
-                               data-sexe="${row.sexe}" 
-                               data-datenais="${row.datenais}"
-                               data-filiation="${row.filiation}"
-                               data-assurer="${row.assurer}"
+                            <a class="btn btn-outline-info btn-sm"
                                data-bs-toggle="modal" 
                                data-bs-target="#ModifP" 
-                               id="modifP">
+                               id="modifP"
+                               data-nom="${row.nompatient}"
+                               data-prenom="${row.prenomspatient}"
+                               data-matricule="${row.idenregistremetpatient}"
+                               data-tel="${row.telpatient}" 
+                               data-tel2="${row.telpatient_2}" 
+                               data-telu="${row.telurgence_1}" 
+                               data-telu2="${row.telurgence_2}" 
+                               data-nomu="${row.nomurgence}"
+                               data-sexe="${row.sexe}" 
+                               data-residence="${row.lieuderesidencepat}"
+                               data-datenais="${row.datenaispatient}"
+                            >
                                 <i class="ri-edit-line"></i>
                             </a>
                         </div>
@@ -1103,27 +1323,28 @@
         function initializeRowEventListeners() {
 
             $('#Table_day').on('click', '#detailP', function() {
+
                 const row = {
-                    id: $(this).data('id'),
-                    name: $(this).data('name'),
-                    email: $(this).data('email'),
-                    tel: $(this).data('tel'),
-                    tel2: $(this).data('tel2'),
-                    adresse: $(this).data('adresse'),
-                    sexe: $(this).data('sexe'),
-                    role_id: $(this).data('role_id'),
-                    matricule: $(this).data('matricule'),
-                    assurer: $(this).data('assurer'),
-                    societe: $(this).data('societe'),
-                    assurance: $(this).data('assurance'),
-                    taux: $(this).data('taux'),
-                    filiation: $(this).data('filiation'),
-                    matricule_assurance: $(this).data('matricule_assurance'),
-                    nbre_cons: $(this).data('nbre_cons'),
-                    nbre_hos: $(this).data('nbre_hos'),
-                    created_at: $(this).data('created_at'),
-                    datenais: $(this).data('datenais'),
-                    age: $(this).data('age'),
+                    nom : $(this).data('nom'),
+                    prenom : $(this).data('prenom'),
+                    matricule : $(this).data('matricule'),
+                    tel : $(this).data('tel'), 
+                    tel2 : $(this).data('tel2'), 
+                    telu : $(this).data('telu'), 
+                    telu2 : $(this).data('telu2'), 
+                    nomu : $(this).data('nomu'),
+                    sexe : $(this).data('sexe'), 
+                    residence : $(this).data('residence'),
+                    created_at : $(this).data('created_at'), 
+                    datenais : $(this).data('datenais'), 
+                    assurer : $(this).data('assurer'),
+                    assurance : $(this).data('assurance'),
+                    societe : $(this).data('societe'), 
+                    taux : $(this).data('taux'),
+                    filiation : $(this).data('filiation'),
+                    matricule_assurance : $(this).data('matricule_assurance'),
+                    dossierDC : $(this).data('dossierDC'),
+                    dossierDH : $(this).data('dossierDH'),
                 };
 
                 const modal = document.getElementById('modal_detailP');
@@ -1137,10 +1358,9 @@
                                 <div class="card-body">
                                     <div class="text-center">
                                         <a href="doctors-profile.html" class="d-flex align-items-center flex-column">
-                                            <img src="{{asset('assets/images/user7.png')}}" class="img-7x rounded-circle mb-3 border border-3">
-                                            <h5>${row.sexe}. ${row.name}</h5>
-                                            <h6 class="text-truncate">+225 ${row.tel}</h6>
-                                            <p>Date création : ${formatDateHeure(row.created_at)} </p>
+                                            <img src="{{asset('assets/images/user8.png')}}" class="img-7x rounded-circle mb-3 border border-3">
+                                            <h5>${row.nom} ${row.prenom}</h5>
+                                            <p>Date création : ${formatDate(row.created_at)} </p>
                                         </a>
                                     </div>
                                 </div>
@@ -1154,62 +1374,61 @@
                                             Informations personnelles
                                         </li>
                                         <li class="list-group-item">
-                                            N° Dossier : ${row.matricule}
+                                            Matricule : ${row.matricule}
                                         </li>
                                         <li class="list-group-item">
-                                            Nom et Prénoms : ${row.name}
+                                            Nom : ${row.nom}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Prénoms : ${row.prenom}
                                         </li>
                                         <li class="list-group-item">
                                             Date de naissance : ${formatDate(row.datenais)}
                                         </li>
                                         <li class="list-group-item">
-                                            Age : ${row.age ? row.age : '0'} an(s)
+                                            Age : ${calculateAge(row.datenais)} An(s)
                                         </li>
                                         <li class="list-group-item">
                                             Genre : ${row.sexe == 'M' ? 'Homme' : 'Femme'}
                                         </li>
                                         <li class="list-group-item">
-                                            Email : ${row.email ? row.email : 'Néant'}
+                                            Contact 1 : ${row.tel !== null ? `${row.tel}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Contact 1 : ${row.tel ? '+225 '+row.tel : 'Néant'}
+                                            Contact 2 :  ${row.tel2 !== null ? `${row.tel2}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Contact 2 :  ${row.tel2 ? '+225 '+row.tel2 : 'Néant'}
+                                            Résidence : ${row.residence !== null ? `${row.residence}` : 'Néant'}
                                         </li>
-                                        <li class="list-group-item">
-                                            Adresse : ${row.adresse ? row.adresse : 'Néant'}
+                                        <li class="list-group-item ${row.assurer == 1 ? 'text-success' : 'text-danger'}">
+                                            Assurer : ${row.assurer == 1 ? 'Oui' : 'Non'}
                                         </li>
-                                        <li class="list-group-item">
-                                            Assurer : ${row.assurer ? row.assurer : 'Néant'}
-                                        </li>
-                                        ${row.assurer == 'oui' ? 
-                                        `<li class="list-group-item">
-                                            Société : ${row.societe ? row.societe : 'Néant'}
-                                        </li>` : ``}
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                        ${row.assurer == 'oui' ?  
+                        ${row.assurer == '1' ?  
                         `<div class="col-12">
                             <div class=" mb-3">
                                 <div class="card-body">
                                     <ul class="list-group">
-                                        <li class="list-group-item active text-center" aria-current="true">
+                                        <li class="list-group-item text-white text-center bg-success aria-current="true">
                                             Informations Assurance
                                         </li>
                                         <li class="list-group-item">
-                                            Nom de l'assurance : ${row.assurance ? row.assurance : 'Néant'}
+                                            Nom de l'assurance : ${row.assurance !== null ? `${row.assurance}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Taux de Couverture : ${row.taux ? row.taux+'%' : 'Néant'}
+                                            Taux de Couverture : ${row.taux !== null ? `${row.taux} %` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Filiation : ${row.filiation ? row.filiation : 'Néant'}
+                                            Filiation : ${row.filiation !== null ? `${row.filiation}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Matricule : ${row.matricule_assurance ? row.matricule_assurance : 'Néant'}
+                                            Matricule : ${row.matricule_assurance !== null ? `${row.matricule_assurance}` : 'Néant'}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Société : ${row.societe !== null ? `${row.societe}` : 'Néant'}
                                         </li>
                                     </ul>
                                 </div>
@@ -1219,14 +1438,34 @@
                             <div class=" mb-3">
                                 <div class="card-body">
                                     <ul class="list-group">
-                                        <li class="list-group-item active text-center" aria-current="true">
-                                            Statistique
+                                        <li class="list-group-item text-white text-center bg-warning aria-current="true">
+                                            Informations Dossiers
                                         </li>
                                         <li class="list-group-item">
-                                            Consultation : ${row.nbre_cons ? row.nbre_cons : '0'}
+                                            Numéro Dossier Consultation : ${row.dossierDC !== null ? `${row.dossierDC}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
-                                            Hospitalisation : ${row.nbre_hos ? row.nbre_hos : '0'}
+                                            Numéro Dossier Hospitalisation : ${row.dossierDH !== null ? `${row.dossierDH}` : 'Néant'}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item text-white text-center bg-danger" aria-current="true">
+                                            En Cas d'urgence
+                                        </li>
+                                        <li class="list-group-item">
+                                            Contact 1 : ${row.telu !== null ? `${row.telu}` : 'Néant'}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Contact 1 : ${row.telu2 !== null ? `${row.telu2}` : 'Néant'}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Nom : ${row.nomu !== null ? `${row.nomu}` : 'Néant'}
                                         </li>
                                     </ul>
                                 </div>
@@ -1241,33 +1480,33 @@
             $('#Table_day').on('click', '#modifP', function() {
 
                 const row = {
-                    id: $(this).data('id'),
-                    name: $(this).data('name'),
-                    email: $(this).data('email'),
-                    tel: $(this).data('tel'),
-                    tel2: $(this).data('tel2'),
-                    adresse: $(this).data('adresse'),
-                    sexe: $(this).data('sexe'),
-                    datenais: $(this).data('datenais'),
-                    filiation: $(this).data('filiation'),
-                    assurer: $(this).data('assurer'),
+                    nom : $(this).data('nom'),
+                    prenom : $(this).data('prenom'),
+                    matricule : $(this).data('matricule'),
+                    tel : $(this).data('tel'), 
+                    tel2 : $(this).data('tel2'), 
+                    telu : $(this).data('telu'), 
+                    telu2 : $(this).data('telu2'), 
+                    nomu : $(this).data('nomu'),
+                    sexe : $(this).data('sexe'), 
+                    residence : $(this).data('residence'), 
+                    datenais : $(this).data('datenais'),
                 };
 
-                $('#patient_idM').val(row.id);
-                $('#nameM').val(row.name);
-                $('#emailM').val(row.email);
-                $('#telM').val(row.tel);
-                $('#tel2M').val(row.tel2);
-                $('#adresseM').val(row.adresse);
-                $('#sexeM').val(row.sexe).trigger('change');
-                $('#datenaisM').val(row.datenais);
+                $('#MatriculeModif').val(row.matricule);
 
-                if (row.assurer === 'oui') {
-                    $('#div_filiationM').show();
-                    $('#filiationM').val(row.filiation).trigger('change');
-                } else {
-                    $('#div_filiationM').hide();
-                }
+                $('#patient_nom_Modif').val(row.nom);
+                $('#patient_prenom_Modif').val(row.prenom);
+                $('#patient_datenaiss_Modif').val(row.datenais);
+                $('#patient_tel_Modif').val(row.tel);
+                $('#patient_tel2_Modif').val(row.tel2);
+                $('#patient_residence_Modif').val(row.residence);
+
+                $('#patient_nomu_Modif').val(row.nomu);
+                $('#patient_telu_Modif').val(row.telu);
+                $('#patient_telu2_Modif').val(row.telu2);
+
+                $('#patient_sexe_Modif').val(row.sexe).trigger('change');
 
             });
         }
@@ -1349,31 +1588,6 @@
                     showAlert('Alert', 'Une erreur est survenue.','error');
                 }
             });
-        }
-
-        function formatDate(dateString) {
-
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            const year = date.getFullYear();
-
-            return `${day}/${month}/${year}`; // Format as dd/mm/yyyy
-        }
-
-        function formatDateHeure(dateString) {
-
-            const date = new Date(dateString);
-                
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-
-            return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
         function Statistique() {
