@@ -84,11 +84,25 @@ class ApiinsertController extends Controller
     private function generateUniqueMatriculeEmploye()
     {
         do {
-            // Generate a random 9-digit number
-            $matricule = random_int(100000, 999999); // Generates a number between 100000000 and 999999999
-        } while (DB::table('employes')->where('matricule', '=', 'P'.$matricule)->exists()); // Ensure uniqueness
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('employes')->where('matricule', '=', 'P'.$matricule)->exists());
 
-        // Return matricule with prefix
+        return $matricule;
+    }
+    private function generateUniqueMatriculeMedecin()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('medecin')->where('codemedecin', '=', 'MED'.$matricule)->exists());
+
+        return $matricule;
+    }
+    private function generateUniqueMatriculeAssurance()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('assurance')->where('codeassurance', '=', 'ASS'.$matricule)->exists());
+
         return $matricule;
     }
 
@@ -119,106 +133,133 @@ class ApiinsertController extends Controller
     public function societe_new(Request $request)
     {
 
-        $verifications = [
-            'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
-            'email' => $request->email,
-            'nom' => $request->nom,
-            'fax' => $request->fax,
-        ];
+        $verf = DB::table('societeassure')->where('nomsocieteassure', '=', $request->nom)->exists();
 
-        $assuranceExist = societe::where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
-                      }
-                  })
-                  ->orWhere('email', $verifications['email'])
-                  ->orWhere('nom', $verifications['nom'])
-                  ->orWhere('fax', $verifications['fax']);
-        })->first();
+        if ($verf) {
+            return response()->json(['existe' => true]);
+        }
 
-        if ($assuranceExist) {
-            if ($assuranceExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $assuranceExist->tel2 === $verifications['tel2'])) {
-                return response()->json(['tel_existe' => true]);
-            } elseif ($assuranceExist->email === $verifications['email']) {
-                return response()->json(['email_existe' => true]);
-            } elseif ($assuranceExist->nom === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
-            } elseif ($assuranceExist->fax === $verifications['fax']) {
-                return response()->json(['fax_existe' => true]);
+        DB::beginTransaction();
+
+            try {
+
+                $societeInserted = DB::table('societeassure')->insert([
+                    'nomsocieteassure' => $request->nom,
+                    'codeassurance' => $request->codeassurance,
+                    'codeassureur' => $request->assureur_id,
+                ]);
+
+                if ($societeInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table societeassure');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
-
-        $add = new societe();
-        $add->nom = $request->nom;
-        $add->email = $request->email;
-        $add->adresse = $request->adresse;
-        $add->fax = $request->fax;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->sgeo = $request->sgeo;
-
-        if ($add->save()) {
-            return response()->json(['success' => true]);
-        }
-
-        return response()->json(['error' => true]);
+        
     }
 
     public function assurance_new(Request $request)
     {
+
         $verifications = [
-            'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
-            'email' => $request->email,
             'nom' => $request->nom,
-            'fax' => $request->fax,
+            'tel' => $request->tel,
+            'email' => $request->email,
+            'fax' => $request->fax ?? null,
         ];
 
-        $assuranceExist = assurance::where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['fax'])) {
-                          $query->where('fax', $verifications['fax']);
-                      }
-                  })
-                  ->orWhere('email', $verifications['email'])
-                  ->orWhere('nom', $verifications['nom']);
+        $Exist = DB::table('assurance')->where(function ($query) use ($verifications) {
+            $query->where('libelleassurance', $verifications['nom'])
+                    ->where('telassurance', $verifications['tel'])
+                    ->where('emailassurance', $verifications['email'])
+                    ->orWhere(function ($query) use ($verifications) {
+                        if (!is_null($verifications['fax'])) {
+                            $query->where('faxassurance', $verifications['fax']);
+                        }
+                    });
         })->first();
 
-        if ($assuranceExist) {
-            if ($assuranceExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $assuranceExist->tel2 === $verifications['tel2'])) {
-                return response()->json(['tel_existe' => true]);
-            } elseif ($assuranceExist->email === $verifications['email']) {
-                return response()->json(['email_existe' => true]);
-            } elseif ($assuranceExist->nom === $verifications['nom']) {
+        if ($Exist) {
+            if ($Exist->libelleassurance === $verifications['nom']) {
                 return response()->json(['nom_existe' => true]);
-            } elseif ($assuranceExist->fax === $verifications['fax']) {
+            } elseif ($Exist->emailassurance === $verifications['email']) {
+                return response()->json(['email_existe' => true]);
+            } elseif ($Exist->telassurance === $verifications['tel']) {
+                return response()->json(['tel_existe' => true]);
+            } elseif (!is_null($verifications['fax']) && $Exist->faxassurance === $verifications['fax']) {
                 return response()->json(['fax_existe' => true]);
             }
         }
 
-        $add = new assurance();
-        $add->nom = $request->nom;
-        $add->email = $request->email;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->fax = $request->fax;
-        $add->adresse = $request->adresse;
-        $add->carte = $request->carte;
+        DB::beginTransaction();
 
-        if($add->save()){
-            return response()->json(['success' => true]);
-        }else{
-            return response()->json(['error' => true]);
+            try {
+
+                $matricule = $this->generateUniqueMatriculeAssurance();
+
+                $assuranceInserted = DB::table('assurance')->insert([
+                    'codeassurance' => 'ASS'.$matricule,
+                    'libelleassurance' => $request->nom,
+                    'telassurance' => $request->tel,
+                    'faxassurance' => $request->fax,
+                    'emailassurance' => $request->email,
+                    'adrassurance' => $request->adresse,
+                    'situationgeo' => $request->carte,
+                    'description' => $request->desc,
+                ]);
+
+                if ($assuranceInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table assurance');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function assureur_new(Request $request)
+    {
+
+        $verifications = [
+            'nom' => $request->nom,
+        ];
+
+        $Exist = DB::table('assureur')->where(function ($query) use ($verifications) {
+            $query->where('libelle_assureur', $verifications['nom']);
+        })->first();
+
+        if ($Exist) {
+            if ($Exist->libelle_assureur === $verifications['nom']) {
+                return response()->json(['nom_existe' => true]);
+            }
         }
+
+        DB::beginTransaction();
+
+            try {
+
+                $assureurInserted = DB::table('assureur')->insert([
+                    'libelle_assureur' => $request->nom,
+                ]);
+
+                if ($assureurInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table assureur');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function patient_new(Request $request)
@@ -395,80 +436,64 @@ class ApiinsertController extends Controller
     public function new_medecin(Request $request)
     {
         $verifications = [
-            'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
+            'tel' => $request->tel ?? null,
             'email' => $request->email ?? null,
-            'nom' => $request->nom,
         ];
 
-        $role = role::where('nom', '=', 'MEDECIN')->first();
-
-        $Exist = user::where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
+        $Exist = DB::table('medecin')->where(function ($query) use ($verifications) {
+            $query->where('contact', $verifications['tel'])
+                  ->orWhere(function ($query) use ($verifications) {
                       if (!is_null($verifications['email'])) {
                           $query->where('email', $verifications['email']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['nom'])) {
-                          $query->where('name', $verifications['nom']);
                       }
                   });
         })->first();
 
+
         if ($Exist) {
-            if ($Exist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $Exist->tel2 === $verifications['tel2'])) {
+            if ($Exist->tel === $verifications['tel']) {
                 return response()->json(['tel_existe' => true]);
             } elseif ($Exist->email === $verifications['email']) {
                 return response()->json(['email_existe' => true]);
-            } elseif ($Exist->nom === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
             }
         }
 
         DB::beginTransaction();
 
-        $matricule = $this->generateUniqueMatricule();
+            try {
 
-        $add = new user();
-        $add->name = $request->nom;
-        $add->email = $request->email;
-        $add->sexe = $request->sexe;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->password = bcrypt('00000');
-        $add->adresse = $request->adresse;
-        $add->matricule = $matricule;
-        $add->role_id = $role->id;
-        $add->role = $role->nom;
+                $matricule = $this->generateUniqueMatriculeMedecin();
 
-        try {
+                $specialite = DB::table('specialitemed')->where('codespecialitemed', '=', $request->specialite_id)->first();
 
-            if (!$add->save()) {
-                return response()->json(['error' => true]);
+                if (!$specialite) {
+                    throw new Exception('Spécialité introuvable');
+                }
+
+                $medecinInserted = DB::table('medecin')->insert([
+                    'codemedecin' => 'MED'.$matricule,
+                    'titremed' => 'Dr',
+                    'nommedecin' => $request->nom,
+                    'prenomsmedecin' => $request->prenom,
+                    'nomprenomsmed' => 'Dr '.$request->nom.' '.$request->prenom ,
+                    'codespecialitemed' => $specialite->codespecialitemed,
+                    'numordremed' => $request->num,
+                    'contact' => $request->tel,
+                    'dateservice' => $request->dateservice,
+                    'email' => $request->email,
+                ]);
+
+                if ($medecinInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table employes');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-
-            $type = new typemedecin();
-            $type->typeacte_id = $request->typeacte_id;
-            $type->user_id = $add->id;
-
-            if (!$type->save()) {
-                return response()->json(['error' => true]);
-            }
-
-            DB::commit();
-            return response()->json(['success' => true]);
-            
-        } catch (Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => true]);
-        }
     }
 
     public function new_consultation(Request $request)
@@ -1683,7 +1708,6 @@ class ApiinsertController extends Controller
                 DB::rollback();
                 return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-
     }
 
     public function caisse_ouvert(Request $request)

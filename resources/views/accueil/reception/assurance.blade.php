@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body " style="background: rgba(0, 0, 0, 0.7);" >
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Assurances.</h5>
+                        <h6>ASSURANCES</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Récéption / Assurances</p>
                     </div>
                 </div>
             </div>
@@ -95,12 +95,6 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Contact 2</label>
-                                                <input type="tel" class="form-control" id="tel2_assurance_new" placeholder="Facultatif" maxlength="10">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
                                                 <label class="form-label" >Fax</label>
                                                 <input type="text" class="form-control" id="fax_assurance_new" placeholder="Facultatif">
                                             </div>
@@ -108,13 +102,19 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Adresse</label>
-                                                <input type="text" class="form-control" id="adresse_assurance_new" placeholder="Facultatif">
+                                                <input type="text" class="form-control" id="adresse_assurance_new" placeholder="Saisie Obligatoire">
                                             </div>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Localisation</label>
                                                 <input type="text" class="form-control" id="carte_assurance_new" placeholder="Saisie Obligatoire">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Description</label>
+                                                <input type="text" class="form-control" id="desc_assurance_new" placeholder="Facultatif">
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
@@ -147,12 +147,10 @@
                                                         <th scope="col">N°</th>
                                                         <th scope="col">Assurance</th>
                                                         <th scope="col">Email</th>
-                                                        <th scope="col">Contact 1</th>
-                                                        <th scope="col">Contact 2</th>
+                                                        <th scope="col">Contact</th>
                                                         <th scope="col">Fax</th>
                                                         <th scope="col">Adresse</th>
-                                                        <th scope="col">Carte</th>
-                                                        <th scope="col">Date de création</th>
+                                                        <th scope="col">Situation Géophraphique</th>
                                                         <th scope="col">Actions</th>
                                                     </tr>
                                                 </thead>
@@ -165,7 +163,7 @@
                             </div>
                             <div class="tab-pane fade" id="twoRech" role="tabpanel" aria-labelledby="tab-twoRech">
                                 <div class="row gx-3">
-                                    <div class="row gx-3 justify-content-center align-items-center" >
+                                    {{-- <div class="row gx-3 justify-content-center align-items-center" >
                                         <div class="col-xxl-4 col-lg-4 col-sm-6">
                                             <div class=" mb-1">
                                                 <div class="card-body">
@@ -188,6 +186,14 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-12 mt-3" id="div_info_patient">
+                                    </div> --}}
+                                    <div class="error-container">
+                                        <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
+                                        <h5 class="fw-light mb-4">
+                                            Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
+                                            <br>
+                                            Merci de votre patience !
+                                        </h5>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +206,7 @@
 </div>
 
 <div class="modal fade" id="Mmodif" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Mise à jour</h5>
@@ -209,35 +215,49 @@
             <div class="modal-body">
                 <form id="updateChambreForm">
                     <input type="hidden" id="Id">
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="nomModif" oninput="this.value = this.value.toUpperCase()">
+                    <div class="row gx-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact</label>
-                        <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact 2</label>
-                        <input type="tel2" class="form-control" id="tel2Modif" placeholder="Facultatif" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fax</label>
-                        <input type="text" class="form-control" id="faxModif" placeholder="Facultatif">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse</label>
-                        <input type="text" class="form-control" id="adresseModif" placeholder="Facultatif">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Localisation</label>
-                        <input type="text" class="form-control" id="carteModif" placeholder="Saisie Obligatoire">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input required type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Contact</label>
+                                <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label" >Fax</label>
+                                <input type="text" class="form-control" id="faxModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Adresse</label>
+                                <input type="text" class="form-control" id="adresseModif" placeholder="Facultatif">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Localisation</label>
+                                <input type="text" class="form-control" id="carteModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <input type="text" class="form-control" id="descModif" placeholder="Facultatif">
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -249,18 +269,16 @@
     </div>
 </div>
 
-<div class="modal fade" id="DetailP" tabindex="-1" aria-modal="true" role="dialog">
+<div class="modal fade" id="Detail" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    Détail Patient
+                    Détail Assurance
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="modal_detailP">
-                
-            </div>
+            <div class="modal-body" id="modal_detail"></div>
         </div>
     </div>
 </div>
@@ -478,6 +496,29 @@
     </div>
 </div>
 
+<div class="modal fade" id="Mdelete" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delRowLabel">
+                    Confirmation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimé cette assurance ?
+                <input type="hidden" id="Id_delete">
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Non</a>
+                    <button id="deleteBtn" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{asset('assets/js/app/js/jspdfinvoicetemplate/dist/index.js')}}" ></script>
 <script src="{{asset('jsPDF-master/dist/jspdf.umd.js')}}"></script>
 <script src="{{asset('assets/vendor/apex/apexcharts.min.js')}}"></script>
@@ -487,16 +528,17 @@
 <script>
     $(document).ready(function() {
 
-        select_assurance();
+        // select_assurance();
 
         $("#btn_eng_assurance").on("click", eng_assurance);
         $("#updateBtn").on("click", updatee);
+        $("#deleteBtn").on("click", deletee);
 
         $('#btn_refresh_tableP').on('click', function () {
             $('#Table_day').DataTable().ajax.reload();
         });
 
-        var inputs = ['tel_assurance_new', 'tel2_assurance_new',]; // Array of element IDs
+        var inputs = ['tel_assurance_new', 'telModif',]; // Array of element IDs
         inputs.forEach(function(id) {
             var inputElement = document.getElementById(id); // Get each element by its ID
 
@@ -563,40 +605,45 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
-        function select_assurance()
-        {
-            const selectElement = document.getElementById('assurance_id');
-            // Clear existing options
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Selectionner';
-            selectElement.appendChild(defaultOption);
+        // function select_assurance() 
+        // {
+        //     const selectElement2 = $('#assurance_id');
+        //     selectElement2.empty();
+        //     selectElement2.append($('<option>', {
+        //         value: '',
+        //         text: 'Selectionner',
+        //     }));
 
-            fetch('/api/assurance_select_patient_new')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(assurance => {
-                        const option = document.createElement('option');
-                        option.value = assurance.id;
-                        option.textContent = assurance.nom;
-                        selectElement.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
-        }
+        //     $.ajax({
+        //         url: '/api/assurance_select_patient_new',
+        //         method: 'GET',
+        //         success: function(response) {
+        //             const data = response.assurance;
+
+        //             data.forEach(function(item) {
+        //                 selectElement2.append($('<option>', {
+        //                     value: item.codeassurance,
+        //                     text: item.libelleassurance,
+        //                 }));
+        //             });
+        //         },
+        //         error: function() {
+        //             // showAlert('danger', 'Impossible de generer le code automatiquement');
+        //         }
+        //     });
+        // }
 
         function eng_assurance()
         {
             var nom = document.getElementById("nom_assurance_new");
             var email = document.getElementById("email_assurance_new");
             var phone = document.getElementById("tel_assurance_new");
-            var phone2 = document.getElementById("tel2_assurance_new");
             var adresse = document.getElementById("adresse_assurance_new");
             var fax = document.getElementById("fax_assurance_new");
             var carte = document.getElementById("carte_assurance_new");
+            var desc = document.getElementById("desc_assurance_new");
 
-            if (!nom.value.trim() || !email.value.trim() || !phone.value.trim() || !carte.value.trim()) {
+            if (!nom.value.trim() || !email.value.trim() || !phone.value.trim() || !carte.value.trim() || !carte.value.trim() || !adresse.value.trim()) {
                 showAlert('Alert', 'Tous les champs obligatoires n\'ont pas été rempli.','warning');
                 return false; 
             }
@@ -608,7 +655,7 @@
             }
 
 
-            if (phone.value.length !== 10 || (phone2.value !== '' && phone2.value.length !== 10)) {
+            if (phone.value.length !== 10) {
                 showAlert('Alert', 'Contact incomplet.','warning');
                 return false;
             }
@@ -628,9 +675,9 @@
                     nom: nom.value, 
                     email: email.value, 
                     tel: phone.value, 
-                    tel2: phone2.value || null, 
+                    desc: desc.value || null, 
                     fax: fax.value || null, 
-                    adresse: adresse.value || null,
+                    adresse: adresse.value,
                     carte: carte.value,
                 },
                 success: function(response) {
@@ -641,7 +688,7 @@
                     }
                     
                     if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a une assurance.','warning');
+                        showAlert('Alert', 'Ce numéro de contact appartient déjà a une assurance.','warning');
                     }else if (response.email_existe) {
                         showAlert('Alert', 'Ce email appartient déjà a une assurance.','warning');
                     }else if (response.nom_existe) {
@@ -653,7 +700,7 @@
                         nom.value = '';
                         email.value = '';
                         phone.value = '';
-                        phone2.value = '';
+                        desc.value = '';
                         fax.value = '';
                         adresse.value = '';
                         carte.value = '';
@@ -661,7 +708,7 @@
                         $('#Table_day').DataTable().ajax.reload();
                         select_assurance();
 
-                        showAlert('Succès', 'Assurance Enregistrée.','success');
+                        showAlert('Succès', response.message,'success');
                     } else if (response.error) {
                         showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.','error');
                     }
@@ -696,7 +743,7 @@
                     orderable: false,
                 },
                 { 
-                    data: 'nom', 
+                    data: 'libelleassurance', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
@@ -707,42 +754,35 @@
                     searchable: true, 
                 },
                 {
-                    data: 'email',
+                    data: 'emailassurance',
                     render: (data, type, row) => {
                         return data ? `${data}` : 'Néant';
                     },
                     searchable: true,
                 },
                 {
-                    data: 'tel',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'tel2',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'fax',
+                    data: 'telassurance',
                     render: (data, type, row) => {
                         return data ? `${data}` : 'Néant';
                     },
                     searchable: true,
                 },
                 {
-                    data: 'adresse',
+                    data: 'faxassurance',
                     render: (data, type, row) => {
                         return data ? `${data}` : 'Néant';
                     },
                     searchable: true,
                 },
                 {
-                    data: 'carte',
+                    data: 'adrassurance',
+                    render: (data, type, row) => {
+                        return data ? `${data}` : 'Néant';
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'situationgeo',
                     render: (data, type, row) => {
                         if (data) {
                             return data.length > 15 ? `${data.substring(0, 15)}...` : data;
@@ -751,26 +791,40 @@
                     },
                     searchable: true,
                 },
-                { 
-                    data: 'created_at',
-                    render: formatDateHeure,
-                    searchable: true,
-                },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
+                            <a class="btn btn-outline-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Detail" id="detail" 
+                                data-id="${row.idassurance}" 
+                                data-code="${row.codeassurance}" 
+                                data-nom="${row.libelleassurance}" 
+                                data-email="${row.emailassurance}" 
+                                data-tel="${row.telassurance}"
+                                data-adresse="${row.adrassurance}" 
+                                data-fax="${row.faxassurance}"
+                                data-carte="${row.situationgeo}"
+                                data-description="${row.description}"
+                            >
+                                <i class="ri-eye-line"></i>
+                            </a>
                             <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif"
-                                data-id="${row.id}" 
-                                data-nom="${row.nom}" 
-                                data-email="${row.email}" 
-                                data-tel="${row.tel}" 
-                                data-tel2="${row.tel2}" 
-                                data-adresse="${row.adresse}" 
-                                data-fax="${row.fax}"
-                                data-carte="${row.carte}"
+                                data-id="${row.idassurance}" 
+                                data-code="${row.codeassurance}" 
+                                data-nom="${row.libelleassurance}" 
+                                data-email="${row.emailassurance}" 
+                                data-tel="${row.telassurance}"
+                                data-adresse="${row.adrassurance}" 
+                                data-fax="${row.faxassurance}"
+                                data-carte="${row.situationgeo}"
+                                data-description="${row.description}"
                             >
                                 <i class="ri-edit-box-line"></i>
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete"
+                                data-id="${row.idassurance}"
+                            >
+                                <i class="ri-delete-bin-line"></i>
                             </a>
                         </div>
                     `,
@@ -786,12 +840,84 @@
 
         function initializeRowEventListeners() {
 
+            $('#Table_day').on('click', '#detail', function() {
+                const row = {
+                    id: $(this).data('id'),
+                    code: $(this).data('code'),
+                    nom: $(this).data('nom'),
+                    email: $(this).data('email'),
+                    tel: $(this).data('tel'),
+                    adresse: $(this).data('adresse'),
+                    fax: $(this).data('fax'),
+                    carte: $(this).data('carte'),
+                    description: $(this).data('description'),
+                };
+
+                const modal = document.getElementById('modal_detail');
+                modal.innerHTML = '';
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="row gx-3">
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <a class="d-flex align-items-center flex-column">
+                                            <img src="{{asset('assets/images/assurance3.jpg')}}" class="img-7x rounded-circle mb-3 border border-3">
+                                            <h5>${row.nom}</h5>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations
+                                        </li>
+                                        <li class="list-group-item">
+                                            Code : ${row.code}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Nom : ${row.nom}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Email : ${row.email !== null ? `${row.email}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Téléphone : ${row.tel !== null ? `${row.tel}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Fax : ${row.fax !== null ? `${row.fax}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Adresse : ${row.adresse !== null ? `${row.adresse}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Situation Géographique : ${row.carte !== null ? `${row.carte}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Description : ${row.description !== null ? `${row.description}` : `Néant`}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                modal.appendChild(div);
+            });
+
             $('#Table_day').on('click', '#modif', function() {
                 const id = $(this).data('id');
                 const nom = $(this).data('nom');
                 const email = $(this).data('email');
                 const tel = $(this).data('tel');
-                const tel2 = $(this).data('tel2');
+                const desc = $(this).data('description');
                 const adresse = $(this).data('adresse');
                 const fax = $(this).data('fax');
                 const carte = $(this).data('carte');
@@ -801,9 +927,14 @@
                 $('#emailModif').val(email);
                 $('#adresseModif').val(adresse);
                 $('#telModif').val(tel);
-                $('#tel2Modif').val(tel2);
+                $('#descModif').val(desc);
                 $('#faxModif').val(fax);
                 $('#carteModif').val(carte);
+            });
+
+            $('#Table_day').on('click', '#delete', function() {
+                const id = $(this).data('id');
+                $('#Id_delete').val(id);
             });
         }
 
@@ -815,10 +946,10 @@
             const adresse = document.getElementById("adresseModif");
             const fax = document.getElementById("faxModif");
             const tel = document.getElementById("telModif");
-            const tel2 = document.getElementById("tel2Modif");
+            const desc = document.getElementById("descModif");
             const carte = document.getElementById("carteModif");
 
-            if(!nom.value.trim() || !email.value.trim() || !carte.value.trim() || !tel.value.trim())
+            if(!nom.value.trim() || !email.value.trim() || !carte.value.trim() || !tel.value.trim() || !adresse.value.trim())
             {
                 showAlert('Alert', 'Tous les champs obligatoires n\'ont pas été rempli.','warning');
                 return false;
@@ -831,7 +962,7 @@
             }
 
 
-            if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
+            if (tel.value.length !== 10) {
                 showAlert('Alert', 'Contact incomplet.','warning');
                 return false;
             }
@@ -856,7 +987,7 @@
                     adresse: adresse.value || null,
                     fax: fax.value || null,
                     tel: tel.value,
-                    tel2: tel2.value || null,
+                    desc: desc.value || null,
                     carte: carte.value,
                 },
                 success: function(response) {
@@ -917,132 +1048,166 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
-        $('#assurance_id').on('change', function() {
+        function deletee() 
+        {
+            const id = $('#Id_delete').val().trim();
 
-            const dynamicFields = document.getElementById("div_info_patient");
-            dynamicFields.innerHTML = "";
+            var modal = bootstrap.Modal.getInstance($('#Mdelete')[0]);
+            modal.hide();
 
-            if (this.value == ''){
-                showAlert('Alert', 'Veuillez selectionner une assurance s\'il vous plaît.','warning');
-                return false;
-            }
-
-            const assurance_id = this.value;
-
-            //--------------------------------------------------------------
-
-            var charge = `
-                <div class="d-flex justify-content-center align-items-center" id="laoder_stat">
-                    <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                    <strong>Chargement des données...</strong>
+            var preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            dynamicFields.innerHTML = charge;
 
-            const url = `/api/assurance_stat/${assurance_id}`;
+            $.ajax({
+                url: '/api/delete_assurance/' + id,
+                method: 'GET',  // Use 'POST' for data creation
+                success: function(response) {
+                    $('#preloader_ch').remove(); // Remove preloader
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
+                    if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload();
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    $('#preloader_ch').remove(); // Remove preloader
 
-                    var loader = document.getElementById('laoder_stat');
-                    if (loader) loader.remove();
+                    showAlert('Erreur', 'Erreur lors de la suppression.', 'error');
+                }
+            });
+        }
 
-                    //--------------------------------------------------
+        // $('#assurance_id').on('change', function() {
 
-                    const nbre_cons = data.nbre_cons;
-                    const nbre_hos = data.nbre_hos;
-                    const nbre_exam = data.nbre_exam;
-                    const nbre_soinsam = data.nbre_soinsam;
-                    const stats = data.data;
+        //     const dynamicFields = document.getElementById("div_info_patient");
+        //     dynamicFields.innerHTML = "";
 
-                    //--------------------------------------------------
+        //     if (this.value == ''){
+        //         showAlert('Alert', 'Veuillez selectionner une assurance s\'il vous plaît.','warning');
+        //         return false;
+        //     }
 
-                    var groupe1 = document.createElement("div");
-                    groupe1.className = "row gx-3";
-                    groupe1.innerHTML = `
-                        <div class=" mb-0">
-                            <div class="card-body">
-                                <div class="card-header d-flex flex-column justify-content-center align-items-center">
-                                    <h5 class="card-title mb-3">
-                                        Statistique des actes éffectués
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    dynamicFields.appendChild(groupe1);
+        //     const assurance_id = this.value;
 
-                    //--------------------------------------------------
+        //     //--------------------------------------------------------------
 
-                    var groupe01 = document.createElement("div");
-                    groupe01.className = "row gx-3 stat_acte";
-                    dynamicFields.appendChild(groupe01);
+        //     var charge = `
+        //         <div class="d-flex justify-content-center align-items-center" id="laoder_stat">
+        //             <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
+        //             <strong>Chargement des données...</strong>
+        //         </div>
+        //     `;
+        //     dynamicFields.innerHTML = charge;
 
-                    groupe01.innerHTML = '';
-                    const cardData_acte = [
-                        { label: "Consultations", count: nbre_cons, icon: "ri-lungs-line", colorClass: "text-success", borderColor: "border-success", bgColor: "bg-success", mTotal : formatPrice(stats.m_cons.total_general), pTotal : formatPrice(stats.m_cons.total_payer), ipTotal : formatPrice(stats.m_cons.total_impayer), assurance : formatPrice(stats.m_cons.part_assurance), patient : formatPrice(stats.m_cons.part_patient)},
-                        { label: "Examens", count: nbre_exam, icon: "ri-medicine-bottle-line", colorClass: "text-danger", borderColor: "border-danger", bgColor: "bg-danger", mTotal : formatPrice(stats.m_exam.total_general), pTotal : formatPrice(stats.m_exam.total_payer), ipTotal : formatPrice(stats.m_exam.total_impayer), assurance : formatPrice(stats.m_exam.part_assurance), patient : formatPrice(stats.m_exam.part_patient)},
-                        { label: "Hospitalisations", count: nbre_hos, icon: "ri-hotel-bed-line", colorClass: "text-primary", borderColor: "border-primary", bgColor: "bg-primary", mTotal : formatPrice(stats.m_hos.total_general), pTotal : formatPrice(stats.m_hos.total_payer), ipTotal : formatPrice(stats.m_hos.total_impayer), assurance : formatPrice(stats.m_hos.part_assurance), patient : formatPrice(stats.m_hos.part_patient)},
-                        { label: "Soins Ambulatoires", count: nbre_soinsam, icon: "ri-dossier-line", colorClass: "text-warning", borderColor: "border-warning", bgColor: "bg-warning", mTotal : formatPrice(stats.m_soinsam.total_general), pTotal : formatPrice(stats.m_soinsam.total_payer), ipTotal : formatPrice(stats.m_soinsam.total_impayer), assurance : formatPrice(stats.m_soinsam.part_assurance), patient : formatPrice(stats.m_soinsam.part_patient)},
-                    ];
+        //     const url = `/api/assurance_stat/${assurance_id}`;
 
-                    cardData_acte.forEach(card => {
-                        const div = document.createElement('div');
-                        div.className = "col-xl-3 col-sm-6 col-12";
-                        div.innerHTML = `
-                            <div class="border rounded-2 d-flex align-items-center flex-row p-2 mb-3">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="p-2 ${card.borderColor} rounded-circle me-3">
-                                            <div class="icon-box md ${card.bgColor} rounded-5">
-                                                <i class="${card.icon} fs-4 text-white"></i>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <h2 class="lh-1">${card.count}</h2>
-                                            <p class="m-0">${card.label}</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-1">
-                                        <a class="${card.colorClass}" href="javascript:void(0);">
-                                            <span>Montant Total</span>
-                                            <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
-                                        </a>
-                                        <div class="text-end">
-                                            <p class="mb-0 ${card.colorClass}">${card.mTotal} Fcfa</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-1">
-                                        <a class="${card.colorClass}" href="javascript:void(0);">
-                                            <span>Part Assurance</span>
-                                            <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
-                                        </a>
-                                        <div class="text-end">
-                                            <p class="mb-0 ${card.colorClass}">${card.assurance} Fcfa</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-1">
-                                        <a class="${card.colorClass}" href="javascript:void(0);">
-                                            <span>Part Patient</span>
-                                            <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
-                                        </a>
-                                        <div class="text-end">
-                                            <p class="mb-0 ${card.colorClass}">${card.patient} Fcfa</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        groupe01.appendChild(div);
-                    });
+        //     fetch(url)
+        //         .then(response => response.json())
+        //         .then(data => {
+
+        //             var loader = document.getElementById('laoder_stat');
+        //             if (loader) loader.remove();
+
+        //             //--------------------------------------------------
+
+        //             const nbre_cons = data.nbre_cons;
+        //             const nbre_hos = data.nbre_hos;
+        //             const nbre_exam = data.nbre_exam;
+        //             const nbre_soinsam = data.nbre_soinsam;
+        //             const stats = data.data;
+
+        //             //--------------------------------------------------
+
+        //             var groupe1 = document.createElement("div");
+        //             groupe1.className = "row gx-3";
+        //             groupe1.innerHTML = `
+        //                 <div class=" mb-0">
+        //                     <div class="card-body">
+        //                         <div class="card-header d-flex flex-column justify-content-center align-items-center">
+        //                             <h5 class="card-title mb-3">
+        //                                 Statistique des actes éffectués
+        //                             </h5>
+        //                         </div>
+        //                     </div>
+        //                 </div>
+        //             `;
+        //             dynamicFields.appendChild(groupe1);
+
+        //             //--------------------------------------------------
+
+        //             var groupe01 = document.createElement("div");
+        //             groupe01.className = "row gx-3 stat_acte";
+        //             dynamicFields.appendChild(groupe01);
+
+        //             groupe01.innerHTML = '';
+        //             const cardData_acte = [
+        //                 { label: "Consultations", count: nbre_cons, icon: "ri-lungs-line", colorClass: "text-success", borderColor: "border-success", bgColor: "bg-success", mTotal : formatPrice(stats.m_cons.total_general), pTotal : formatPrice(stats.m_cons.total_payer), ipTotal : formatPrice(stats.m_cons.total_impayer), assurance : formatPrice(stats.m_cons.part_assurance), patient : formatPrice(stats.m_cons.part_patient)},
+        //                 { label: "Examens", count: nbre_exam, icon: "ri-medicine-bottle-line", colorClass: "text-danger", borderColor: "border-danger", bgColor: "bg-danger", mTotal : formatPrice(stats.m_exam.total_general), pTotal : formatPrice(stats.m_exam.total_payer), ipTotal : formatPrice(stats.m_exam.total_impayer), assurance : formatPrice(stats.m_exam.part_assurance), patient : formatPrice(stats.m_exam.part_patient)},
+        //                 { label: "Hospitalisations", count: nbre_hos, icon: "ri-hotel-bed-line", colorClass: "text-primary", borderColor: "border-primary", bgColor: "bg-primary", mTotal : formatPrice(stats.m_hos.total_general), pTotal : formatPrice(stats.m_hos.total_payer), ipTotal : formatPrice(stats.m_hos.total_impayer), assurance : formatPrice(stats.m_hos.part_assurance), patient : formatPrice(stats.m_hos.part_patient)},
+        //                 { label: "Soins Ambulatoires", count: nbre_soinsam, icon: "ri-dossier-line", colorClass: "text-warning", borderColor: "border-warning", bgColor: "bg-warning", mTotal : formatPrice(stats.m_soinsam.total_general), pTotal : formatPrice(stats.m_soinsam.total_payer), ipTotal : formatPrice(stats.m_soinsam.total_impayer), assurance : formatPrice(stats.m_soinsam.part_assurance), patient : formatPrice(stats.m_soinsam.part_patient)},
+        //             ];
+
+        //             cardData_acte.forEach(card => {
+        //                 const div = document.createElement('div');
+        //                 div.className = "col-xl-3 col-sm-6 col-12";
+        //                 div.innerHTML = `
+        //                     <div class="border rounded-2 d-flex align-items-center flex-row p-2 mb-3">
+        //                         <div class="card-body">
+        //                             <div class="d-flex align-items-center">
+        //                                 <div class="p-2 ${card.borderColor} rounded-circle me-3">
+        //                                     <div class="icon-box md ${card.bgColor} rounded-5">
+        //                                         <i class="${card.icon} fs-4 text-white"></i>
+        //                                     </div>
+        //                                 </div>
+        //                                 <div class="d-flex flex-column">
+        //                                     <h2 class="lh-1">${card.count}</h2>
+        //                                     <p class="m-0">${card.label}</p>
+        //                                 </div>
+        //                             </div>
+        //                             <div class="d-flex align-items-end justify-content-between mt-1">
+        //                                 <a class="${card.colorClass}" href="javascript:void(0);">
+        //                                     <span>Montant Total</span>
+        //                                     <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
+        //                                 </a>
+        //                                 <div class="text-end">
+        //                                     <p class="mb-0 ${card.colorClass}">${card.mTotal} Fcfa</p>
+        //                                 </div>
+        //                             </div>
+        //                             <div class="d-flex align-items-end justify-content-between mt-1">
+        //                                 <a class="${card.colorClass}" href="javascript:void(0);">
+        //                                     <span>Part Assurance</span>
+        //                                     <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
+        //                                 </a>
+        //                                 <div class="text-end">
+        //                                     <p class="mb-0 ${card.colorClass}">${card.assurance} Fcfa</p>
+        //                                 </div>
+        //                             </div>
+        //                             <div class="d-flex align-items-end justify-content-between mt-1">
+        //                                 <a class="${card.colorClass}" href="javascript:void(0);">
+        //                                     <span>Part Patient</span>
+        //                                     <i class="ri-arrow-right-line ${card.colorClass} ms-1"></i>
+        //                                 </a>
+        //                                 <div class="text-end">
+        //                                     <p class="mb-0 ${card.colorClass}">${card.patient} Fcfa</p>
+        //                                 </div>
+        //                             </div>
+        //                         </div>
+        //                     </div>
+        //                 `;
+        //                 groupe01.appendChild(div);
+        //             });
 
 
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement des données:', error);
-                });
-        });
+        //         })
+        //         .catch(error => {
+        //             console.error('Erreur lors du chargement des données:', error);
+        //         });
+        // });
 
     });
 </script>

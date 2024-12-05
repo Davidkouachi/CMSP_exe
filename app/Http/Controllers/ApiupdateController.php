@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\assurance;
 use App\Models\taux;
@@ -175,77 +176,70 @@ class ApiupdateController extends Controller
         return response()->json(['error' => true]);
     }
 
-    public function update_medecin(Request $request, $id)
+    public function update_medecin(Request $request, $matricule)
     {
         $verifications = [
             'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
             'email' => $request->email ?? null,
-            'nom' => $request->nom,
         ];
 
-        // Check if the user exists except for the current user being updated
-        $Exist = user::where(function($query) use ($verifications) {
-                $query->where('tel', $verifications['tel'])
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['tel2'])) {
-                              $query->where('tel2', $verifications['tel2']);
-                          }
-                      })
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['email'])) {
-                              $query->where('email', $verifications['email']);
-                          }
-                      })
-                      ->orWhere(function($query) use ($verifications) {
-                          if (!is_null($verifications['nom'])) {
-                              $query->where('name', $verifications['nom']);
-                          }
-                      });
-            })->where('id', '!=', $id)->first();
+        $Exist = DB::table('medecin')->where(function ($query) use ($verifications) {
+            $query->where('contact', $verifications['tel'])
+                  ->orWhere(function ($query) use ($verifications) {
+                      if (!is_null($verifications['email'])) {
+                          $query->where('email', $verifications['email']);
+                      }
+                  });
+        })->where('codemedecin', '!=', $matricule)->first();
 
-        // Return appropriate response based on existing data
         if ($Exist) {
-            if ($Exist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $Exist->tel2 === $verifications['tel2'])) {
+            if ($Exist->contact === $verifications['tel']) {
                 return response()->json(['tel_existe' => true]);
             } elseif ($Exist->email === $verifications['email']) {
                 return response()->json(['email_existe' => true]);
-            } elseif ($Exist->name === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
             }
         }
 
         DB::beginTransaction();
 
-        try {
-            // Update the user
-            $user = user::find($id);
-            $user->name = $request->nom;
-            $user->email = $request->email;
-            $user->sexe = $request->sexe;
-            $user->tel = $request->tel;
-            $user->tel2 = $request->tel2;
-            $user->adresse = $request->adresse;
+            try {
 
-            if (!$user->save()) {
-                throw new \Exception('Erreur lors de la mise à jour de l\'utilisateur.');
+                $specialite = DB::table('specialitemed')->where('codespecialitemed', '=', $request->specialite_id)->first();
+
+                if (!$specialite) {
+                    throw new Exception('Spécialité introuvable');
+                }
+
+                $updateData_medecin =[
+                    'nommedecin' => $request->nom,
+                    'prenomsmedecin' => $request->prenom,
+                    'nomprenomsmed' => 'Dr '.$request->nom.' '.$request->prenom ,
+                    'codespecialitemed' => $specialite->codespecialitemed,
+                    'numordremed' => $request->num,
+                    'contact' => $request->tel,
+                    'dateservice' => $request->dateservice,
+                    'email' => $request->email,
+                    'updated_at' => now(),
+                ];
+
+                log::info(DB::table('medecin')->where('codemedecin', '=', $matricule)->toSql());
+                log::info($updateData_medecin);
+
+                $medecinUpdate = DB::table('medecin')
+                                    ->where('codemedecin', '=', $matricule)
+                                    ->update($updateData_medecin);
+
+                if ($medecinUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table médecin');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-
-            // Update the typeacte for the medecin
-            $type = typemedecin::where('user_id', '=', $id)->first();
-            $type->typeacte_id = $request->typeacte_id;
-
-            if (!$type->save()) {
-                throw new \Exception('Erreur lors de la mise à jour du typeacte.');
-            }
-
-            DB::commit();
-            return response()->json(['success' => true]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => true, 'message' => $e->getMessage()]);
-        }
     }
 
     public function update_typeadmission(Request $request, $id)
@@ -345,60 +339,42 @@ class ApiupdateController extends Controller
 
     public function update_societe(Request $request, $id)
     {
-        $put = societe::find($id);
 
-        if ($put) {
+        $verf = DB::table('societeassure')
+                ->where('nomsocieteassure', '=', $request->nom)
+                ->where('codesocieteassure', '!=', $id)
+                ->exists();
 
-            $verifications = [
-                'tel' => $request->tel,
-                'tel2' => $request->tel2 ?? null,
-                'email' => $request->email,
-                'nom' => $request->nom,
-                'fax' => $request->fax,
-            ];
-
-            $assuranceExist = societe::where('id', '!=', $id)
-                                    ->where(function($query) use ($verifications) {
-                                        $query->where('tel', $verifications['tel'])
-                                            ->orWhere(function($query) use ($verifications) {
-                                                if (!is_null($verifications['tel2'])) {
-                                                    $query->where('tel2', $verifications['tel2']);
-                                                }
-                                            })
-                                            ->orWhere('email', $verifications['email'])
-                                            ->orWhere('nom', $verifications['nom'])
-                                            ->orWhere('fax', $verifications['fax']);
-                                    })->first();
-
-            if ($assuranceExist ) {
-                if ($assuranceExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $assuranceExist->tel2 === $verifications['tel2'])) {
-                    return response()->json(['tel_existe' => true]);
-                } elseif ($assuranceExist->email === $verifications['email']) {
-                    return response()->json(['email_existe' => true]);
-                } elseif ($assuranceExist->nom === $verifications['nom']) {
-                    return response()->json(['nom_existe' => true]);
-                } elseif ($assuranceExist->fax === $verifications['fax']) {
-                    return response()->json(['fax_existe' => true]);
-                }
-            }
-
-            $put->nom = $request->nom;
-            $put->email = $request->email;
-            $put->adresse = $request->adresse;
-            $put->fax = $request->fax;
-            $put->tel = $request->tel;
-            $put->tel2 = $request->tel2;
-            $put->sgeo = $request->sgeo;
-
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
-
+        if ($verf) {
+            return response()->json(['existe' => true]);
         }
 
-        return response()->json(['error' => true]);
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_societe =[
+                    'nomsocieteassure' => $request->nom,
+                    'codeassurance' => $request->codeassurance,
+                    'codeassureur' => $request->assureur_id,
+                    'updated_at' => now(),
+                ];
+
+                $societeUpdate = DB::table('societeassure')
+                                    ->where('codesocieteassure', '=', $id)
+                                    ->update($updateData_societe);
+
+                if ($societeUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table societeassure');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function examen_Modif(Request $request, $id)
@@ -543,64 +519,110 @@ class ApiupdateController extends Controller
 
     public function update_assurance(Request $request, $id)
     {
-        $put = assurance::find($id);
 
-        if ($put) {
+        $verifications = [
+            'nom' => $request->nom,
+            'tel' => $request->tel,
+            'email' => $request->email,
+            'fax' => $request->fax ?? null,
+        ];
 
-            $verifications = [
-                'tel' => $request->tel,
-                'tel2' => $request->tel2 ?? null,
-                'email' => $request->email,
-                'nom' => $request->nom,
-                'fax' => $request->fax,
-            ];
+        $Exist = DB::table('assurance')->where(function ($query) use ($verifications) {
+            $query->where('libelleassurance', $verifications['nom'])
+                    ->where('telassurance', $verifications['tel'])
+                    ->where('emailassurance', $verifications['email'])
+                    ->orWhere(function ($query) use ($verifications) {
+                        if (!is_null($verifications['fax'])) {
+                            $query->where('faxassurance', $verifications['fax']);
+                        }
+                    });
+        })->where('idassurance', '!=', $id)->first();
 
-            $assuranceExist = assurance::where('id', '!=', $id)
-                                    ->where(function($query) use ($verifications) {
-                                        $query->where('tel', $verifications['tel'])
-                                            ->orWhere(function($query) use ($verifications) {
-                                                if (!is_null($verifications['tel2'])) {
-                                                    $query->where('tel2', $verifications['tel2']);
-                                                }
-                                            })
-                                            ->orWhere(function($query) use ($verifications) {
-                                                if (!is_null($verifications['fax'])) {
-                                                    $query->where('fax', $verifications['fax']);
-                                                }
-                                            })
-                                            ->orWhere('email', $verifications['email'])
-                                            ->orWhere('nom', $verifications['nom']);
-                                    })->first();
-
-            if ($assuranceExist ) {
-                if ($assuranceExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $assuranceExist->tel2 === $verifications['tel2'])) {
-                    return response()->json(['tel_existe' => true]);
-                } elseif ($assuranceExist->email === $verifications['email']) {
-                    return response()->json(['email_existe' => true]);
-                } elseif ($assuranceExist->nom === $verifications['nom']) {
-                    return response()->json(['nom_existe' => true]);
-                } elseif ($assuranceExist->fax === $verifications['fax']) {
-                    return response()->json(['fax_existe' => true]);
-                }
+        if ($Exist) {
+            if ($Exist->libelleassurance === $verifications['nom']) {
+                return response()->json(['nom_existe' => true]);
+            } elseif ($Exist->emailassurance === $verifications['email']) {
+                return response()->json(['email_existe' => true]);
+            } elseif ($Exist->telassurance === $verifications['tel']) {
+                return response()->json(['tel_existe' => true]);
+            } elseif (!is_null($verifications['fax']) && $Exist->faxassurance === $verifications['fax']) {
+                return response()->json(['fax_existe' => true]);
             }
-
-            $put->nom = $request->nom;
-            $put->email = $request->email;
-            $put->tel = $request->tel;
-            $put->tel2 = $request->tel2;
-            $put->fax = $request->fax;
-            $put->adresse = $request->adresse;
-            $put->carte = $request->carte;
-
-            if($put->save()){
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
-
         }
 
-        return response()->json(['error' => true]);
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_assurance =[
+                    'libelleassurance' => $request->nom,
+                    'telassurance' => $request->tel,
+                    'faxassurance' => $request->fax,
+                    'emailassurance' => $request->email,
+                    'adrassurance' => $request->adresse,
+                    'situationgeo' => $request->carte,
+                    'description' => $request->desc,
+                    'updated_at' => now(),
+                ];
+
+                $assuranceUpdate = DB::table('assurance')
+                                    ->where('idassurance', '=', $id)
+                                    ->update($updateData_assurance);
+
+                if ($assuranceUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table assurances');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function update_assureur(Request $request, $id)
+    {
+
+        $verifications = [
+            'nom' => $request->nom,
+        ];
+
+        $Exist = DB::table('assureur')->where(function ($query) use ($verifications) {
+            $query->where('libelle_assureur', $verifications['nom']);
+        })->where('codeassureur', '!=', $id)->first();
+
+        if ($Exist) {
+            if ($Exist->libelle_assureur === $verifications['nom']) {
+                return response()->json(['nom_existe' => true]);
+            }
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_assureur =[
+                    'libelle_assureur' => $request->nom,
+                    'updated_at' => now(),
+                ];
+
+                $assureurUpdate = DB::table('assureur')
+                                    ->where('codeassureur', '=', $id)
+                                    ->update($updateData_assureur);
+
+                if ($assureurUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table assureur');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function update_user(Request $request, $matricule)
@@ -663,6 +685,7 @@ class ApiupdateController extends Controller
                     'typecontrat' => $request->contrat_id,
                     'datecontrat' => $request->date_debut,
                     'datefincontrat' => $request->date_fin,
+                    'updated_at' => now(),
                 ];
 
                 $employeUpdate = DB::table('employes')
@@ -670,7 +693,7 @@ class ApiupdateController extends Controller
                                     ->update($updateData_employes);
 
                 if ($employeUpdate === 0) {
-                    throw new Exception('Erreur lors de l\'insertion dans la table employes');
+                    throw new Exception('Erreur lors de la mise à jour dans la table employes');
                 }
 
                 $updateData_users = [
@@ -680,6 +703,7 @@ class ApiupdateController extends Controller
                     'tel' => $request->tel,
                     'user_profil_id' => $request->profil_id,
                     'email' => $request->email,
+                    'updated_at' => now(),
                 ];
 
                 if ($request->password !== null) {
@@ -702,6 +726,7 @@ class ApiupdateController extends Controller
                 return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
     }
+
     public function update_mdp(Request $request, $matricule)
     {
         $put = user::find($id);

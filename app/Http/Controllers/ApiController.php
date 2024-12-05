@@ -38,8 +38,9 @@ class ApiController extends Controller
 
     public function assurance_select_patient_new()
     {
-       $assurance = assurance::select('id','nom')->get(); // Récupère toutes les assurances
-        return response()->json($assurance); 
+        $assurance = DB::table('assurance')->where('codeassurance', '!=', 'NONAS')->select('codeassurance','libelleassurance')->get();
+
+        return response()->json(['assurance' => $assurance]); 
     }
 
     public function select_medecin()
@@ -49,5 +50,12 @@ class ApiController extends Controller
         $medecin = user::where('users.role_id', '=', $role->id)->select('id','name')->get();
 
         return response()->json($medecin);
+    }
+
+    public function select_assureur()
+    {
+        $assureur = DB::table('assureur')->select('codeassureur','libelle_assureur')->get();
+
+        return response()->json(['assureur' => $assureur]); 
     }
 }

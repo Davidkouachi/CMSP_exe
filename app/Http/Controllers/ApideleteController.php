@@ -113,20 +113,26 @@ class ApideleteController extends Controller
         return response()->json(['error' => true]);
     }
 
-    public function delete_medecin($id)
+    public function delete_medecin($matricule)
     {
-        $put1 = user::find($id);
-        $put2 = typemedecin::where('user_id', '=', $id)->first();
+        DB::beginTransaction();
 
-        if ($put1 && $put2) {
-            // Perform deletion
-            $put2->delete(); // Delete related typemedecin entry
-            $put1->delete(); // Delete user entry
+            try {
 
-            return response()->json(['success' => true]);
-        }
+                $medecinDelete = DB::table('medecin')
+                                ->where('codemedecin', '=', $matricule)
+                                ->delete();
 
-        return response()->json(['error' => true]);
+                if (!$medecinDelete === 0) {
+                    throw new Exception('Erreur lors de la suppression dans la table medecin');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function delete_typeadmission($id)
@@ -195,18 +201,24 @@ class ApideleteController extends Controller
 
     public function delete_societe($id)
     {
-        $put = societe::find($id);
+        DB::beginTransaction();
 
-        if ($put) {
-            if ($put->delete()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
+            try {
+
+                $societeDelete = DB::table('societeassure')
+                                ->where('codesocieteassure', '=', $id)
+                                ->delete();
+
+                if (!$societeDelete === 0) {
+                    throw new Exception('Erreur lors de la suppresion dans la table societeassure');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
-
-        return response()->json(['error' => true]);
-
     }
 
     public function delete_rdv($id)
@@ -315,13 +327,55 @@ class ApideleteController extends Controller
                 }
 
                 DB::commit();
-                return response()->json(['success' => true]);
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
             } catch (Exception $e) {
                 DB::rollback();
                 return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
+    }
 
-        return response()->json(['error' => true]);
+    public function delete_assurance($id)
+    {
+        DB::beginTransaction();
+
+            try {
+
+                $assuranceDelete = DB::table('assurance')
+                                ->where('idassurance', '=', $id)
+                                ->delete();
+
+                if (!$assuranceDelete === 0) {
+                    throw new Exception('Erreur lors de la suppresion dans la table assurance');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function delete_assureur($id)
+    {
+        DB::beginTransaction();
+
+            try {
+
+                $assureurDelete = DB::table('assureur')
+                                ->where('codeassureur', '=', $id)
+                                ->delete();
+
+                if (!$assureurDelete === 0) {
+                    throw new Exception('Erreur lors de la suppresion dans la table assureur');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
 }

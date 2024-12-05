@@ -43,6 +43,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/societe_select_patient_new', [ApiController::class, 'societe_select_patient_new']);
 	Route::get('/assurance_select_patient_new', [ApiController::class, 'assurance_select_patient_new']);
 	Route::get('/select_medecin', [ApiController::class, 'select_medecin']);
+	Route::get('/select_assureur', [ApiController::class, 'select_assureur']);
 	// recherche fin
 
 	// insert debut
@@ -74,6 +75,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/new_user', [ApiinsertController::class, 'new_user']);
 	Route::get('/caisse_ouvert', [ApiinsertController::class, 'caisse_ouvert']);
 	Route::get('/caisse_fermer', [ApiinsertController::class, 'caisse_fermer']);
+	Route::get('/assureur_new', [ApiinsertController::class, 'assureur_new']);
 	// insert debut
 
 	// search debut
@@ -120,7 +122,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/update_lit/{id}', [ApiupdateController::class, 'update_lit']);
 	Route::get('/update_acte/{id}', [ApiupdateController::class, 'update_acte']);
 	Route::get('/update_typeacte/{id}', [ApiupdateController::class, 'update_typeacte']);
-	Route::get('/update_medecin/{id}', [ApiupdateController::class, 'update_medecin']);
+	Route::get('/update_medecin/{matricule}', [ApiupdateController::class, 'update_medecin']);
 	Route::get('/update_typeadmission/{id}', [ApiupdateController::class, 'update_typeadmission']);
 	Route::get('/update_natureadmission/{id}', [ApiupdateController::class, 'update_natureadmission']);
 	Route::get('/update_produit/{id}', [ApiupdateController::class, 'update_produit']);
@@ -137,6 +139,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/update_assurance/{id}', [ApiupdateController::class, 'update_assurance']);
 	Route::get('/update_date_hos/{id}', [ApiupdateController::class, 'update_date_hos']);
 	Route::get('/patient_modif/{id}', [ApiupdateController::class, 'patient_modif']);
+	Route::get('/update_assureur/{id}', [ApiupdateController::class, 'update_assureur']);
 	// update debut
 
 	// delete debut
@@ -144,7 +147,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/delete_lit/{id}', [ApideleteController::class, 'delete_lit']);
 	Route::get('/delete_acte/{id}', [ApideleteController::class, 'delete_acte']);
 	Route::get('/delete_typeacte/{id}', [ApideleteController::class, 'delete_typeacte']);
-	Route::get('/delete_medecin/{id}', [ApideleteController::class, 'delete_medecin']);
+	Route::get('/delete_medecin/{matricule}', [ApideleteController::class, 'delete_medecin']);
 	Route::get('/delete_typeadmission/{id}', [ApideleteController::class, 'delete_typeadmission']);
 	Route::get('/delete_natureadmission/{id}', [ApideleteController::class, 'delete_natureadmission']);
 	Route::get('/delete_typesoins/{id}', [ApideleteController::class, 'delete_typesoins']);
@@ -155,6 +158,8 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/delete_depotfacture/{id}', [ApideleteController::class, 'delete_depotfacture']);
 	Route::get('/delete_Cons/{id}', [ApideleteController::class, 'delete_Cons']);
 	Route::get('/delete_user/{matricule}', [ApideleteController::class, 'delete_user']);
+	Route::get('/delete_assurance/{id}', [ApideleteController::class, 'delete_assurance']);
+	Route::get('/delete_assureur/{id}', [ApideleteController::class, 'delete_assureur']);
 	// delete debut
 
 	// liste debut
@@ -193,6 +198,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/trace_operation/{date1}/{date2}/{typemvt}/{user_id}', [ApilistController::class, 'trace_operation']);
 	Route::get('/list_rdv_two_days', [ApilistController::class, 'list_rdv_two_days']);
 	Route::get('/trace_ouvert_fermer/{date1}/{date2}', [ApilistController::class, 'trace_ouvert_fermer']);
+	Route::get('/list_assureur_all', [ApilistController::class, 'list_assureur_all']);
 	// liste debut
 
 	// statistique debut

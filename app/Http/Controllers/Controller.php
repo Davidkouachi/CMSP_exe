@@ -56,6 +56,11 @@ class Controller
         return view('accueil.reception.societe');
     }
 
+    public function assureur_liste()
+    {
+        return view('accueil.reception.assureur');
+    }
+
     public function assurance_liste()
     {
         return view('accueil.reception.assurance');

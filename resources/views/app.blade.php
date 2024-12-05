@@ -146,7 +146,7 @@
                 </a>
                 <div class="sidebarMenuScroll">
                     <ul class="sidebar-menu">
-                        <li @if(request()->routeIs('index_accueil','consultation_liste','patient_liste','societe_liste','horaire_medecin','assurance_liste')) class="active current-page treeview" @else class="treeview" @endif >
+                        <li @if(request()->routeIs('index_accueil','consultation_liste','patient_liste','societe_liste','horaire_medecin','assurance_liste','assureur_liste')) class="active current-page treeview" @else class="treeview" @endif >
                             <a href="#!">
                                 <i class="ri-computer-line"></i>
                                 <span class="menu-text text-primary">
@@ -162,6 +162,11 @@
                                 <li>
                                     <a @if(request()->routeIs('consultation_liste')) class="text-primary" @endif href="{{route('consultation_liste')}}">
                                         <b>Consultations</b>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a @if(request()->routeIs('assureur_liste')) class="text-primary" @endif href="{{route('assureur_liste')}}">
+                                        <b>Assureur</b>
                                     </a>
                                 </li>
                                 <li>

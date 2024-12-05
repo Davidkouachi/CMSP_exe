@@ -71,6 +71,8 @@ Route::middleware(['auth','statutchambre','dateRdv'])->group(function () {
 	Route::get('/Facture Impayer', [Controller::class, 'facture_impayer'])->name('facture_impayer');
 	Route::get('/Liste Facture', [Controller::class, 'facture_liste'])->name('facture_liste');
 
+	Route::get('/Assureur', [Controller::class, 'assureur_liste'])->name('assureur_liste');
+
 	Route::get('/Acte', [Controller::class, 'acte_new'])->name('acte_new');
 	Route::get('/Type Acte', [Controller::class, 'typeacte_new'])->name('typeacte_new');
 	Route::get('/Nouvel Medecin', [utilisateurController::class, 'medecin_new'])->name('medecin_new');

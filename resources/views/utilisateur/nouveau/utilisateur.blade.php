@@ -188,13 +188,13 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Date début contrat</label>
-                                                <input type="date" class="form-control" id="date_debut" min="{{ date('Y-m-d') }}">
+                                                <input type="date" class="form-control" id="date_debut">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Date fin contrat</label>
-                                                <input disabled type="date" class="form-control" id="date_fin" min="{{ date('Y-m-d') }}">
+                                                <input disabled type="date" class="form-control">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -440,13 +440,13 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Date début contrat</label>
-                                <input type="date" class="form-control" id="date_debutModif" min="{{ date('Y-m-d') }}">
+                                <input type="date" class="form-control" id="date_debutModif">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Date fin contrat</label>
-                                <input type="date" class="form-control" id="date_finModif" min="{{ date('Y-m-d') }}">
+                                <input type="date" class="form-control" id="date_finModif">
                             </div>
                         </div>
                         <div class="col-12">
@@ -920,23 +920,23 @@
                     } else if (response.success) {
 
                         civilite.val('').trigger('change');
-                        nom.val('')
-                        prenom.val('')
-                        email.val('')
-                        tel.val('')
-                        tel2.val('')
-                        datenais.val('')
+                        nom.val('');
+                        prenom.val('');
+                        email.val('');
+                        tel.val('');
+                        tel2.val('');
+                        datenais.val('');
                         typepiece.val('').trigger('change');
                         niveau.val('').trigger('change');
                         diplome.val('').trigger('change');
-                        residence.val('')
+                        residence.val('');
                         service_id.val('').trigger('change');
                         profil_id.val('').trigger('change');
                         contrat_id.val('').trigger('change');
-                        date_debut.val('')
-                        date_fin.val('')
-                        login.val('')
-                        password.val('0000')
+                        date_debut.val('');
+                        date_fin.val('');
+                        login.val('');
+                        password.val('0000');
 
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
@@ -1011,7 +1011,7 @@
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                        <a class="btn btn-outline-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Detail" id="detail" 
+                            <a class="btn btn-outline-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Detail" id="detail" 
                                 data-dateenregistre="${row.dateenregistre}"
                                 data-civilite="${row.civilite}"
                                 data-nomprenom="${row.nomprenom}"
@@ -1442,9 +1442,12 @@
                 success: function(response) {
                     $('#preloader_ch').remove(); // Remove preloader
 
-                    $('#Table_day').DataTable().ajax.reload();
-
-                    showAlert('Succès', 'Opération éffectuée.', 'success');
+                    if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload();
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
                 },
                 error: function() {
                     $('#preloader_ch').remove(); // Remove preloader

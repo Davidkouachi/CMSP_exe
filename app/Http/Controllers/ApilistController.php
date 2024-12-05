@@ -54,6 +54,30 @@ use App\Models\portecaisse;
 
 class ApilistController extends Controller
 {
+    private function formatWithPeriods($number) 
+    {
+        return number_format($number, 0, '', '.');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function list_chambre()
     {
         $chambre = chambre::orderBy('created_at', 'desc')->get();
@@ -90,20 +114,16 @@ class ApilistController extends Controller
 
     public function list_medecin()
     {
-        $role = role::where('nom', '=', 'MEDECIN')->first();
 
-        $medecin = user::join('typemedecins', 'typemedecins.user_id', '=', 'users.id')
-                        ->join('typeactes', 'typemedecins.typeacte_id', '=', 'typeactes.id')
-                        ->where('users.role_id', '=', $role->id)
-                        ->orderBy('users.created_at', 'desc')
-                        ->select(
-                            'users.*', 
-                            'typeactes.nom as typeacte', 
-                            'typemedecins.typeacte_id as typeacte_id'
-                        )
-                        ->get();
+        $medecins = DB::table('medecin')
+            ->join('specialitemed', 'specialitemed.codespecialitemed', '=', 'medecin.codespecialitemed')
+            ->select('medecin.*','specialitemed.codespecialitemed as specialite_id','specialitemed.nomspecialite as specialite')
+            ->orderBy('medecin.dateservice', 'desc')
+            ->get();
 
-        return response()->json(['data' => $medecin]);
+        return response()->json([
+            'data' => $medecins,
+        ]);
     }
 
     public function list_cons_day()
@@ -453,7 +473,17 @@ class ApilistController extends Controller
 
     public function list_societe_all()
     {
-        $societe = societe::orderBy('created_at', 'desc')->get();
+        $societe = DB::table('societeassure')
+            ->join('assurance', 'assurance.codeassurance', '=', 'societeassure.codeassurance')
+            ->join('assureur', 'assureur.codeassureur', '=', 'societeassure.codeassureur')
+            ->select(
+                'societeassure.*',
+                'assurance.codeassurance as codeassurance',
+                'assurance.libelleassurance as assurance',
+                'assureur.codeassureur as codeassureur',
+                'assureur.libelle_assureur as assureur',
+            )
+            ->get();
 
         return response()->json([
             'data' => $societe,
@@ -683,11 +713,6 @@ class ApilistController extends Controller
                         ->get();
 
         return response()->json(['typeacte' => $typeacte]);
-    }
-
-    private function formatWithPeriods($number) 
-    {
-        return number_format($number, 0, '', '.');
     }
 
     public function list_depotfacture(Request $request)
@@ -970,9 +995,18 @@ class ApilistController extends Controller
         ]);
     }
 
+    public function list_assureur_all()
+    {
+        $assureur = DB::table('assureur')->get();
+
+        return response()->json([
+            'data' => $assureur,
+        ]);
+    }
+
     public function list_assurance_all()
     {
-        $assurance = assurance::orderBy('created_at', 'desc')->get();
+        $assurance = DB::table('assurance')->where('codeassurance', '!=', 'NONAS')->get();
 
         return response()->json([
             'data' => $assurance,
@@ -1032,7 +1066,6 @@ class ApilistController extends Controller
             'data' => $users,
         ]);
     }
-
 
     public function list_rdv_two_days()
     {

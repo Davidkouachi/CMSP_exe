@@ -27,7 +27,7 @@
                     <div class="py-4 px-3 text-white">
                         <h6>MEDECINS</h6>
                         {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
-                        <p>Accueil / Configuration / Nouveau Médécin</p>
+                        <p>Accueil / Configuration / Médécin</p>
                     </div>
                 </div>
             </div>
@@ -64,23 +64,18 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="card-body" >
-                                    <!-- Row starts -->
+                                <div class="card-body">
                                     <div class="row gx-3">
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Nom et Prénoms</label>
+                                                <label class="form-label">Nom</label>
                                                 <input type="text" class="form-control" id="nom" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Sexe</label>
-                                                <select class="form-select" id="sexe">
-                                                    <option value="">Selectionner</option>
-                                                    <option value="Mr">Homme</option>
-                                                    <option value="Mme">Femme</option>
-                                                </select>
+                                                <label class="form-label">Prénoms</label>
+                                                <input type="text" class="form-control" id="prenom" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -97,21 +92,21 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Contact 2</label>
-                                                <input type="tel" class="form-control" id="tel2" placeholder="facultatif" maxlength="10">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="adresse">Localisation</label>
-                                                <input type="text" class="form-control" id="adresse" placeholder="Saisie Obligatoire">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
                                                 <label class="form-label">Spécialité</label>
                                                 <select class="form-select select2" id="specialite_id">
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Numéro d'ordre</label>
+                                                <input type="tel" class="form-control" id="numodremed" placeholder="Saisie Obligatoire">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Date de service</label>
+                                                <input type="date" class="form-control" id="dateservice" placeholder="Saisie Obligatoire">
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
@@ -121,13 +116,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="col-sm-12" >
-                                            <div class="mb-3" >
-                                                <div id="div_alert" ></div>
-                                            </div>
-                                        </div>
                                     </div>
-                                    <!-- Row ends -->
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="twoAAA" role="tabpanel" aria-labelledby="tab-twoAAA">
@@ -142,16 +131,16 @@
                                 <div class="card-body">
                                     <div class="">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col">Nom et Prénoms</th>
-                                                        <th scope="col">Email</th>
                                                         <th scope="col">Matricule</th>
                                                         <th scope="col">Specialité</th>
                                                         <th scope="col">contact</th>
-                                                        <th scope="col">Localisation</th>
+                                                        <th scope="col">Date de service</th>
+                                                        <th scope="col">Durée de service</th>
                                                         <th scope="col">Actions</th>
                                                     </tr>
                                                 </thead>
@@ -170,7 +159,21 @@
     </div>
 </div>
 
-<div class="modal fade" id="Mdelete" tabindex="-1" aria-labelledby="delRowLabel" aria-modal="true" role="dialog">
+<div class="modal fade" id="Detail" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Détail Médecin
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal_detail"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Mdelete" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -181,7 +184,7 @@
             </div>
             <div class="modal-body">
                 Voulez-vous vraiment supprimé ce Médecin
-                <input type="hidden" id="Iddelete">
+                <input type="hidden" id="Matricule_delete">
             </div>
             <div class="modal-footer">
                 <div class="d-flex justify-content-end gap-2">
@@ -193,8 +196,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="Mmodif" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="Mmodif" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
@@ -202,40 +205,51 @@
             </div>
             <div class="modal-body">
                 <form id="updateForm">
-                    <div class="mb-3" id="alert_update">
-                        
-                    </div>
-                    <input type="hidden" id="Id">
-                    <div class="mb-3">
-                        <label class="form-label">Nom et Prénoms</label>
-                        <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Sexe</label>
-                        <select class="form-select" id="sexeModif">
-                            <option value="Mr">Homme</option>
-                            <option value="Mme">Femme</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact</label>
-                        <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact 2</label>
-                        <input type="tel" class="form-control" id="tel2Modif" placeholder="facultatif" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse</label>
-                        <input type="text" class="form-control" id="adresseModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Specialité</label>
-                        <select class="form-select select2" id="specialite_idModif"></select>
+                    <input type="hidden" id="Matricule_up">
+                    <div class="row gx-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Prénoms</label>
+                                <input type="text" class="form-control" id="prenomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Contact</label>
+                                <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Spécialité</label>
+                                <select class="form-select select2" id="specialite_idModif">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Numéro d'ordre</label>
+                                <input type="tel" class="form-control" id="numodremedModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Date de service</label>
+                                <input type="date" class="form-control" id="dateserviceModif" placeholder="Saisie Obligatoire">
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -269,7 +283,6 @@
     $(document).ready(function() {
 
         select();
-        select_modif();
 
         $("#btn_eng").on("click", eng);
         $("#updateBtn").on("click", updatee);
@@ -279,14 +292,15 @@
             $('#Table_day').DataTable().ajax.reload();
         });
 
-        var inputs = ['#tel', '#tel2', '#telModif', '#tel2Modif'];
+        var inputs = ['#tel', '#telModif', '#numodremed'];
         inputs.forEach(function(selector) {
             $(selector).on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
             });
         });
 
-        function select() {
+        function select() 
+        {
             const $selectElement = $('#specialite_id');
             $selectElement.empty();
             $selectElement.append('<option value="">Sélectionner une spécialité</option>');
@@ -314,28 +328,8 @@
             });
         }
 
-        function select_modif() {
-            const $selectElement = $('#specialite_idModif');
-
-            // Clear existing options
-            $selectElement.empty();
-
-            $.ajax({
-                url: '/api/select_specialite',
-                method: 'GET',
-                success: function(response) {
-                    const data = response.typeacte;
-                    data.forEach(typeacte => {
-                        $selectElement.append(`<option value="${typeacte.id}">${typeacte.nom}</option>`);
-                    });
-                },
-                error: function() {
-                    // showAlert('danger', 'Impossible de generer le code automatiquement');
-                }
-            });
-        }
-
-        function showAlert(title, message, type) {
+        function showAlert(title, message, type) 
+        {
             Swal.fire({
                 title: title,
                 text: message,
@@ -343,16 +337,88 @@
             });
         }
 
-        function eng() {
+        function formatDate(dateString) 
+        {
+
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+        }
+
+        function formatDateHeure(dateString)
+        {
+
+            const date = new Date(dateString);
+                
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
+        }
+
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function calculateDuration(date_debut) 
+        {
+            const now = new Date();
+            const startDate = new Date(date_debut);
+
+            // Si la date de début est dans le passé par rapport à aujourd'hui, retourne 0
+            if (startDate > now) {
+                return '0';
+            }
+
+            const diffTime = Math.abs(now - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
+
+            if (diffDays < 7) {
+                return `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            } else if (diffDays < 30) {
+                const weeks = Math.floor(diffDays / 7);
+                return `${weeks} semaine${weeks > 1 ? 's' : ''}`;
+            } else if (diffDays < 365) {
+                const months = Math.floor(diffDays / 30);
+                return `${months} mois`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                return `${years} an${years > 1 ? 's' : ''}`;
+            }
+        }
+
+        function eng() 
+        {
             const nom = $('#nom');
+            const prenom = $('#prenom');
             const email = $('#email');
             const tel = $('#tel');
-            const tel2 = $('#tel2');
-            const sexe = $('#sexe');
-            const adresse = $('#adresse');
+            const num = $('#numodremed');
+            const dateservice = $('#dateservice');
             const specialite_id = $('#specialite_id');
 
-            if (!nom.val().trim() || !email.val().trim() || !tel.val().trim() || !sexe.val().trim() || !adresse.val().trim() || !specialite_id.val().trim()) {
+            if (!nom.val().trim() || !prenom.val().trim() || !email.val().trim() || !tel.val().trim() || !specialite_id.val().trim() || !dateservice.val().trim() || !num.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
@@ -363,7 +429,7 @@
                 return false;
             }
 
-            if (tel.val().length !== 10 || (tel2.val().trim() && tel2.val().length !== 10)) {
+            if (tel.val().length !== 10) {
                 showAlert('Alert', 'Contact incomplet.', 'warning');
                 return false;
             }
@@ -381,12 +447,12 @@
                 method: 'GET',
                 data: {
                     nom: nom.val(),
+                    prenom: prenom.val(),
                     email: email.val(),
                     tel: tel.val(),
-                    tel2: tel2.val() || null,
-                    adresse: adresse.val(),
-                    sexe: sexe.val(),
-                    specialite_id: specialite_id.val()
+                    num: num.val(),
+                    dateservice: dateservice.val(),
+                    specialite_id: specialite_id.val(),
                 },
                 success: function(response) {
                     $('#preloader_ch').remove();
@@ -399,12 +465,12 @@
                         showAlert('Alert', 'Cet Médecin existe déjà.', 'warning');
                     } else if (response.success) {
 
-                        nom.val('');
-                        email.val('');
-                        tel.val('');
-                        tel2.val('');
-                        adresse.val('');
-                        sexe.val('');
+                        nom: nom.val('');
+                        prenom: prenom.val('');
+                        email: email.val('');
+                        tel: tel.val('');
+                        num: num.val('');
+                        dateservice: dateservice.val('');
                         specialite_id.val('').trigger('change');
                         
                         $('#Table_day').DataTable().ajax.reload();
@@ -437,45 +503,74 @@
                     orderable: false,
                 },
                 { 
-                    data: 'name', 
+                    data: 'nomprenomsmed', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
                             <img src="{{ asset('/assets/images/docteur.png') }}" class="img-2x rounded-circle border border-1">
                         </a>
-                        Dr. ${data}
+                        ${data}
                     </div>`,
                     searchable: true, 
                 },
                 { 
-                    data: 'email',
+                    data: 'codemedecin',
                     searchable: true,
                 },
                 { 
-                    data: 'matricule',
+                    data: 'specialite',
+                    searchable: true, 
+                },
+                {
+                    data: 'contact',
+                    render: (data, type, row) => {
+                        return data ? `+225 ${data}` : 'Néant';
+                    },
+                    searchable: true,
+                },
+                { 
+                    data: 'dateservice', 
+                    render: (data) => `${formatDate(data)}`,
                     searchable: true, 
                 },
                 { 
-                    data: 'typeacte',
-                    searchable: true, 
-                },
-                { 
-                    data: 'tel', 
-                    render: (data) => `+225 ${data}`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'adresse',
+                    data: 'dateservice', 
+                    render: (data) => `${calculateDuration(data)}`,
                     searchable: true, 
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm edit-btn" data-id="${row.id}" data-name="${row.name}" data-email="${row.email}" data-tel="${row.tel}" data-tel2="${row.tel2}" data-adresse="${row.adresse}" data-sexe="${row.sexe}" data-specialite_id="${row.specialite_id}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
+                            <a class="btn btn-outline-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Detail" id="detail" 
+                                data-dateservice="${row.dateservice}"
+                                data-nomprenom="${row.nomprenomsmed}"
+                                data-tel="${row.contact}"
+                                data-matricule="${row.codemedecin}"
+                                data-nom="${row.nommedecin}"
+                                data-prenom="${row.prenomsmedecin}"
+                                data-num="${row.numordremed}"
+                                data-specialite="${row.specialite}"
+                                data-email="${row.email}"
+
+                            >
+                                <i class="ri-eye-line"></i>
+                            </a>
+                            <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif"
+                                data-dateservice="${row.dateservice}"
+                                data-tel="${row.contact}"
+                                data-matricule="${row.codemedecin}"
+                                data-nom="${row.nommedecin}"
+                                data-prenom="${row.prenomsmedecin}"
+                                data-num="${row.numordremed}"
+                                data-specialite_id="${row.specialite_id}"
+                                data-email="${row.email}"
+                            >
                                 <i class="ri-edit-box-line"></i>
                             </a>
-                            <a class="btn btn-outline-danger btn-sm delete-btn" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete">
+                            <a class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete"
+                                data-matricule="${row.codemedecin}"
+                            >
                                 <i class="ri-delete-bin-line"></i>
                             </a>
                         </div>
@@ -492,60 +587,150 @@
 
         function initializeRowEventListeners() {
 
+            $('#Table_day').on('click', '#detail', function() {
+                const row = {
+                    dateservice: $(this).data('dateservice'),
+                    nomprenom: $(this).data('nomprenom'),
+                    tel: $(this).data('tel'),
+                    matricule: $(this).data('matricule'),
+
+                    nom: $(this).data('nom'),
+                    prenom: $(this).data('prenom'),
+
+                    num: $(this).data('num'),
+                    specialite: $(this).data('specialite'),
+                    email: $(this).data('email'),
+                };
+
+                const modal = document.getElementById('modal_detail');
+                modal.innerHTML = '';
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="row gx-3">
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <a class="d-flex align-items-center flex-column">
+                                            <img src="{{asset('assets/images/docteur.png')}}" class="img-7x rounded-circle mb-3 border border-3">
+                                            <h5>${row.nomprenom}</h5>
+                                            ${row.tel !== null ? 
+                                                `<h6 class="text-truncate"> +225 ${row.tel} </h6>` : 
+                                                ``
+                                            }
+                                            <p>Date de service : ${formatDate(row.dateservice)} </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations personnelles
+                                        </li>
+                                        <li class="list-group-item">
+                                            Matricule : ${row.matricule}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Nom : ${row.nom}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Prénoms : ${row.prenom}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Email : ${row.email !== null ? `${row.email}` : `Néant`}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Téléphone : ${row.tel !== null ? `+225 ${row.tel}` : `Néant`}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class=" mb-3">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active text-center" aria-current="true">
+                                            Informations Service
+                                        </li>
+                                        <li class="list-group-item">
+                                            Spécialité : ${row.specialite}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Numéro d'ordre : ${row.num}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Date de service : ${formatDate(row.dateservice)}
+                                        </li>
+                                        <li class="list-group-item">
+                                            Durée de service : ${calculateDuration(row.dateservice)} 
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                modal.appendChild(div);
+            });
+
             $('#Table_day').on('click', '#modif', function() {
-                const id = $(this).data('id');
-                const name = $(this).data('name');
-                const email = $(this).data('email');
+                const dateservice = $(this).data('dateservice');
                 const tel = $(this).data('tel');
-                const tel2 = $(this).data('tel2');
-                const adresse = $(this).data('adresse');
-                const sexe = $(this).data('sexe');
+                const matricule = $(this).data('matricule');
+                const nom = $(this).data('nom');
+                const prenom = $(this).data('prenom');
+                const num = $(this).data('num');
                 const specialite_id = $(this).data('specialite_id');
+                const email = $(this).data('email');
                 
-                $('#Id').val(id);
-                $('#nomModif').val(name);
+                $('#Matricule_up').val(matricule);
+                $('#nomModif').val(nom);
+                $('#prenomModif').val(prenom);
                 $('#emailModif').val(email);
                 $('#telModif').val(tel);
-                $('#tel2Modif').val(tel2);
-                $('#adresseModif').val(adresse);
-                $('#sexeModif').val(sexe);
+                $('#numodremedModif').val(num);
+                $('#dateserviceModif').val(dateservice);
 
-                $('#specialite_idModif').val(null).trigger('change');
                 $('#specialite_idModif').val(specialite_id).trigger('change');
             });
 
             $('#Table_day').on('click', '#delete', function() {
-                const id = $(this).data('id');
-                $('#Iddelete').val(id);
+                const matricule = $(this).data('matricule');
+                $('#Matricule_delete').val(matricule);
             });
         }
 
-        function updatee() {
+        function updatee() 
+        {
 
-            const id = $("#Id").val();
-            const nom = $("#nomModif").val().trim();
-            const email = $("#emailModif").val().trim();
-            const tel = $("#telModif").val().trim();
-            const tel2 = $("#tel2Modif").val().trim();
-            const sexe = $("#sexeModif").val().trim();
-            const adresse = $("#adresseModif").val().trim();
-            const specialite_id = $("#specialite_idModif").val().trim();
+            const matricule = $('#Matricule_up').val().trim();
+            const nom = $('#nomModif');
+            const prenom = $('#prenomModif');
+            const email = $('#emailModif');
+            const tel = $('#telModif');
+            const num = $('#numodremedModif');
+            const dateservice = $('#dateserviceModif');
+            const specialite_id = $('#specialite_idModif');
 
-            // Field validation
-            if (!nom || !email || !tel || !sexe || !adresse || !specialite_id) {
+            if (!nom.val().trim() || !prenom.val().trim() || !email.val().trim() || !tel.val().trim() || !specialite_id.val().trim() || !dateservice.val().trim() || !num.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
-            // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
+            if (!emailRegex.test(email.val().trim())) {
                 showAlert('Alert', 'Email incorrect.', 'warning');
                 return false;
             }
 
-            // Phone validation
-            if (tel.length !== 10 || (tel2 && tel2.length !== 10)) {
+            if (tel.val().length !== 10) {
                 showAlert('Alert', 'Contact incomplet.', 'warning');
                 return false;
             }
@@ -561,16 +746,16 @@
             $("body").append(preloader);
 
             $.ajax({
-                url: '/api/update_medecin/' + id,
+                url: '/api/update_medecin/' + matricule,
                 method: 'GET',
                 data: {
-                    nom: nom,
-                    email: email,
-                    tel: tel,
-                    tel2: tel2 || null,
-                    adresse: adresse,
-                    sexe: sexe,
-                    specialite_id: specialite_id
+                    nom: nom.val(),
+                    prenom: prenom.val(),
+                    email: email.val(),
+                    tel: tel.val(),
+                    num: num.val(),
+                    dateservice: dateservice.val(),
+                    specialite_id: specialite_id.val(),
                 },
                 success: function(response) {
                     $("#preloader_ch").remove();
@@ -579,13 +764,11 @@
                         showAlert('Alert', 'Veuillez saisir autre numéro de téléphone s\'il vous plaît', 'warning');
                     } else if (response.email_existe) {
                         showAlert('Alert', 'Veuillez saisir autre email s\'il vous plaît', 'warning');
-                    } else if (response.nom_existe) {
-                        showAlert('Alert', 'Cet Médecin existe déjà.', 'warning');
                     } else if (response.success) {
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
+                        showAlert('Erreur', response.message, 'error');
                     }
                 },
                 error: function() {
@@ -595,8 +778,9 @@
             });
         }
 
-        function deletee() {
-            const id = $("#Iddelete").val();
+        function deletee() 
+        {
+            const matricule = $("#Matricule_delete").val().trim();
 
             const modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
             modal.hide();
@@ -609,19 +793,21 @@
             $("body").append(preloader);
 
             $.ajax({
-                url: '/api/delete_medecin/' + id,
-                method: 'DELETE',
+                url: '/api/delete_medecin/' + matricule,
+                method: 'GET',
                 success: function(response) {
                     $("#preloader_ch").remove();
 
                     if (response.success) {
                         $('#Table_day').DataTable().ajax.reload();
-                        showAlert('Succès', 'Opération éffectuée.', 'success');
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
                     }
                 },
                 error: function() {
                     $("#preloader_ch").remove();
-                    showAlert('Erreur', 'Erreur lors de la suppression de la chambre.', 'error');
+                    showAlert('Erreur', 'Erreur lors de l\'opération.', 'error');
                 }
             });
         }

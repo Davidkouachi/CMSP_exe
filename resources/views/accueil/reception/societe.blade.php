@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Sociétes.</h5>
+                        <h6>SOCIETES</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Récéption / Sociétés</p>
                     </div>
                 </div>
             </div>
@@ -74,38 +74,16 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" id="email" placeholder="Saisie Obligatoire">
+                                                <label class="form-label">Assurance</label>
+                                                <select class="form-select select2" id="codeassurance">
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Contact</label>
-                                                <input type="tel" class="form-control" id="tel" placeholder="Saisie Obligatoire" maxlength="10">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Contact 2</label>
-                                                <input type="tel2" class="form-control" id="tel2" placeholder="facultatif" maxlength="10">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Adresse</label>
-                                                <input type="text" class="form-control" id="adresse" placeholder="Saisie Obligatoire">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Fax</label>
-                                                <input type="text" class="form-control" id="fax" placeholder="Saisie Obligatoire">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Situation Géographique</label>
-                                                <input type="text" class="form-control" id="sgeo" placeholder="Saisie Obligatoire">
+                                                <label class="form-label">Assureur</label>
+                                                <select class="form-select select2" id="assureur_id">
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-sm-12 mb-3 ">
@@ -137,13 +115,8 @@
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col">Nom</th>
-                                                        <th scope="col">Email</th>
-                                                        <th scope="col">contact 1</th>
-                                                        <th scope="col">contact 2</th>
-                                                        <th scope="col">Adresse</th>
-                                                        <th scope="col">Fax</th>
-                                                        <th scope="col">Localisation</th>
-                                                        <th scope="col">Date de création</th>
+                                                        <th scope="col">Assurance</th>
+                                                        <th scope="col">Assureur</th>
                                                         <th scope="col">Actions</th>
                                                     </tr>
                                                 </thead>
@@ -172,35 +145,27 @@
             <div class="modal-body">
                 <form id="updateChambreForm">
                     <input type="hidden" id="Id">
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="nomModif" oninput="this.value = this.value.toUpperCase()">
+                    <div class="row gx-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Nom de la société</label>
+                                <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact</label>
-                        <input type="tel" class="form-control" id="telModif" placeholder="Saisie Obligatoire" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact 2</label>
-                        <input type="tel2" class="form-control" id="tel2Modif" placeholder="Facultatif" maxlength="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse</label>
-                        <input type="text" class="form-control" id="adresseModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fax</label>
-                        <input type="text" class="form-control" id="faxModif" placeholder="Saisie Obligatoire">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Situation Géographique</label>
-                        <input type="text" class="form-control" id="sgeoModif" placeholder="Saisie Obligatoire">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Assurance</label>
+                                <select class="form-select select2" id="codeassuranceModif">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Assureur</label>
+                                <select class="form-select select2" id="assureur_idModif">
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -223,7 +188,7 @@
             </div>
             <div class="modal-body">
                 Voulez-vous vraiment supprimé cette Société
-                <input type="hidden" id="Iddelete">
+                <input type="hidden" id="Id_delete">
             </div>
             <div class="modal-footer">
                 <div class="d-flex justify-content-end gap-2">
@@ -238,8 +203,32 @@
 <script src="{{asset('assets/js/app/js/jspdfinvoicetemplate/dist/index.js')}}" ></script>
 <script src="{{asset('jsPDF-master/dist/jspdf.umd.js')}}"></script>
 
+@include('select2')
+
+<script>
+    $('#Mmodif').on('shown.bs.modal', function () {
+        var select = ['#codeassuranceModif', '#codeassurance', '#assureur_idModif', '#assureur_id'];
+        select.forEach(function(id) {
+            $(id).select2({
+                theme: 'bootstrap',
+                placeholder: 'Selectionner',
+                language: {
+                    noResults: function() {
+                        return "Aucun résultat trouvé";
+                    }
+                },
+                width: '100%',
+                dropdownParent: $('#Mmodif'),
+            });
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function() {
+
+        select_assureur();
+        select_assurance();
 
         $("#btn_eng").on("click", eng);
         $("#updateBtn").on("click", updatee);
@@ -247,25 +236,6 @@
 
         $('#btn_refresh_table').on('click', function () {
             $('#Table_day').DataTable().ajax.reload();
-        });
-
-        var inputs = ['tel', 'tel2','telModif', 'tel2Modif',]; // Array of element IDs
-        inputs.forEach(function(id) {
-            var inputElement = document.getElementById(id); // Get each element by its ID
-
-            // Allow only numeric input (and optionally some special keys like backspace or delete)
-            inputElement.addEventListener('keypress', function(event) {
-                const key = event.key;
-                // Allow numeric keys, backspace, and delete
-                if (!/[0-9]/.test(key) && key !== 'Backspace' && key !== 'Delete') {
-                    event.preventDefault();
-                }
-            });
-
-            // Alternatively, for more comprehensive input validation, use input event listener
-            inputElement.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
-            });
         });
 
         function showAlert(title, message, type) {
@@ -276,91 +246,126 @@
             });
         }
 
-        function eng()
+        function select_assurance() 
         {
-            const nom = document.getElementById("nom");
-            const email = document.getElementById("email");
-            const adresse = document.getElementById("adresse");
-            const fax = document.getElementById("fax");
-            const tel = document.getElementById("tel");
-            const tel2 = document.getElementById("tel2");
-            const sgeo = document.getElementById("sgeo");
+            const selectElement2 = $('#codeassurance');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-            if(!nom.value.trim() || !email.value.trim() || !adresse.value.trim() || !fax.value.trim() || !tel.value.trim() || !sgeo.value.trim())
-            {
+            const selectElement3 = $('#codeassuranceModif');
+            selectElement3.empty();
+
+            $.ajax({
+                url: '/api/assurance_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assurance;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
+
+                        selectElement3.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_assureur() 
+        {
+            const selectElement2 = $('#assureur_id');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            const selectElement3 = $('#assureur_idModif');
+            selectElement3.empty();
+
+            $.ajax({
+                url: '/api/select_assureur',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assureur;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassureur,
+                            text: item.libelle_assureur,
+                        }));
+
+                        selectElement3.append($('<option>', {
+                            value: item.codeassureur,
+                            text: item.libelle_assureur,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function eng() 
+        {
+            const nom = $("#nom");
+            const codeassurance= $("#codeassurance");
+            const assureur_id = $("#assureur_id");
+
+            if (!codeassurance.val().trim() || !nom.val().trim() || !assureur_id.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value.trim())) { 
-                showAlert('Alert', 'Email incorrect.','warning');
-                return false;
-            }
-
-
-            if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.','warning');
-                return false;
-            }
-
-            var preloader_ch = `
+            // Show preloader
+            const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
+            // AJAX request to create a new user
             $.ajax({
                 url: '/api/societe_new',
                 method: 'GET',
-                data: { 
-                    nom: nom.value,
-                    email: email.value,
-                    adresse: adresse.value,
-                    fax: fax.value,
-                    tel: tel.value,
-                    tel2: tel2.value || null,
-                    sgeo: sgeo.value,
+                data: {
+                    codeassurance: codeassurance.val(),
+                    nom: nom.val(),
+                    assureur_id: assureur_id.val(),
                 },
                 success: function(response) {
+                    $("#preloader_ch").remove();
 
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a une Société.','warning');
-                    }else if (response.email_existe) {
-                        showAlert('Alert', 'Ce email appartient déjà a une Société.','warning');
-                    }else if (response.nom_existe) {
-                        showAlert('Alert', 'Cette Société existe déjà.','warning');
-                    }else if (response.fax_existe) {
-                        showAlert('Alert', 'Ce fax appartient déjà a une Société.','warning');
+                    if (response.existe) {
+                        showAlert('Alert', 'Cette société existe déjà', 'warning');
                     } else if (response.success) {
-                        nom.value = '';
-                        email.value = '';
-                        adresse.value = '';
-                        fax.value = '';
-                        tel.value = '';
-                        tel2.value = '';
-                        sgeo.value = '';
+
+                        nom.val('')
+                        codeassurance.val('').trigger('change');
+                        assureur_id.val('').trigger('change');
 
                         $('#Table_day').DataTable().ajax.reload();
-
-                        showAlert('Succès', 'Opérationn éffectué.','success');
+                        showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue.','error');
+                        showAlert('Erreur', reponse.message, 'error');
                     }
                 },
                 error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
+                    $("#preloader_ch").remove();
+                    showAlert('Erreur', 'Une erreur est survenue', 'error');
                 }
             });
         }
@@ -382,7 +387,7 @@
                     orderable: false,
                 },
                 { 
-                    data: 'nom', 
+                    data: 'nomsocieteassure', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
@@ -393,62 +398,35 @@
                     searchable: true, 
                 },
                 {
-                    data: 'email',
+                    data: 'assurance',
                     render: (data, type, row) => {
                         return data ? `${data}` : 'Néant';
                     },
                     searchable: true,
                 },
                 {
-                    data: 'tel',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'tel2',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'adresse',
+                    data: 'assureur',
                     render: (data, type, row) => {
                         return data ? `${data}` : 'Néant';
                     },
                     searchable: true,
                 },
-                {
-                    data: 'fax',
-                    render: (data, type, row) => {
-                        return data ? `${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'sgeo',
-                    render: (data, type, row) => {
-                        if (data) {
-                            return data.length > 15 ? `${data.substring(0, 15)}...` : data;
-                        }
-                        return 'Néant';
-                    },
-                    searchable: true,
-                },
-                { 
-                    data: 'created_at', 
-                    render: formatDateHeure,
-                    searchable: true, 
-                },
-                
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm edit-btn" data-id="${row.id}" data-nom="${row.nom}" data-email="${row.email}" data-tel="${row.tel}" data-tel2="${row.tel2}" data-adresse="${row.adresse}" data-fax="${row.fax}" data-sgeo="${row.sgeo}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
+                            <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif"
+                                data-id="${row.codesocieteassure}"
+                                data-nom="${row.nomsocieteassure}"
+                                data-codeassurance="${row.codeassurance}"
+                                data-assurance_id="${row.codeassureur}"
+                            >
                                 <i class="ri-edit-box-line"></i>
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete"
+                                data-id="${row.codesocieteassure}"
+                            >
+                                <i class="ri-delete-bin-line"></i>
                             </a>
                         </div>
                     `,
@@ -467,138 +445,76 @@
             $('#Table_day').on('click', '#modif', function() {
                 const id = $(this).data('id');
                 const nom = $(this).data('nom');
-                const email = $(this).data('email');
-                const tel = $(this).data('tel');
-                const tel2 = $(this).data('tel2');
-                const adresse = $(this).data('adresse');
-                const fax = $(this).data('fax');
-                const sgeo = $(this).data('sgeo');
+                const code = $(this).data('codeassurance');
+                const assuranceid = $(this).data('assurance_id');
 
                 $('#Id').val(id);
                 $('#nomModif').val(nom);
-                $('#emailModif').val(email);
-                $('#adresseModif').val(adresse);
-                $('#telModif').val(tel);
-                $('#tel2Modif').val(tel2);
-                $('#faxModif').val(fax);
-                $('#sgeoModif').val(sgeo);
+                $('#codeassuranceModif').val(code).trigger('change');
+                $('#assureur_idModif').val(assuranceid).trigger('change');
+            });
+
+            $('#Table_day').on('click', '#delete', function() {
+                const id = $(this).data('id');
+                $('#Id_delete').val(id);
             });
         }
 
-        function formatDate(dateString) {
-
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            const year = date.getFullYear();
-
-            return `${day}/${month}/${year}`; // Format as dd/mm/yyyy
-        }
-
-        function formatDateHeure(dateString) {
-
-            const date = new Date(dateString);
-                
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-
-            return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
-        }
-
-        function updatee() {
-
+        function updatee() 
+        {
             const id = document.getElementById('Id').value;
-            const nom = document.getElementById('nomModif');
-            const email = document.getElementById("emailModif");
-            const adresse = document.getElementById("adresseModif");
-            const fax = document.getElementById("faxModif");
-            const tel = document.getElementById("telModif");
-            const tel2 = document.getElementById("tel2Modif");
-            const sgeo = document.getElementById("sgeoModif");
+            const nom = $("#nomModif");
+            const codeassurance= $("#codeassuranceModif");
+            const assureur_id = $("#assureur_idModif");
 
-            if(!nom.value.trim() || !email.value.trim() || !adresse.value.trim() || !fax.value.trim() || !tel.value.trim() || !sgeo.value.trim())
-            {
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
-                return false;
-            }
-
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value.trim())) { 
-                showAlert('Alert', 'Email incorrect.','warning');
-                return false;
-            }
-
-
-            if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.','warning');
+            if (!codeassurance.val().trim() || !nom.val().trim() || !assureur_id.val().trim()) {
+                showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
             var modal = bootstrap.Modal.getInstance(document.getElementById('Mmodif'));
             modal.hide();
 
-            var preloader_ch = `
+            // Show preloader
+            const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
+            // AJAX request to create a new user
             $.ajax({
                 url: '/api/update_societe/'+id,
                 method: 'GET',
-                data: { 
-                    nom: nom.value,
-                    email: email.value,
-                    adresse: adresse.value,
-                    fax: fax.value,
-                    tel: tel.value,
-                    tel2: tel2.value || null,
-                    sgeo: sgeo.value,
+                data: {
+                    codeassurance: codeassurance.val(),
+                    nom: nom.val(),
+                    assureur_id: assureur_id.val(),
                 },
                 success: function(response) {
+                    $("#preloader_ch").remove();
 
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a une Société.','warning');
-                    }else if (response.email_existe) {
-                        showAlert('Alert', 'Ce email appartient déjà a une Société.','warning');
-                    }else if (response.nom_existe) {
-                        showAlert('Alert', 'Cette Société existe déjà.','warning');
-                    }else if (response.fax_existe) {
-                        showAlert('Alert', 'Ce fax appartient déjà a une Société.','warning');
+                    if (response.existe) {
+                        showAlert('Alert', 'Cette société existe déjà', 'warning');
                     } else if (response.success) {
+
                         $('#Table_day').DataTable().ajax.reload();
-                        showAlert('Succès', 'Opérationn éffectué.','success');
+                        showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue.','error');
+                        showAlert('Erreur', reponse.message, 'error');
                     }
                 },
                 error: function() {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Alert', 'Erreur lors de la mise à jour de l\'acte.','error');
+                    $("#preloader_ch").remove();
+                    showAlert('Erreur', 'Une erreur est survenue', 'error');
                 }
             });
         }
 
         function deletee() {
 
-            const id = document.getElementById('Iddelete').value;
+            const id = document.getElementById('Id_delete').value;
 
             var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
             modal.hide();
@@ -621,9 +537,12 @@
                         preloader.remove();
                     }
 
-                    showAlert('Succès', 'Acte supprimer avec succès.','success');
-
-                    $('#Table_day').DataTable().ajax.reload();
+                    if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload();
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
                 },
                 error: function() {
 
@@ -632,7 +551,7 @@
                         preloader.remove();
                     }
 
-                    showAlert('Erreur', 'Erreur lors de la suppression de la chambre.','error');
+                    showAlert('Erreur', 'Erreur lors de la suppression .','error');
                 }
             });
         }
