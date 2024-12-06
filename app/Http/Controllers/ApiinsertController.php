@@ -121,6 +121,14 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueMatriculeSpecialite()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('specialitemed')->where('codespecialitemed', '=', 'SP'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -1258,24 +1266,41 @@ class ApiinsertController extends Controller
 
     public function specialite_new(Request $request)
     {
-        $verf = typeacte::where('nom', '=', $request->nom)->exists();
 
-        if ($verf) {
-            return response()->json(['existe' => true]);
+        $Exist = DB::table('specialitemed')
+            ->where('nomspecialite', '=', $request->nom)
+            ->orWhere('abrspecialite', '=', $request->abr)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'Cette spécialité existe déjà']);
         }
 
-        $acte = acte::where('nom', '=', 'CONSULTATION')->first();
+        DB::beginTransaction();
 
-        $add = new typeacte();
-        $add->nom = $request->nom;
-        $add->prix = $request->prix;
-        $add->acte_id = $acte->id;
+            try {
 
-        if($add->save()){
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['error' => true]);
-        }
+                $matricule = $this->generateUniqueMatriculeSpecialite();
+
+                $specialiteInserted = DB::table('specialitemed')->insert([
+                    'codespecialitemed' => 'SP'.$matricule,
+                    'nomspecialite' => $request->nom,
+                    'abrspecialite' => $request->abr,
+                    'libellespecialite' => $request->nom,
+
+                ]);
+
+                if ($specialiteInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table specialitemed');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function new_depot_fac(Request $request)
@@ -1940,6 +1965,73 @@ class ApiinsertController extends Controller
         } else {
             return response()->json(['error' => true]);
         }
+    }
+
+    public function type_garantie_new(Request $request)
+    {
+        $Exist = DB::table('typgarantie')
+            ->where('codtypgar', '=', $request->code)
+            ->orWhere('libtypgar', '=', $request->nom)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'le Code ou le Type existe dèjà']);
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $typegarantieInserted = DB::table('typgarantie')->insert([
+                    'codtypgar' => $request->code,
+                    'libtypgar' => $request->nom,
+                ]);
+
+                if ($typegarantieInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table typgarantie');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function garantie_new(Request $request)
+    {
+        $Exist = DB::table('garantie')
+            ->where('codgaran', '=', $request->code)
+            ->orWhere('libgaran', '=', $request->nom)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'le Code ou cette garantie existe dèjà']);
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $garantieInserted = DB::table('garantie')->insert([
+                    'codgaran' => $request->code,
+                    'libgaran' => $request->nom,
+                    'codtypgar' => $request->code_type,
+                ]);
+
+                if ($garantieInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table garantie');
+                }
+
+                 // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
 }

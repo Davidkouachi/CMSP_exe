@@ -239,17 +239,24 @@ class ApideleteController extends Controller
 
     public function delete_specialite($id)
     {
-        $put = typeacte::find($id);
+        DB::beginTransaction();
 
-        if ($put) {
-            if ($put->delete()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
+            try {
+
+                $specialiteDelete = DB::table('specialitemed')
+                                ->where('codespecialitemed', '=', $id)
+                                ->delete();
+
+                if (!$specialiteDelete === 0) {
+                    throw new Exception('Erreur lors de la suppresion dans la table specialitemed');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
-
-        return response()->json(['error' => true]);
     }
 
     public function delete_depotfacture($id)

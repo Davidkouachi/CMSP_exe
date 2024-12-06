@@ -704,13 +704,14 @@ class ApilistController extends Controller
 
     public function list_specialite()
     {
-        $typeacte = typeacte::join('actes', 'actes.id', '=', 'typeactes.acte_id')
-                        ->where('actes.nom', '=', 'CONSULTATION')
-                        ->orderBy('typeactes.created_at', 'desc')
-                        ->select('typeactes.*')
-                        ->get();
 
-        return response()->json(['typeacte' => $typeacte]);
+        $specialite = DB::table('specialitemed')
+            ->select('codespecialitemed','nomspecialite', 'abrspecialite')
+            ->get();
+
+        return response()->json([
+            'data' => $specialite,
+        ]);
     }
 
     public function list_depotfacture(Request $request)
@@ -1127,6 +1128,29 @@ class ApilistController extends Controller
 
         return response()->json([
             'data' => $trace,
+        ]);
+    }
+
+    public function list_type_garantie()
+    {
+        $type = DB::table('typgarantie')
+            ->select('typgarantie.*')
+            ->get();
+
+        return response()->json([
+            'data' => $type,
+        ]);
+    }
+
+    public function list_garantie()
+    {
+        $garantie = DB::table('garantie')
+            ->leftJoin('typgarantie', 'garantie.codtypgar', '=', 'typgarantie.codtypgar')
+            ->select('garantie.*','typgarantie.libtypgar as type_garantie')
+            ->get();
+
+        return response()->json([
+            'data' => $garantie,
         ]);
     }
 

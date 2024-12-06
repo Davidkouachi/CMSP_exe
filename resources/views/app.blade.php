@@ -342,7 +342,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li @if(request()->routeIs('medecin_new','assurance_new','taux_new','societe_new','acte_new','typeacte_new','chambre_new','lit_new','typeadmission_new','natureadmission_new','produit_new','typesoins_new','soinsinfirmier_new','specialite','utilisateur')) class="active current-page treeview" @else class="treeview" @endif>
+                        <li @if(request()->routeIs('medecin_new','assurance_new','taux_new','societe_new','acte_new','typeacte_new','chambre_new','lit_new','typeadmission_new','natureadmission_new','produit_new','typesoins_new','soinsinfirmier_new','specialite','utilisateur','garantie_tarif')) class="active current-page treeview" @else class="treeview" @endif>
                             <a href="#!">
                                 <i class="ri-settings-5-line"></i>
                                 <span class="menu-text text-primary">
@@ -350,6 +350,11 @@
                                 </span>
                             </a>
                             <ul class="treeview-menu">
+                                <li>
+                                    <a @if(request()->routeIs('garantie_tarif')) class="text-primary" @endif href="{{route('garantie_tarif')}}">
+                                        <b>Garanties & Tarifs</b>
+                                    </a>
+                                </li>
                                 <li @if(request()->routeIs('chambre_new','lit_new','typeadmission_new','natureadmission_new','produit_new')) class="active" @endif >
                                     <a href="#!">
                                         <b>Hospitalisations</b>

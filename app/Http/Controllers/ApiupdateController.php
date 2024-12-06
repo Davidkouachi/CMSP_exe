@@ -814,4 +814,78 @@ class ApiupdateController extends Controller
             }
     }
 
+    public function update_type_garantie(Request $request, $code)
+    {
+        $Exist = DB::table('typgarantie')
+            ->where('codtypgar', '!=', $code)
+            ->Where('libtypgar', '=', $request->nom)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'Cet Type existe dèjà']);
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_typegarantie =[
+                    'libtypgar' => $request->nom,
+                    'updated_at' => now(),
+                ];
+
+                $typegarantieUpdate = DB::table('typgarantie')
+                                    ->where('codtypgar', '=', $code)
+                                    ->update($updateData_typegarantie);
+
+                if ($typegarantieUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table typgarantie');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function update_garantie(Request $request, $code)
+    {
+        $Exist = DB::table('garantie')
+            ->where('codgaran', '!=', $code)
+            ->Where('libgaran', '=', $request->nom)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'Cette garantie existe dèjà']);
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_garantie =[
+                    'libgaran' => $request->nom,
+                    'updated_at' => now(),
+                ];
+
+                $garantieUpdate = DB::table('garantie')
+                                    ->where('codgaran', '=', $code)
+                                    ->update($updateData_garantie);
+
+                if ($garantieUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table garantie');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
 }

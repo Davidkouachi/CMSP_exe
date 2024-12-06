@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Spécialité</h5>
+                        <h6>SPECIALITE</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Accueil / Configuration / Spécialité</p>
                     </div>
                 </div>
             </div>
@@ -76,13 +76,39 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Prix Consultation</label>
+                                                <label class="form-label">
+                                                    Abréviation
+                                                </label>
+                                                <input type="text" class="form-control" id="abr_acte" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        {{-- <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Prix Consultation Jour</label>
                                                 <div class="input-group">
-                                                    <input type="tel" class="form-control" id="prix" placeholder="Saisie Obligatoire">
+                                                    <input type="tel" class="form-control" id="prixj" placeholder="Saisie Obligatoire">
                                                     <span class="input-group-text">Fcfa</span>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Prix Consultation Nuit</label>
+                                                <div class="input-group">
+                                                    <input type="tel" class="form-control" id="prixn" placeholder="Saisie Obligatoire">
+                                                    <span class="input-group-text">Fcfa</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Prix Consultation Férier</label>
+                                                <div class="input-group">
+                                                    <input type="tel" class="form-control" id="prixf" placeholder="Saisie Obligatoire">
+                                                    <span class="input-group-text">Fcfa</span>
+                                                </div>
+                                            </div>
+                                        </div> --}}
                                         <div class="col-sm-12">
                                             <div class="mb-3">
                                                 <div class="d-flex gap-2 justify-content-center">
@@ -90,10 +116,6 @@
                                                         Enregistrer
                                                     </button>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3" id="div_alert">
                                             </div>
                                         </div>
                                     </div>
@@ -109,31 +131,20 @@
                                     </a>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-outer" id="div_Table" style="display: none;">
+                                    <div class="">
                                         <div class="table-responsive">
-                                            <table class="table align-middle table-hover m-0 truncate" id="Table" >
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col">Spécialité</th>
-                                                        <th scope="col">Prix Consultation</th>
+                                                        <th scope="col">Abréviation</th>
                                                         <th scope="col">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                 </tbody>
                                             </table>
-                                        </div>
-                                    </div>
-                                    <div id="message_Table" style="display: none;">
-                                        <p class="text-center" >
-                                            Aucune spécialité n'a été trouvé
-                                        </p>
-                                    </div>
-                                    <div id="div_Table_loader" style="display: none;">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                                            <strong>Chargement des données...</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -178,18 +189,36 @@
             </div>
             <div class="modal-body">
                 <form id="updateForm">
-                    <input type="hidden" id="Id">
+                    <input type="hidden" id="MatriculeModif">
                     <div class="mb-3">
                         <label class="form-label">Spécialité</label>
                         <input type="text" class="form-control" id="nomModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Prix Consultation</label>
+                        <label class="form-label">Abréviation</label>
+                        <input type="text" class="form-control" id="abrModif" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    {{-- <div class="mb-3">
+                        <label class="form-label">Prix Consultation Jour</label>
                         <div class="input-group">
-                            <input type="tel" class="form-control" id="prixModif" placeholder="Saisie Obligatoire">
+                            <input type="tel" class="form-control" id="prixjModif" placeholder="Saisie Obligatoire">
                             <span class="input-group-text">Fcfa</span>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prix Consultation Nuit</label>
+                        <div class="input-group">
+                            <input type="tel" class="form-control" id="prixnModif" placeholder="Saisie Obligatoire">
+                            <span class="input-group-text">Fcfa</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prix Consultation Férier</label>
+                        <div class="input-group">
+                            <input type="tel" class="form-control" id="prixfModif" placeholder="Saisie Obligatoire">
+                            <span class="input-group-text">Fcfa</span>
+                        </div>
+                    </div> --}}
                 </form>
             </div>
             <div class="modal-footer">
@@ -201,34 +230,33 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    $(document).ready(function() {
 
-        list();
+        $("#btn_eng").on("click", eng);
+        $("#updateBtn").on("click", updatee);
+        $("#deleteBtn").on("click", deletee);
 
-        document.getElementById("btn_eng").addEventListener("click", eng);
-        document.getElementById("btn_refresh_table").addEventListener("click", list);
-        document.getElementById("updateBtn").addEventListener("click", updatee);
-        document.getElementById("deleteBtn").addEventListener("click", deletee);
-
-        document.getElementById('prix').addEventListener('input', function() {
-            this.value = formatPrice(this.value);
-        });
-        document.getElementById('prix').addEventListener('keypress', function(event) {
-            const key = event.key;
-            if (isNaN(key)) {
-                event.preventDefault();
-            }
+        $('#btn_refresh_table').on('click', function () {
+            $('#Table_day').DataTable().ajax.reload(null, false);
         });
 
-        document.getElementById('prixModif').addEventListener('input', function() {
-            this.value = formatPrice(this.value);
-        });
-        document.getElementById('prixModif').addEventListener('keypress', function(event) {
-            const key = event.key;
-            if (isNaN(key)) {
-                event.preventDefault();
-            }
-        });
+        // var inputs = ['#prixj','#prixn','#prixf','#prixjModif','#prixnModif','#prixfModif',]; // Array of element IDs
+        // inputs.forEach(function(id) {
+        //     var inputElement = $(id); // Get each element by its ID
+
+        //     // Allow only numeric input (and optionally some special keys like backspace or delete)
+        //     inputElement.on('keypress', function(event) {
+        //         const key = event.key;
+        //         // Allow numeric keys, backspace, and delete
+        //         if (!/[0-9]/.test(key) && key !== 'Backspace' && key !== 'Delete') {
+        //             event.preventDefault();
+        //         }
+        //     });
+
+        //     inputElement.on('input', function() {
+        //         this.value = formatPrice(this.value); // Allow only numbers
+        //     });
+        // });
 
         function formatPrice(input) {
             // Supprimer tous les points existants
@@ -246,12 +274,11 @@
         }
 
         function eng() {
+            const nom = $("#nom_acte");
+            const abr = $("#abr_acte");
 
-            const nom = document.getElementById("nom_acte");
-            const prix = document.getElementById("prix");
-
-            if(!nom.value.trim() || !prix.value.trim()){
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
+            if (!nom.val().trim() || !abr.val().trim()) {
+                showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
@@ -261,126 +288,123 @@
                 </div>
             `;
             // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
             $.ajax({
                 url: '/api/specialite_new',
                 method: 'GET',
-                data: {nom: nom.value, prix: prix.value },
+                data: {
+                    nom: nom.val(),
+                    abr: abr.val(),
+                },
                 success: function(response) {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+                    $("#preloader_ch").remove(); // Remove preloader
 
                     if (response.success) {
-                        showAlert('Succès', 'Opération éffectuée.','success');
+
+                        nom.val('');
+                        abr.val('');
+
+                        $('#Table_day').DataTable().ajax.reload(null, false);
+
+                        showAlert('Succès', response.message, 'success');
                     } else if (response.error) {
-                        showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
+                        showAlert('Erreur', response.message, 'error');
                     } else if (response.existe) {
-                        showAlert('Alert', 'Cette Spécialité existe déjà.','warning');
-                    } 
-
-                    nom.value = '';
-                    prix.value = '';
-
-                    list();
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
+                        showAlert('Alert', response.message, 'warning');
                     }
 
-                    showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
-                    
-                    nom.value = '';
-                    prix.value = '';
-                    
-                    list();
+                },
+                error: function() {
+                    $("#preloader_ch").remove();
+
+                    showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
                 }
             });
         }
 
-        function list() {
+        $('#Table_day').DataTable({
 
-            const tableBody = document.querySelector('#Table tbody'); // Target the specific table by id
-            const messageDiv = document.getElementById('message_Table');
-            const tableDiv = document.getElementById('div_Table'); // The message div
-            const loaderDiv = document.getElementById('div_Table_loader');
+            processing: true,
+            serverSide: false,
+            ajax: {
+                url: `/api/list_specialite`,
+                type: 'GET',
+                dataSrc: 'data',
+            },
+            columns: [
+                { 
+                    data: null, 
+                    render: (data, type, row, meta) => meta.row + 1,
+                    searchable: false,
+                    orderable: false,
+                },
+                { 
+                    data: 'nomspecialite', 
+                    render: (data, type, row) => `
+                    <div class="d-flex align-items-center">
+                        <a class="d-flex align-items-center flex-column me-2">
+                            <img src="{{ asset('/assets/images/specialite1.jpg') }}" class="img-2x rounded-circle border border-1">
+                        </a>
+                        ${data}
+                    </div>`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'abrspecialite',
+                    searchable: true, 
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => `
+                        <div class="d-inline-flex gap-1" style="font-size:10px;">
+                            <a class="btn btn-outline-info btn-sm me-2"
+                               data-bs-toggle="modal" 
+                               data-bs-target="#Mmodif" 
+                               id="modif"
+                               data-code="${row.codespecialitemed}"
+                               data-nom="${row.nomspecialite}"
+                               data-abr="${row.abrspecialite}"
+                            >
+                                <i class="ri-edit-line"></i>
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete"
+                                data-code="${row.codespecialitemed}"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </a>
+                        </div>
+                    `,
+                    searchable: false,
+                    orderable: false,
+                }
+            ],
+            ...dataTableConfig, 
+            initComplete: function(settings, json) {
+                initializeRowEventListeners();
+            },
+        });
 
-            messageDiv.style.display = 'none';
-            tableDiv.style.display = 'none';
-            loaderDiv.style.display = 'block';
+        function initializeRowEventListeners() {
 
-            // Fetch data from the API
-            fetch('/api/list_specialite') // API endpoint
-                .then(response => response.json())
-                .then(data => {
-                    // Access the 'chambre' array from the API response
-                    const typeactes = data.typeacte;
+            $('#Table_day').on('click', '#modif', function() {
 
-                    // Clear any existing rows in the table body
-                    tableBody.innerHTML = '';
+                const row = {
+                    code : $(this).data('code'),
+                    nom : $(this).data('nom'),
+                    abr : $(this).data('abr'),
+                };
 
-                    if (typeactes.length > 0) {
+                $('#MatriculeModif').val(row.code);
 
-                        loaderDiv.style.display = 'none';
-                        messageDiv.style.display = 'none';
-                        tableDiv.style.display = 'block';
+                $('#nomModif').val(row.nom);
+                $('#abrModif').val(row.abr);
+            });
 
-                        // Loop through each item in the chambre array
-                        typeactes.forEach((item, index) => {
-                            // Create a new row
-                            const row = document.createElement('tr');
-                            // Create and append cells to the row based on your table's structure
-                            row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>
-                                    <div class="d-flex align-items-center ">
-                                        <a class="d-flex align-items-center flex-column me-2">
-                                            <img src="{{asset('assets/images/specialite1.jpg')}}" class="img-2x rounded-circle border border-1">
-                                        </a>
-                                        ${item.nom}
-                                    </div>
-                                </td>
-                                <td>${item.prix} Fcfa</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <a class="btn btn-outline-info btn-sm " data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit-${item.id}">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                        
-                                    </div>
-                                </td>
-                            `;
-
-                            tableBody.appendChild(row);
-
-                            document.getElementById(`edit-${item.id}`).addEventListener('click', () =>
-                            {
-                                // Set the values in the modal form
-                                document.getElementById('Id').value = item.id;
-                                document.getElementById('nomModif').value = item.nom;
-                                document.getElementById('prixModif').value = item.prix;
-
-                            });
-
-                        });
-                    } else {
-                        loaderDiv.style.display = 'none';
-                        messageDiv.style.display = 'block';
-                        tableDiv.style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement des données:', error);
-                    // Hide the table and show the error message in case of failure
-                    loaderDiv.style.display = 'none';
-                    messageDiv.style.display = 'block';
-                    tableDiv.style.display = 'none';
-                });
+            $('#Table_day').on('click', '#delete', function() {
+                const code = $(this).data('code');
+                $('#Iddelete').val(code);
+            });
         }
 
         function updatee() {
@@ -455,9 +479,12 @@
                         preloader.remove();
                     }
 
-                    showAlert('Succès', 'Spécialité supprimer avec succès.','success');
-                    
-                    list();
+                    if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload(null, false);
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
                 },
                 error: function() {
                     var preloader = document.getElementById('preloader_ch');

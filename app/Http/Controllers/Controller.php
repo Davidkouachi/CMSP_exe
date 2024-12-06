@@ -213,4 +213,11 @@ class Controller
     {
         return view('finance.facture.liste');
     }
+
+    // ------------------------------------------------------------
+
+    public function garantie_tarif()
+    {
+        return view('grille.garantie_tarif');
+    }
 }

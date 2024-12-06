@@ -72,6 +72,7 @@ Route::middleware(['auth','statutchambre','dateRdv'])->group(function () {
 	Route::get('/Liste Facture', [Controller::class, 'facture_liste'])->name('facture_liste');
 
 	Route::get('/Assureur', [Controller::class, 'assureur_liste'])->name('assureur_liste');
+	Route::get('/Garanties & Tarifs', [Controller::class, 'garantie_tarif'])->name('garantie_tarif');
 
 	Route::get('/Acte', [Controller::class, 'acte_new'])->name('acte_new');
 	Route::get('/Type Acte', [Controller::class, 'typeacte_new'])->name('typeacte_new');

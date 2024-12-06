@@ -65,7 +65,7 @@
                                     </div>
                                 </div>
                                 <div class="card-body" >
-                                    <div class="row gx-3">
+                                    <div class="row gx-3 alig-items-center justify-content-center">
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Nom de la société</label>
@@ -353,14 +353,14 @@
                         showAlert('Alert', 'Cette société existe déjà', 'warning');
                     } else if (response.success) {
 
-                        nom.val('')
+                        nom.val('');
                         codeassurance.val('').trigger('change');
                         assureur_id.val('').trigger('change');
 
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Erreur', reponse.message, 'error');
+                        showAlert('Erreur', response.message, 'error');
                     }
                 },
                 error: function() {

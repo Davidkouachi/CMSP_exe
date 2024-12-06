@@ -45,6 +45,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/filiation_select_patient_new', [ApiController::class, 'filiation_select_patient_new']);
 	Route::get('/select_medecin', [ApiController::class, 'select_medecin']);
 	Route::get('/select_assureur', [ApiController::class, 'select_assureur']);
+	Route::get('/select_typegarantie', [ApiController::class, 'select_typegarantie']);
 	// recherche fin
 
 	// insert debut
@@ -77,6 +78,8 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/caisse_ouvert', [ApiinsertController::class, 'caisse_ouvert']);
 	Route::get('/caisse_fermer', [ApiinsertController::class, 'caisse_fermer']);
 	Route::get('/assureur_new', [ApiinsertController::class, 'assureur_new']);
+	Route::get('/type_garantie_new', [ApiinsertController::class, 'type_garantie_new']);
+	Route::get('/garantie_new', [ApiinsertController::class, 'garantie_new']);
 	// insert debut
 
 	// search debut
@@ -141,6 +144,8 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/update_date_hos/{id}', [ApiupdateController::class, 'update_date_hos']);
 	Route::get('/patient_modif/{matricule}', [ApiupdateController::class, 'patient_modif']);
 	Route::get('/update_assureur/{id}', [ApiupdateController::class, 'update_assureur']);
+	Route::get('/update_type_garantie/{code}', [ApiupdateController::class, 'update_type_garantie']);
+	Route::get('/update_garantie/{code}', [ApiupdateController::class, 'update_garantie']);
 	// update debut
 
 	// delete debut
@@ -200,6 +205,8 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/list_rdv_two_days', [ApilistController::class, 'list_rdv_two_days']);
 	Route::get('/trace_ouvert_fermer/{date1}/{date2}', [ApilistController::class, 'trace_ouvert_fermer']);
 	Route::get('/list_assureur_all', [ApilistController::class, 'list_assureur_all']);
+	Route::get('/list_type_garantie', [ApilistController::class, 'list_type_garantie']);
+	Route::get('/list_garantie', [ApilistController::class, 'list_garantie']);
 	// liste debut
 
 	// statistique debut
