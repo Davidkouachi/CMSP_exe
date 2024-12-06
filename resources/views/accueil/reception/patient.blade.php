@@ -101,8 +101,8 @@
                                                 <label class="form-label">Sexe</label>
                                                 <select class="form-select select2" id="patient_sexe_new">
                                                     <option value=""></option>
-                                                    <option value="H">Homme</option>
-                                                    <option value="F">Femme</option>
+                                                    <option value="M">Masculin</option>
+                                                    <option value="F">Féminin</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -128,7 +128,7 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Contact</label>
+                                                <label class="form-label">Contact 1</label>
                                                 <input type="tel" class="form-control" id="patient_tel_new" placeholder="Saisie Obligatoire" maxlength="10">
                                             </div>
                                         </div>
@@ -213,7 +213,7 @@
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Contact</label>
+                                                <label class="form-label">Contact 1</label>
                                                 <input type="tel" class="form-control" id="patient_telu_new" placeholder="facultatif" maxlength="10">
                                             </div>
                                         </div>
@@ -581,8 +581,8 @@
                                     <label class="form-label">Sexe</label>
                                     <select class="form-select select2" id="patient_sexe_Modif">
                                         <option value=""></option>
-                                        <option value="H">Homme</option>
-                                        <option value="F">Femme</option>
+                                        <option value="M">Masculin</option>
+                                        <option value="F">Féminin</option>
                                     </select>
                                 </div>
                             </div>
@@ -702,24 +702,24 @@
             $('#Table_day').DataTable().ajax.reload(null, false);
         });
 
-        // $('#btn_affiche_stat').on('click', function() {
-        //     $('#div_btn_affiche_stat').hide(); // Masque le bouton d'affichage
-        //     $('#div_btn_cache_stat').show();  // Affiche le bouton de cache
-        //     Statistique(); // Appelle la fonction Statistique
-        // });
+        $('#btn_affiche_stat').on('click', function() {
+            $('#div_btn_affiche_stat').hide(); // Masque le bouton d'affichage
+            $('#div_btn_cache_stat').show();  // Affiche le bouton de cache
+            Statistique(); // Appelle la fonction Statistique
+        });
 
-        // $('#btn_cache_stat').on('click', function() {
-        //     $('#div_btn_affiche_stat').show(); // Affiche le bouton d'affichage
-        //     $('#div_btn_cache_stat').hide();  // Masque le bouton de cache
-        //     $('#stat').empty(); // Vide le contenu de l'élément avec l'ID "stat"
-        // });
+        $('#btn_cache_stat').on('click', function() {
+            $('#div_btn_affiche_stat').show(); // Affiche le bouton d'affichage
+            $('#div_btn_cache_stat').hide();  // Masque le bouton de cache
+            $('#stat').empty(); // Vide le contenu de l'élément avec l'ID "stat"
+        });
 
         // $('#patient_id').on('change', function() {
         //     const id = $(this).val();
         //     rech_dosier(id);
         // });
 
-        var inputs = ['patient_tel_new', 'patient_tel2_new', 'patient_telu_new', 'patient_telu2_new']; // Array of element IDs
+        var inputs = ['patient_tel_new', 'patient_tel2_new', 'patient_telu_new', 'patient_telu2_new','patient_tel_Modif', 'patient_tel2_Modif', 'patient_telu_Modif', 'patient_telu2_Modif']; // Array of element IDs
         inputs.forEach(function(id) {
             var inputElement = document.getElementById(id); // Get each element by its ID
 
@@ -1097,27 +1097,46 @@
             let taux_id = $("#patient_idtauxcouv_new");
             let societe_id = $("#patient_codesocieteassure_new");
 
+            let nomu = $("#patient_nomu_new");
+            let telu = $("#patient_telu_new");
+            let telu2 = $("#patient_telu2_new");
+
             // Validation des champs obligatoires
-            if (!nom.val().trim() || !phone.val().trim() || !datenais.val().trim() || !sexe.val().trim()) {
-                showAlert("Alert", "Tous les champs sont obligatoires.", "warning");
+            if (!nom.val().trim() || !prenom.val().trim() || !phone.val().trim() || !datenais.val().trim() || !sexe.val().trim() || !residence.val().trim() || !assurer.val().trim()) {
+                showAlert("Alert", "Veuillez remplir tous les champs obligatoires.", "warning");
                 return false;
             }
 
             // Validation de l'email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.val().trim() && !emailRegex.test(email.val().trim())) {
-                showAlert("Alert", "Email incorrect.", "warning");
+            // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // if (email.val().trim() && !emailRegex.test(email.val().trim())) {
+            //     showAlert("Alert", "Email incorrect.", "warning");
+            //     return false;
+            // }
+
+            // Validation des numéros de téléphone
+            if (phone.val().length !== 10 ) {
+                showAlert("Alert", "Contact 1 incomplet.", "warning");
                 return false;
             }
 
-            // Validation des numéros de téléphone
-            if (phone.val().length !== 10 || (phone2.val() && phone2.val().length !== 10)) {
-                showAlert("Alert", "Contact incomplet.", "warning");
+            if (phone2.val() && phone2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 incomplet.", "warning");
+                return false;
+            }
+
+            if (telu.val() && telu.val().length !== 10) {
+                showAlert("Alert", "Contact 1 en cas d'urgence incomplet.", "warning");
+                return false;
+            }
+
+            if (telu2.val() && telu2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 en cas d'urgence incomplet.", "warning");
                 return false;
             }
 
             // Validation des champs relatifs à l'assurance
-            if (assurer.val() === "oui") {
+            if (assurer.val() === "1") {
                 if (!assurance_id.val() || !taux_id.val() || !societe_id.val() || !filiation.val() || !matricule_assurance.val()) {
                     showAlert("Alert", "Veuillez remplir tous les champs relatifs à l'assurance.", "warning");
                     return false;
@@ -1135,13 +1154,13 @@
             // Envoi AJAX
             $.ajax({
                 url: "/api/patient_new",
-                method: "POST", // POST pour créer les données
+                method: "GET", // POST pour créer les données
                 data: {
                     nom: nom.val(),
-                    email: email.val() || null,
+                    prenom: prenom.val(),
                     tel: phone.val(),
                     tel2: phone2.val() || null,
-                    adresse: adresse.val() || null,
+                    residence: residence.val(),
                     assurer: assurer.val(),
                     assurance_id: assurance_id.val() || null,
                     taux_id: taux_id.val() || null,
@@ -1149,52 +1168,53 @@
                     datenais: datenais.val(),
                     sexe: sexe.val(),
                     filiation: filiation.val() || null,
-                    matricule_assurance: matricule_assurance.val() || null
+                    matricule_assurance: matricule_assurance.val() || null,
+                    nomu: nomu.val() || null,
+                    telu: telu.val() || null,
+                    telu2: telu2.val() || null,
                 },
                 success: function (response) {
                     // Supprimer le préchargement
                     $("#preloader_ch").remove();
 
-                    if (response.tel_existe) {
-                        showAlert("Alert", "Ce numéro de téléphone appartient déjà à un patient.", "warning");
-                    } else if (response.email_existe) {
-                        showAlert("Alert", "Cet email appartient déjà à un patient.", "warning");
-                    } else if (response.nom_existe) {
-                        showAlert("Alert", "Ce patient existe déjà.", "warning");
-                    } else if (response.success) {
+                    if (response.success) {
                         // Réinitialisation des champs
                         nom.val("");
-                        email.val("");
+                        prenom.val("");
                         phone.val("");
                         phone2.val("");
-                        adresse.val("");
+                        residence.val("");
                         datenais.val("");
-                        sexe.val("");
-                        filiation.val("");
+                        sexe.val("").trigger('change');
+
+                        nomu.val("");
+                        telu.val("");
+                        telu2.val("");
+
+                        filiation.val("").trigger('change');
                         matricule_assurance.val("");
-                        assurance_id.val("");
-                        taux_id.val("");
-                        societe_id.val("");
-                        assurer.val("non");
+                        assurance_id.val("").trigger('change');
+                        taux_id.val("").trigger('change');
+                        societe_id.val("").trigger('change');
+                        assurer.val("").trigger('change');
+
                         divAssurer.hide();
 
-                        // Recharger le tableau et les données
                         $("#Table_day").DataTable().ajax.reload(null, false);
-                        select_patient();
+                        // select_patient();
 
-                        showAlert("Succès", "Patient enregistré.", "success");
+                        showAlert("Succès", response.message, "success");
                     } else if (response.error) {
-                        showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
+                        showAlert("Alert", response.message, "error");
                     }
                 },
                 error: function () {
-                    // Supprimer le préchargement en cas d'erreur
+
                     $("#preloader_ch").remove();
                     showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
                 }
             });
         }
-
 
         $('#Table_day').DataTable({
 
@@ -1260,7 +1280,7 @@
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm" 
+                            <a class="btn btn-outline-warning btn-sm me-2" 
                                data-bs-toggle="modal" 
                                data-bs-target="#DetailP" 
                                id="detailP"
@@ -1283,13 +1303,10 @@
                                data-taux="${row.taux}"
                                data-filiation="${row.filiation}"
                                data-matricule_assurance="${row.matriculeassure}"
-                               data-dossierDC="${row.dossierDC}"
-                               data-dossierDH="${row.dossierDH}"
+                               data-numdossier="${row.numdossier}"
                             >
                                 <i class="ri-eye-line"></i>
                             </a>
-                        </div>
-                        <div class="d-inline-flex gap-1" style="font-size:10px;">
                             <a class="btn btn-outline-info btn-sm"
                                data-bs-toggle="modal" 
                                data-bs-target="#ModifP" 
@@ -1343,8 +1360,7 @@
                     taux : $(this).data('taux'),
                     filiation : $(this).data('filiation'),
                     matricule_assurance : $(this).data('matricule_assurance'),
-                    dossierDC : $(this).data('dossierDC'),
-                    dossierDH : $(this).data('dossierDH'),
+                    numdossier : $(this).data('numdossier'),
                 };
 
                 const modal = document.getElementById('modal_detailP');
@@ -1389,7 +1405,7 @@
                                             Age : ${calculateAge(row.datenais)} An(s)
                                         </li>
                                         <li class="list-group-item">
-                                            Genre : ${row.sexe == 'M' ? 'Homme' : 'Femme'}
+                                            Genre : ${row.sexe == 'H' ? 'Homme' : 'Femme'}
                                         </li>
                                         <li class="list-group-item">
                                             Contact 1 : ${row.tel !== null ? `${row.tel}` : 'Néant'}
@@ -1439,13 +1455,10 @@
                                 <div class="card-body">
                                     <ul class="list-group">
                                         <li class="list-group-item text-white text-center bg-warning aria-current="true">
-                                            Informations Dossiers
+                                            Information Dossier
                                         </li>
                                         <li class="list-group-item">
-                                            Numéro Dossier Consultation : ${row.dossierDC !== null ? `${row.dossierDC}` : 'Néant'}
-                                        </li>
-                                        <li class="list-group-item">
-                                            Numéro Dossier Hospitalisation : ${row.dossierDH !== null ? `${row.dossierDH}` : 'Néant'}
+                                            Numéro Dossier : ${row.numdossier !== null ? `${row.numdossier}` : 'Néant'}
                                         </li>
                                     </ul>
                                 </div>
@@ -1456,16 +1469,16 @@
                                 <div class="card-body">
                                     <ul class="list-group">
                                         <li class="list-group-item text-white text-center bg-danger" aria-current="true">
-                                            En Cas d'urgence
+                                            Informations en Cas d'urgence
+                                        </li>
+                                        <li class="list-group-item">
+                                            Nom : ${row.nomu !== null ? `${row.nomu}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
                                             Contact 1 : ${row.telu !== null ? `${row.telu}` : 'Néant'}
                                         </li>
                                         <li class="list-group-item">
                                             Contact 1 : ${row.telu2 !== null ? `${row.telu2}` : 'Néant'}
-                                        </li>
-                                        <li class="list-group-item">
-                                            Nom : ${row.nomu !== null ? `${row.nomu}` : 'Néant'}
                                         </li>
                                     </ul>
                                 </div>
@@ -1511,81 +1524,92 @@
             });
         }
 
-        function eng_patient_modif()
-        {
-            var id = document.getElementById("patient_idM").value;
-            var nom = document.getElementById("nameM");
-            var email = document.getElementById("emailM");
-            var phone = document.getElementById("telM");
-            var phone2 = document.getElementById("tel2M");
-            var adresse = document.getElementById("adresseM");
-            var datenais = document.getElementById("datenaisM");
-            var sexe = document.getElementById("sexeM");
-            var filiation = document.getElementById("filiationM");
+        function eng_patient_modif() {
 
-            if (!nom.value.trim() || !phone.value.trim() || !datenais.value.trim()) {
-                showAlert('Alert', 'Tous les champs sont obligatoires.','warning');
-                return false; 
-            }
+            let matricule = $("#MatriculeModif").val();
 
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value.trim() && !emailRegex.test(email.value.trim())) {
-                showAlert('Alert', 'Email incorrect.','warning');
+            let nom = $("#patient_nom_Modif");
+            let prenom = $("#patient_prenom_Modif");
+            let sexe = $("#patient_sexe_Modif");
+            let datenais = $("#patient_datenaiss_Modif");
+            let phone = $("#patient_tel_Modif");
+            let phone2 = $("#patient_tel2_Modif");
+            let residence = $("#patient_residence_Modif");
+
+            let nomu = $("#patient_nomu_Modif");
+            let telu = $("#patient_telu_Modif");
+            let telu2 = $("#patient_telu2_Modif");
+
+            // Validation des champs obligatoires
+            if (!nom.val().trim() || !prenom.val().trim() || !phone.val().trim() || !datenais.val().trim() || !sexe.val().trim() || !residence.val().trim()) {
+                showAlert("Alert", "Veuillez remplir tous les champs obligatoires.", "warning");
                 return false;
             }
 
-            if (phone.value.length !== 10 || (phone2.value !== '' && phone2.value.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.','warning');
+            // Validation des numéros de téléphone
+            if (phone.val().length !== 10 ) {
+                showAlert("Alert", "Contact 1 incomplet.", "warning");
+                return false;
+            }
+
+            if (phone2.val() && phone2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 incomplet.", "warning");
+                return false;
+            }
+
+            if (telu.val() && telu.val().length !== 10) {
+                showAlert("Alert", "Contact 1 en cas d'urgence incomplet.", "warning");
+                return false;
+            }
+
+            if (telu2.val() && telu2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 en cas d'urgence incomplet.", "warning");
                 return false;
             }
 
             var modal = bootstrap.Modal.getInstance(document.getElementById('ModifP'));
             modal.hide();
 
-            var preloader_ch = `
+            // Préchargement
+            const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
             $.ajax({
-                url: '/api/patient_modif/'+id,
-                method: 'GET',  // Use 'POST' for data creation
-                data: {nom: nom.value, email: email.value || null , tel: phone.value, tel2: phone2.value || null, adresse: adresse.value || null, datenais: datenais.value, sexe: sexe.value, filiation: filiation.value || null,
+                url: '/api/patient_modif/'+matricule,
+                method: "GET", // POST pour créer les données
+                data: {
+                    nom: nom.val(),
+                    prenom: prenom.val(),
+                    tel: phone.val(),
+                    tel2: phone2.val() || null,
+                    residence: residence.val(),
+                    datenais: datenais.val(),
+                    sexe: sexe.val(),
+                    nomu: nomu.val() || null,
+                    telu: telu.val() || null,
+                    telu2: telu2.val() || null,
                 },
-                success: function(response) {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    
-                    if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a un patient.','warning');
-                    }else if (response.email_existe) {
-                        showAlert('Alert', 'Cet email appartient déjà a un patient.','warning');
-                    }else if (response.nom_existe) {
-                        showAlert('Alert', 'Cet patient existe déjà.','warning');
-                    } else if (response.success) {
+                success: function (response) {
+                    // Supprimer le préchargement
+                    $("#preloader_ch").remove();
 
-                        $('#Table_day').DataTable().ajax.reload(null, false);
-                        select_patient();
+                    if (response.success) {
 
-                        showAlert('Succès', 'Opératin éffectuée.','success');
+                        $("#Table_day").DataTable().ajax.reload(null, false);
+                        // select_patient();
+                        showAlert("Succès", response.message, "success");
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue lors de la mise à jour.','error');
+                        showAlert("Alert", response.message, "error");
                     }
-
                 },
-                error: function() {
+                error: function () {
 
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Alert', 'Une erreur est survenue.','error');
+                    $("#preloader_ch").remove();
+                    showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
                 }
             });
         }

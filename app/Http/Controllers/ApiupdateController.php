@@ -222,9 +222,6 @@ class ApiupdateController extends Controller
                     'updated_at' => now(),
                 ];
 
-                log::info(DB::table('medecin')->where('codemedecin', '=', $matricule)->toSql());
-                log::info($updateData_medecin);
-
                 $medecinUpdate = DB::table('medecin')
                                     ->where('codemedecin', '=', $matricule)
                                     ->update($updateData_medecin);
@@ -667,6 +664,8 @@ class ApiupdateController extends Controller
                     throw new Exception('Profil ou Service introuvable');
                 }
 
+                Log::info($request->all());
+
                 $updateData_employes =[
                     'typepiece' => $request->typepiece,
                     'civilite' => $request->civilite,
@@ -707,12 +706,14 @@ class ApiupdateController extends Controller
                 ];
 
                 if ($request->password !== null) {
-                    $updateData_users['password'] = password_hash($request->password, PASSWORD_BCRYPT);
+                    $updateData_users['password'] = bcrypt($request->password);
                 }
 
                 $userDelete = DB::table('users')
                                 ->where('code_personnel', '=', $matricule)
                                 ->update($updateData_users);
+
+
 
                 if (!$userDelete === 0) {
                     throw new Exception('Erreur lors de l\'insertion dans la table users');
@@ -775,62 +776,42 @@ class ApiupdateController extends Controller
         }
     }
 
-    public function patient_modif(Request $request, $id)
+    public function patient_modif(Request $request, $matricule)
     {
-        $verifications = [
-            'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
-            'email' => $request->email ?? null,
-            'nom' => $request->nom,
-        ];
 
-        $patientExist = patient::where('id', '!=', $id)->where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['email'])) {
-                          $query->where('email', $verifications['email']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['nom'])) {
-                          $query->where('np', $verifications['nom']);
-                      }
-                  });
-        })->first();
+        DB::beginTransaction();
 
-        if ($patientExist) {
-            if ($patientExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $patientExist->tel2 === $verifications['tel2'])) {
-                return response()->json(['tel_existe' => true]);
-            } elseif ($patientExist->email === $verifications['email']) {
-                return response()->json(['email_existe' => true]);
-            } elseif ($patientExist->nom === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
+            try {
+
+                $updateData_patient = [
+                    'nompatient' => $request->nom,
+                    'prenomspatient' => $request->prenom,
+                    'nomprenomspatient' => $request->nom.' '.$request->prenom,
+                    'datenaispatient' => $request->datenais,
+                    'sexe' => $request->sexe,
+                    'telpatient' => $request->tel,
+                    'telpatient_2' => $request->tel2,
+                    'telurgence_1' => $request->telu,
+                    'telurgence_2' => $request->telu2,
+                    'nomurgence' => $request->nomu,
+                    'lieuderesidencepat' => $request->residence,
+                    'updated_at' => now(),
+                ];
+
+                $patientUpdated = DB::table('patient')
+                    ->where('idenregistremetpatient', '=', $matricule)
+                    ->update($updateData_patient);
+
+                if ($patientUpdated === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table patient');
+                }
+                
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
-
-        $add = patient::find($id);
-        $add->np = $request->nom;
-        $add->email = $request->email;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->adresse = $request->adresse;
-        $add->datenais = $request->datenais;
-        $add->sexe = $request->sexe;
-
-        if($request->filiation !== null){
-            $add->filiation = $request->filiation;
-        }
-
-        if($add->save()){
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['error' => true]);
-        }
     }
 
 }

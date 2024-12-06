@@ -105,6 +105,22 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueMatriculePatient()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('patient')->where('idenregistremetpatient', '=', 'P'.$matricule)->exists());
+
+        return $matricule;
+    }
+    private function generateUniqueMatriculeDossierDC()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('dossierpatient')->where('numdossier', '=', 'DC'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -264,69 +280,87 @@ class ApiinsertController extends Controller
 
     public function patient_new(Request $request)
     {
-        $verifications = [
-            'tel' => $request->tel,
-            'tel2' => $request->tel2 ?? null, // Allow tel2 to be null
-            'email' => $request->email ?? null,
-            'nom' => $request->nom,
-        ];
 
-        $patientExist = patient::where(function($query) use ($verifications) {
-            $query->where('tel', $verifications['tel'])
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['tel2'])) {
-                          $query->where('tel2', $verifications['tel2']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['email'])) {
-                          $query->where('email', $verifications['email']);
-                      }
-                  })
-                  ->orWhere(function($query) use ($verifications) {
-                      if (!is_null($verifications['nom'])) {
-                          $query->where('np', $verifications['nom']);
-                      }
-                  });
-        })->first();
+        DB::beginTransaction();
 
-        if ($patientExist) {
-            if ($patientExist->tel === $verifications['tel'] || (!is_null($verifications['tel2']) && $patientExist->tel2 === $verifications['tel2'])) {
-                return response()->json(['tel_existe' => true]);
-            } elseif ($patientExist->email === $verifications['email']) {
-                return response()->json(['email_existe' => true]);
-            } elseif ($patientExist->nom === $verifications['nom']) {
-                return response()->json(['nom_existe' => true]);
+            try {
+
+                $matricule = $this->generateUniqueMatriculePatient();
+
+                if ($request->assurer === '0') {
+                    $codeassurance = 'NONAS';
+                    $codefiliation = 0;
+                    $matriculeassure = null;
+                    $codesocieteassure = 0;
+                    $idtauxcouv = 0;
+                } else if ($request->assurer === '1') {
+                    $codeassurance = $request->assurance_id;
+                    $codefiliation = $request->filiation;
+                    $matriculeassure = $request->matricule_assurance;
+                    $codesocieteassure = $request->societe_id;
+                    $idtauxcouv = $request->taux_id;
+                }
+
+                $insertData_patient = [
+                    'idenregistremetpatient' => 'P'.$matricule,
+                    'idenregistrementhopital' => '1',
+                    'numeroregistre' => '1',
+                    'dateenregistrement' => now(),
+                    'civilite' => '0',
+                    'nompatient' => $request->nom,
+                    'prenomspatient' => $request->prenom,
+                    'nomprenomspatient' => $request->nom.' '.$request->prenom,
+                    'datenaispatient' => $request->datenais,
+                    'sexe' => $request->sexe,
+                    'adressepatient' => null,
+                    'assure' => $request->assurer,
+                    'telpatient' => $request->tel,
+                    'telpatient_2' => $request->tel2,
+                    'telurgence_1' => $request->telu,
+                    'telurgence_2' => $request->telu2,
+                    'nomurgence' => $request->nomu,
+                    'lieuderesidencepat' => $request->residence,
+                    'codeassurance' => $codeassurance,
+                    'codefiliation' => $codefiliation,
+                    'matriculeassure' => $matriculeassure,
+                    'codesocieteassure' => $codesocieteassure,
+                    'idtauxcouv' => $idtauxcouv,
+                ];
+
+                $patientInserted = DB::table('patient')->insert($insertData_patient);
+
+                if ($patientInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table patient');
+                }
+
+                $verf_dossierDC = DB::table('dossierpatient')
+                ->where('idenregistremetpatient', '=', 'P'.$matricule)
+                ->where('codetypedossier', '=', 'DC')
+                ->exists();
+
+                if (!$verf_dossierDC) {
+
+                    $numdossier_new = $this->generateUniqueMatriculeDossierDC();
+
+                    $dossierPatientInserted = DB::table('dossierpatient')->insert([
+                        'numdossier' => 'DC'.$numdossier_new,
+                        'idenregistremetpatient' => 'P'.$matricule,
+                        'datecrea' => now(),
+                        'codetypedossier' => 'DC',
+                    ]);
+
+                    if ($dossierPatientInserted === 0) {
+                        throw new Exception('Erreur lors de l\'insertion dans la table dossierpatient');
+                    }
+                }
+
+                
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-        }
-
-        // Generate a unique matricule
-        $matricule = $this->generateUniqueMatricule();
-        // Create a new record with the unique matricule
-        $add = new patient();
-        $add->matricule = $matricule;
-        $add->np = $request->nom;
-        $add->email = $request->email;
-        $add->tel = $request->tel;
-        $add->tel2 = $request->tel2;
-        $add->assurer = $request->assurer;
-        $add->adresse = $request->adresse;
-        $add->datenais = $request->datenais;
-        $add->sexe = $request->sexe;
-
-        if($request->assurer === 'oui'){
-            $add->assurance_id = $request->assurance_id;
-            $add->taux_id = $request->taux_id;
-            $add->societe_id = $request->societe_id;
-            $add->filiation = $request->filiation;
-            $add->matricule_assurance = $request->matricule_assurance;
-        }
-
-        if($add->save()){
-            return response()->json(['success' => true, 'id' => $add->id, 'name' => $add->np]);
-        } else {
-            return response()->json(['error' => true]);
-        }
     }
 
     public function chambre_new(Request $request)

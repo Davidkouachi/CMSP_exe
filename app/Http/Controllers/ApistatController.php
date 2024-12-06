@@ -494,10 +494,10 @@ class ApistatController extends Controller
 
     public function statistique_patient(Request $request)
     {
-        $stat_h = patient::where('sexe', '=', 'M')->count();
-        $stat_f = patient::where('sexe', '=', 'Mme')->count();
-        $stat_a = patient::where('assurer', '=', 'oui')->count();
-        $stat_an = patient::where('assurer', '=', 'non')->count();
+        $stat_h = DB::table('patient')->where('sexe', '=', 'M')->count();
+        $stat_f = DB::table('patient')->where('sexe', '=', 'F')->count();
+        $stat_a = DB::table('patient')->where('assure', '=', '1')->count();
+        $stat_an = DB::table('patient')->where('assure', '=', '0')->count();
 
         return response()->json([
             'stat_h' => $stat_h ?? 0,

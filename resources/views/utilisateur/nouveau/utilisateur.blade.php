@@ -459,7 +459,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Mot de passe</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="passwordModif" placeholder="Saisie Obligatoire" value="0000">
+                                    <input type="password" class="form-control" id="passwordModif" placeholder="Saisie Obligatoire">
                                     <a class="btn btn-white" id="btn_hidden_mpdModif">
                                         <i id="toggleIconModif" class="ri-eye-line text-primary"></i>
                                     </a>
@@ -1253,7 +1253,6 @@
                 const date_debut = $(this).data('date_debut');
                 const date_fin = $(this).data('date_fin');
                 const login = $(this).data('login');
-                const password = $(this).data('password');
 
                 $('#Matricule_up').val(matricule);
                 $('#nomModif').val(nom);

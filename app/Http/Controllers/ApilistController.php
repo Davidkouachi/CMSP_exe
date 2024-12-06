@@ -309,30 +309,16 @@ class ApilistController extends Controller
             ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
             ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
             ->leftJoin('filiation', 'patient.codefiliation', '=', 'filiation.codefiliation')
+            ->leftJoin('dossierpatient', 'patient.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
             ->select(
                 'patient.*', 
                 'societeassure.nomsocieteassure as societe',
                 'assurance.libelleassurance as assurance',
                 'tauxcouvertureassure.valeurtaux as taux',
                 'filiation.libellefiliation as filiation',
+                'dossierpatient.numdossier as numdossier',
             )
             ->get();
-
-        foreach ($patients as $value) {
-            $dossierC = DB::table('dossierpatient')
-                ->where('idenregistremetpatient', '=', $value->idenregistremetpatient)
-                ->where('codetypedossier', '=', 'DC')
-                ->first();
-
-            $value->dossierDC = $dossierC->numdossier ?? null;
-
-            $dossierH= DB::table('dossierpatient')
-                ->where('idenregistremetpatient', '=', $value->idenregistremetpatient)
-                ->where('codetypedossier', '=', 'DH')
-                ->first();
-
-            $value->dossierDH = $dossierH->numdossier ?? null;
-        }
 
         return response()->json([
             'data' => $patients,
