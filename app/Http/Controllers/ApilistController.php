@@ -340,7 +340,6 @@ class ApilistController extends Controller
             ->whereBetween('consultation.date', [$date1, $date2])
             ->select(
                 'consultation.idconsexterne as idconsexterne',
-                'consultation.idenregistremetpatient as idenregistremetpatient',
                 'consultation.montant as montant',
                 'consultation.date as date',
                 'consultation.numfac as numfac',
@@ -1019,28 +1018,18 @@ class ApilistController extends Controller
         ]);
     }
 
-    public function trace_operation($date1, $date2, $typemvt, $user_id)
+    public function trace_operation($date1, $date2, $typemvt)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $query = historiquecaisse::whereBetween('created_at', [$date1, $date2]);
+        $query = DB::table('caisse')->whereBetween('datecreat', [$date1, $date2]);
 
         if ($typemvt !== 'tous') {
-            $query->where('typemvt', '=', $typemvt);
+            $query->where('type', '=', $typemvt);
         }
 
-        if ($user_id !== 'tous') {
-            $query->where('creer_id', '=', $user_id);
-        }
-
-        $trace = $query->orderBy('created_at', 'desc')->get();
-
-        foreach ($trace as $value) {
-            $user = user::find($value->creer_id);
-            $value->user = $user->name;
-            $value->user_sexe = $user->sexe;
-        }
+        $trace = $query->orderBy('datecreat', 'desc')->get();
 
         return response()->json([
             'data' => $trace,
@@ -1123,15 +1112,10 @@ class ApilistController extends Controller
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $trace = portecaisse::whereBetween('created_at', [$date1, $date2])
-                                            ->orderBy('created_at', 'desc')
-                                            ->get();
-
-        foreach ($trace as $value) {
-            $user = user::find($value->creer_id);
-            $value->user = $user->name;
-            $value->user_sexe = $user->sexe;
-        }
+        $trace = DB::table('caisse_resume')
+            ->whereBetween('datecaisse', [$date1, $date2])
+            ->orderBy('datecaisse', 'desc')
+            ->get();
 
         return response()->json([
             'data' => $trace,

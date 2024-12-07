@@ -20,7 +20,7 @@ use App\Models\typesoins;
 use App\Models\soinsinfirmier;
 use App\Models\prelevement;
 use App\Models\joursemaine;
-use App\Models\caisse;
+use App\Models\porte_caisse;
 
 use Illuminate\Support\Facades\DB;
 
@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // caisse::create(['solde' => '0','statut' => 'fermer']);
+
+        porte_caisse::create(['montant' => '0','statut' => 'fermer']);
 
         // prelevement::create(['prix' => '1.500','code' => '1']);
 

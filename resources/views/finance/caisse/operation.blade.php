@@ -25,8 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
+                        <h5>OPERATION DE CAISSE</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Comptabilité / Opération de caisse</p>
                         <div class="mt-4 row gx-3">
                             <div class="d-flex align-items-center col-xxl-3 col-lg-4 col-sm-6 col-12 mb-3 ">
                                 <div class="icon-box lg bg-success rounded-5 me-3">
@@ -61,12 +62,12 @@
                                     Historique Caisse
                                 </a>
                             </li>
-                            <li class="nav-item" role="presentation">
+                            {{-- <li class="nav-item" role="presentation">
                                 <a class="nav-link text-white" id="tab-tAAA" data-bs-toggle="tab" href="#tAAA" role="tab" aria-controls="tAAA" aria-selected="false" tabindex="-1">
                                     <i class="ri-upload-cloud-line me-2"></i>
                                     Bilan Journalier
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                         <div class="tab-content" id="customTabContent">
                             <div class="tab-pane active show fade" id="twoAAAN" role="tabpanel" aria-labelledby="tab-twoAAAN">
@@ -170,32 +171,26 @@
                                             <div class=" mb-3">
                                                 <div class="card-body">
                                                     <div class="row gx-3">
-                                                        <div class="col-xxl-3 col-lg-3 col-md-6 col-sm-6">
+                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Du</label>
-                                                                <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                                                <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
                                                             </div>
                                                         </div>
-                                                        <div class="col-xxl-3 col-lg-3 col-md-6 col-sm-6">
+                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Au</label>
                                                                 <input type="date" id="searchDate2" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
                                                             </div>
                                                         </div>
-                                                        <div class="col-xxl-3 col-lg-3 col-md-6 col-sm-6">
+                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Type Mvt</label>
                                                                 <select class="form-select me-1" id="statutTrace">
                                                                     <option selected value="tous">Tout</option>
-                                                                    <option value="Entrer de Caisse">Entrer</option>
-                                                                    <option value="Sortie de Caisse">Sortie</option>
+                                                                    <option value="entree">Entrer</option>
+                                                                    <option value="sortie">Sortie</option>
                                                                 </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-xxl-3 col-lg-3 col-md-6 col-sm-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Cassier(ère)</label>
-                                                                <select class="form-select me-1 select2" id="userTrace"></select>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 text-center" >
@@ -212,7 +207,7 @@
                                 <div class="card-body mb-3">
                                     <div class="">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover table-sm Table_OpC">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_OpC">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
@@ -238,7 +233,7 @@
                                     <div class="w-100">
                                         <div class="input-group">
                                             <span class="input-group-text">Du</span>
-                                            <input type="date" id="searchDate1_ofc" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                            <input type="date" id="searchDate1_ofc" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
                                             <span class="input-group-text">au</span>
                                             <input type="date" id="searchDate2_ofc" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
                                             <a id="btn_search_trace_ofc" class="btn btn-outline-success ms-auto">
@@ -267,7 +262,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="tAAA" role="tabpanel" aria-labelledby="tab-tAAA">
+                            {{-- <div class="tab-pane fade" id="tAAA" role="tabpanel" aria-labelledby="tab-tAAA">
                                 <div class="row gx-3 justify-content-center align-items-center">
                                     <div class="col-xxl-4 col-sm-6">
                                         <div class="card-header">
@@ -297,7 +292,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -322,15 +317,14 @@
 
         caisse_verf();
         solde();
-        select_user();
-        historique();
+        // historique();
 
         $("#btn_eng_ope").on("click", eng_ope);
 
         $("#btn_ouvert_C").on("click", caisse_ouvert);
         $("#btn_fermer_C").on("click", caisse_fermer);
 
-        $("#btn_search_trace_bj").on("click", historique);
+        // $("#btn_search_trace_bj").on("click", historique);
 
         function caisse_verf()
         {
@@ -525,30 +519,6 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
-        function select_user() {
-            const selectElement = $('#userTrace');
-
-            selectElement.empty();
-            selectElement.append('<option selected value="tous">Tout</option>');
-
-            $.ajax({
-                url: '/api/list_caissier',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    const caissiers = data.caissier;
-
-                    $.each(caissiers, function (index, item) {
-                        const option = `<option value="${item.id}">${item.sexe}. ${item.name}</option>`;
-                        selectElement.append(option);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Erreur lors du chargement des caissiers:', error);
-                }
-            });
-        }
-
         function solde() 
         {
 
@@ -558,7 +528,7 @@
                 url: '/api/montant_solde',
                 method: 'GET',
                 success: function(response) {
-                    solde_caisse.textContent = response.solde.solde + ' Fcfa';
+                    solde_caisse.textContent = formatPrice(response.montant)+ ' Fcfa';
                 },
                 error: function() {
                     solde_caisse.textContent = '0 Fcfa';
@@ -651,7 +621,6 @@
                 const date1 = $('#searchDate1').val();
                 const date2 = $('#searchDate2').val();
                 const typemvt = $('#statutTrace').val();
-                const user_id = $('#userTrace').val();
 
                 if (!date1.trim() || !date2.trim()) {
                     showAlert('Alert', 'Tous les champs sont obligatoires.','warning');
@@ -673,7 +642,7 @@
                 }
                 
                 $.ajax({
-                    url: `/api/trace_operation/${date1}/${date2}/${typemvt}/${user_id}`,
+                    url: `/api/trace_operation/${date1}/${date2}/${typemvt}`,
                     type: 'GET',
                     success: function(response) {
                         callback({ data: response.data });
@@ -691,64 +660,73 @@
                     orderable: false,
                 },
                 { 
-                    data: 'user',
-                    render: function (data, type, row) { return `${row.user_sexe}. ${row.user}` },
+                    data: 'login',
+                    render: function (data, type, row) { return `${data}` },
                     searchable: true, 
                 },
                 { 
-                    data: 'motif',
+                    data: 'libelle',
                     searchable: true,
-                },
-                { 
-                    data: 'typemvt',
-                    searchable: true, 
                 },
                 {
-                    data: 'typemvt',
+                    data: 'type',
                     searchable: true,
                     render: function (data, type, row) {
-                        if (data === 'Entrer de Caisse') {
+                        if (data === 'entree') {
                             return `<span class="fs-6 badge bg-success-subtle text-success">
-                                        + ${row.montant} Fcfa
+                                        Entrer
                                     </span>`;
                         } else {
                             return `<span class="fs-6 badge bg-danger-subtle text-danger">
-                                        - ${row.montant} Fcfa
+                                        Sortie
                                     </span>`;
                         }
                     }
                 },
                 {
-                    data: 'date_ope',
+                    data: 'type',
+                    searchable: true,
+                    render: function (data, type, row) {
+                        if (data === 'entree') {
+                            return `<span class="fs-6 badge bg-success-subtle text-success">
+                                        + ${formatPrice(row.montant)} Fcfa
+                                    </span>`;
+                        } else {
+                            return `<span class="fs-6 badge bg-danger-subtle text-danger">
+                                        - ${formatPrice(row.montant)} Fcfa
+                                    </span>`;
+                        }
+                    }
+                },
+                {
+                    data: 'dateop',
                     searchable: false,
                     render: function (data, type, row) {
-                        const date = data === '' ? row.created_at : data;
-                        return `<td>${formatDate(date)}</td>`;
+                        return `<td>${formatDate(data)}</td>`;
                     }
                 },
                 { 
-                    data: 'created_at', 
-                    render: formatDateHeure,
+                    data: 'datecreat', 
+                    render: formatDate,
                     searchable: true, 
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm rounded-5" 
+                            <a class="btn btn-outline-warning btn-sm" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#Detail" 
                                 id="detail"
-                                data-typemvt="${row.typemvt}"
+                                data-type="${row.type}"
                                 data-montant="${row.montant}"
-                                data-motif="${row.motif}"
-                                data-solde_avant="${row.solde_avant}"
-                                data-solde_apres="${row.solde_apres}"
-                                data-user_sexe="${row.user_sexe}"
-                                data-user="${row.user}"
-                                data-date_ope="${row.date_ope}"
-                                data-created_at="${row.created_at}"
-                                data-libelle="${row.libelle}">
+                                data-motif="${row.libelle}"
+                                data-dateop="${row.dateop}"
+                                data-datecreat="${row.datecreat}"
+                                data-login="${row.login}"
+                                data-login_recu="${row.beneficiaire}"
+                                data-reference="${row.nopiece}"
+                            >
                                 <i class="ri-eye-line"></i>
                             </a>
                         </div>
@@ -766,18 +744,16 @@
         function initializeRowEventListenersTable_OpC() {
 
             $('.Table_OpC').on('click', '#detail', function() {
-                const id = $(this).data('id');
-                const typemvt = $(this).data('typemvt');
-                const montant = $(this).data('montant');
+                const type = $(this).data('type');
+                const montant = formatPrice($(this).data('montant'));
                 const motif = $(this).data('motif');
-                const solde_avant = $(this).data('solde_avant');
-                const solde_apres = $(this).data('solde_apres');
-                const user_sexe = $(this).data('user_sexe');
-                const user = $(this).data('user');
 
-                const date_ope = $(this).data('date_ope');
-                const created_at = $(this).data('created_at');
-                const libelle = $(this).data('libelle');
+                const dateop = $(this).data('dateop');
+                const datecreat = $(this).data('datecreat');
+
+                const login = $(this).data('login');
+                const login_recu = $(this).data('login_recu');
+                const reference = $(this).data('reference');
                 
                 const modal = document.getElementById('modal_detail');
                 modal.innerHTML = '';
@@ -792,32 +768,35 @@
                                             <li class="list-group-item active text-center" aria-current="true">
                                                 Informations de l'operation
                                             </li>
+                                            ${reference !== null ? 
+                                                `
+                                                <li class="list-group-item">
+                                                    Référence : ${reference}
+                                                </li>
+                                                ` : '' }
                                             <li class="list-group-item">
-                                                Type de Mouvement : ${typemvt}
+                                                Type de Mouvement : ${type == 'entree' ? 'Entrer de Caisse' : 'Sortie de Caisse' }
                                             </li>
-                                            <li class="list-group-item ${typemvt == 'Entrer de Caisse' ? 'text-success' : 'text-danger' }">
-                                                Montant : ${typemvt == 'Entrer de Caisse' ? '+ '+montant : '- '+montant } Fcfa
+                                            <li class="list-group-item ${type == 'entree' ? 'text-success' : 'text-danger' }">
+                                                Montant : ${type == 'entree' ? '+ '+montant : '- '+montant } Fcfa
                                             </li>
                                             <li class="list-group-item">
                                                 Motif : ${motif}
                                             </li>
-                                            <li class="list-group-item text-primary">
-                                                Solde avant opération : ${solde_avant} Fcfa
+                                            <li class="list-group-item">
+                                                Créer par : ${login} 
                                             </li>
-                                            <li class="list-group-item text-primary">
-                                                Solde après opération : ${solde_apres} Fcfa
+                                            ${login_recu !== null ? 
+                                                `
+                                                <li class="list-group-item">
+                                                    Montant remis à : ${login_recu}
+                                                </li>
+                                                ` : '' }
+                                            <li class="list-group-item">
+                                                Date de l'opération : ${formatDate(dateop)}
                                             </li>
                                             <li class="list-group-item">
-                                                Créer par : ${user_sexe}. ${user} 
-                                            </li>
-                                            <li class="list-group-item">
-                                                Date de l'opération : ${date_ope == `` ? `${formatDate(created_at)}` : `${formatDate(date_ope)}` }
-                                            </li>
-                                            <li class="list-group-item">
-                                                Date de création : ${formatDateHeure(created_at)}
-                                            </li>
-                                            <li class="list-group-item">
-                                                Libelle : ${libelle}
+                                                Date de création : ${formatDate(datecreat)}
                                             </li>
                                         </ul>
                                     </div>
@@ -882,34 +861,38 @@
                     orderable: false,
                 },
                 {
-                    data: 'motif',
+                    data: 'action',
                     render: function(data, type, row) {
-                        if (data === 'OUVERTURE DE CAISSE') {
-                            return `<span class="fs-6 badge bg-success-subtle text-success">${data}</span>`;
-                        } else {
-                            return `<span class="fs-6 badge bg-danger-subtle text-danger">${data}</span>`;
+                        if (data === 0) {
+                            return `<span class="fs-6 badge bg-success-subtle text-success">
+                                Ouverture de la caisse
+                                </span>`;
+                        } else if (data === 1) {
+                            return `<span class="fs-6 badge bg-info-subtle text-info">Opération journalière</span>`;
+                        } else if (data === 2) {
+                            return `<span class="fs-6 badge bg-danger-subtle text-danger">Fermeture de la caisse</span>`;
                         }
                     },
                     searchable: true
                 },
                 {
-                    data: 'montant',
+                    data: 'mtcaisse',
                     render: function(data, type, row) {
-                        return `${data} Fcfa`;
+                        return `${formatPrice(data)} Fcfa`;
                     },
                     searchable: true
                 },
                 {
-                    data: null, // Combine `user_sexe` and `user` fields
+                    data: 'user', // Combine `user_sexe` and `user` fields
                     render: function(data, type, row) {
-                        return `${row.user_sexe}. ${row.user}`;
+                        return `${data}`;
                     },
                     searchable: false
                 },
                 {
-                    data: 'created_at',
+                    data: 'datecaisse',
                     render: function(data, type, row) {
-                        return formatDateHeure(data); // Utilise votre fonction de formatage
+                        return `${formatDate(data)} ${row.heurecaisse}`; // Utilise votre fonction de formatage
                     },
                     searchable: false
                 }
@@ -921,116 +904,116 @@
             table_Ofc.ajax.reload(null, false); 
         });
 
-        function historique() {
+        // function historique() {
 
-            const date = document.getElementById('searchDate1_bj').value;
+        //     const date = document.getElementById('searchDate1_bj').value;
 
-            const contenu_total = document.getElementById('historique_total');
+        //     const contenu_total = document.getElementById('historique_total');
 
-            const contenu = document.getElementById('historique_contenu');
-            contenu.innerHTML = '';
+        //     const contenu = document.getElementById('historique_contenu');
+        //     contenu.innerHTML = '';
 
-            var preloader = `
-                <div class="d-flex justify-content-center align-items-center" id="laoder_stat">
-                    <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                    <strong>Chargement des données...</strong>
-                </div>
-            `;
-            contenu.innerHTML = preloader;
+        //     var preloader = `
+        //         <div class="d-flex justify-content-center align-items-center" id="laoder_stat">
+        //             <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
+        //             <strong>Chargement des données...</strong>
+        //         </div>
+        //     `;
+        //     contenu.innerHTML = preloader;
 
-            const url = `/api/historique_caisse/${date}`;
+        //     const url = `/api/historique_caisse/${date}`;
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    const traces = data.trace || [] ;
-                    const ofcs = data.ofc || [] ;
-                    const total = data.total ;
+        //     fetch(url)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             const traces = data.trace || [] ;
+        //             const ofcs = data.ofc || [] ;
+        //             const total = data.total ;
 
-                    const combinedData = [...traces, ...ofcs].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        //             const combinedData = [...traces, ...ofcs].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-                    contenu.innerHTML = '';
+        //             contenu.innerHTML = '';
 
-                    if (combinedData.length > 0) {
+        //             if (combinedData.length > 0) {
 
-                        combinedData.forEach((item) => {
-                            // Si typemvt n'existe pas, utiliser motif comme typemvt
-                            const typemvt = item.typemvt || item.motif || 'Motif non spécifié';
+        //                 combinedData.forEach((item) => {
+        //                     // Si typemvt n'existe pas, utiliser motif comme typemvt
+        //                     const typemvt = item.typemvt || item.motif || 'Motif non spécifié';
 
-                            let borderClass = '';
-                            let iconClass = '';
-                            let textClass = '';
+        //                     let borderClass = '';
+        //                     let iconClass = '';
+        //                     let textClass = '';
 
-                            if (typemvt === 'Entrer de Caisse') {
-                                borderClass = 'border-success';
-                                iconClass = 'ri-arrow-right-up-line';
-                                textClass = 'text-success';
-                            } else if (typemvt === 'Sortie de Caisse') {
-                                borderClass = 'border-danger';
-                                iconClass = 'ri-arrow-right-down-line';
-                                textClass = 'text-danger';
-                            } else if (typemvt === 'OUVERTURE DE CAISSE') {
-                                borderClass = 'border-primary';
-                                iconClass = 'ri-door-open-line';
-                                textClass = 'text-primary';
-                            } else if (typemvt === 'FERMETURE DE CAISSE') {
-                                borderClass = 'border-warning';
-                                iconClass = 'ri-door-closed-line';
-                                textClass = 'text-warning';
-                            }
+        //                     if (typemvt === 'Entrer de Caisse') {
+        //                         borderClass = 'border-success';
+        //                         iconClass = 'ri-arrow-right-up-line';
+        //                         textClass = 'text-success';
+        //                     } else if (typemvt === 'Sortie de Caisse') {
+        //                         borderClass = 'border-danger';
+        //                         iconClass = 'ri-arrow-right-down-line';
+        //                         textClass = 'text-danger';
+        //                     } else if (typemvt === 'OUVERTURE DE CAISSE') {
+        //                         borderClass = 'border-primary';
+        //                         iconClass = 'ri-door-open-line';
+        //                         textClass = 'text-primary';
+        //                     } else if (typemvt === 'FERMETURE DE CAISSE') {
+        //                         borderClass = 'border-warning';
+        //                         iconClass = 'ri-door-closed-line';
+        //                         textClass = 'text-warning';
+        //                     }
 
-                            const div = document.createElement('div');
-                            div.className = "p-3 border rounded-2";
-                            div.innerHTML = `
-                                <div class="d-flex gap-3 mb-3">
-                                    <i class="border ${borderClass} p-1 rounded-3 ${iconClass} fs-1 ${textClass} lh-1"></i>
-                                    <div>
-                                        <h5 class="${textClass}">
-                                            ${
-                                                typemvt === 'Entrer de Caisse'
-                                                    ? '+ ' + item.montant + ' Fcfa'
-                                                    : typemvt === 'Sortie de Caisse'
-                                                    ? '- ' + item.montant + ' Fcfa'
-                                                    : item.montant + ' Fcfa'
-                                            }
-                                        </h5>
-                                        <p class="opacity-100 m-0">
-                                            ${item.motif || 'Motif non spécifié'}.
-                                        </p>
-                                    </div>
-                                </div>
-                                <p>
-                                    Créer par David kouachi à 23H50
-                                </p>
-                            `;
-                            contenu.appendChild(div);
-                        });
-
-
-                        contenu_total.innerHTML = '';
-
-                        const divT = `
-                            <h5 class="card-title">Montant Total : ${formatPrice(total)} Fcfa</h5>   
-                        `;
-                        contenu_total.innerHTML = divT;
+        //                     const div = document.createElement('div');
+        //                     div.className = "p-3 border rounded-2";
+        //                     div.innerHTML = `
+        //                         <div class="d-flex gap-3 mb-3">
+        //                             <i class="border ${borderClass} p-1 rounded-3 ${iconClass} fs-1 ${textClass} lh-1"></i>
+        //                             <div>
+        //                                 <h5 class="${textClass}">
+        //                                     ${
+        //                                         typemvt === 'Entrer de Caisse'
+        //                                             ? '+ ' + item.montant + ' Fcfa'
+        //                                             : typemvt === 'Sortie de Caisse'
+        //                                             ? '- ' + item.montant + ' Fcfa'
+        //                                             : item.montant + ' Fcfa'
+        //                                     }
+        //                                 </h5>
+        //                                 <p class="opacity-100 m-0">
+        //                                     ${item.motif || 'Motif non spécifié'}.
+        //                                 </p>
+        //                             </div>
+        //                         </div>
+        //                         <p>
+        //                             Créer par David kouachi à 23H50
+        //                         </p>
+        //                     `;
+        //                     contenu.appendChild(div);
+        //                 });
 
 
-                    } else {
+        //                 contenu_total.innerHTML = '';
+
+        //                 const divT = `
+        //                     <h5 class="card-title">Montant Total : ${formatPrice(total)} Fcfa</h5>   
+        //                 `;
+        //                 contenu_total.innerHTML = divT;
+
+
+        //             } else {
                         
-                        var message = `
-                            <div class="d-flex justify-content-center align-items-center" id="historique_message">
-                                <strong>Aucune données n'a été trouvées</strong>
-                            </div>
-                        `;
-                        contenu.innerHTML = message;
-                        contenu_total.innerHTML = '';
+        //                 var message = `
+        //                     <div class="d-flex justify-content-center align-items-center" id="historique_message">
+        //                         <strong>Aucune données n'a été trouvées</strong>
+        //                     </div>
+        //                 `;
+        //                 contenu.innerHTML = message;
+        //                 contenu_total.innerHTML = '';
 
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement des données:', error);
-                });
-        }
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Erreur lors du chargement des données:', error);
+        //         });
+        // }
 
     });
 </script>

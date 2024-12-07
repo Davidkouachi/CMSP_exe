@@ -40,7 +40,7 @@ use App\Models\programmemedecin;
 use App\Models\caisse;
 use App\Models\historiquecaisse;
 use App\Models\user;
-use App\Models\portecaisse;
+use App\Models\porte_caisse;
 
 class ApisearchController extends Controller
 {
@@ -256,9 +256,32 @@ class ApisearchController extends Controller
 
     public function montant_solde()
     {
-        $solde = caisse::find('1');
+        // $solde = caisse::find('1');
 
-        return response()->json(['solde' => $solde]); 
+        // return response()->json(['solde' => $solde]);
+
+        // $montant = 0;
+
+        // $solde = DB::table('caisse')->select('type','montant')->get();
+
+        // foreach ($solde as $value) {
+        //     if ($value->type === 'entree') {
+        //         $montant += $value->montant;
+        //     } else if ($value->type === 'sortie') {
+        //         $montant -= $value->montant;
+        //     }
+        // }
+
+        // return response()->json(['montant' => $montant]); 
+
+        $montant = DB::table('caisse')
+            ->selectRaw("SUM(CASE WHEN type = 'entree' THEN montant ELSE -montant END) as solde")
+            ->value('solde');
+
+        // $caisse = DB::table('porte_caisses')->where('id', '=', 1)->select('montant')->first();
+
+        return response()->json(['montant' => $montant]);
+
     }
 
     public function list_caissier()
@@ -288,7 +311,7 @@ class ApisearchController extends Controller
 
     public function verf_caisse()
     {
-        $caisse = caisse::find(1);
+        $caisse = porte_caisse::find(1);
 
         return response()->json(['caisse' => $caisse]);
     }

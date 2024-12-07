@@ -82,13 +82,14 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">N°</th>
-                                        <th scope="col">Code</th>
+                                        <th scope="col">N° Consultation</th>
                                         <th scope="col">N° dossier</th>
                                         <th scope="col">Nom et Prénoms</th>
                                         <th scope="col">Contact</th>
                                         <th scope="col">Médecin</th>
                                         <th scope="col">Spécialité</th>
                                         <th scope="col">Prix</th>
+                                        <th scope="col">N° Facture</th>
                                         <th scope="col">Date</th>
                                         <th scope="col"></th>
                                     </tr>
@@ -384,6 +385,11 @@
                 { 
                     data: 'montant', 
                     render: (data) => `${formatPriceT(data)} Fcfa`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'numfac', 
+                    render: (data) => `${data}`,
                     searchable: true, 
                 },
                 { 
