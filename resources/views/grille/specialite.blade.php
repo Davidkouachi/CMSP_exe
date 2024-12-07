@@ -82,33 +82,6 @@
                                                 <input type="text" class="form-control" id="abr_acte" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
-                                        {{-- <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Prix Consultation Jour</label>
-                                                <div class="input-group">
-                                                    <input type="tel" class="form-control" id="prixj" placeholder="Saisie Obligatoire">
-                                                    <span class="input-group-text">Fcfa</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Prix Consultation Nuit</label>
-                                                <div class="input-group">
-                                                    <input type="tel" class="form-control" id="prixn" placeholder="Saisie Obligatoire">
-                                                    <span class="input-group-text">Fcfa</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Prix Consultation Férier</label>
-                                                <div class="input-group">
-                                                    <input type="tel" class="form-control" id="prixf" placeholder="Saisie Obligatoire">
-                                                    <span class="input-group-text">Fcfa</span>
-                                                </div>
-                                            </div>
-                                        </div> --}}
                                         <div class="col-sm-12">
                                             <div class="mb-3">
                                                 <div class="d-flex gap-2 justify-content-center">
@@ -184,7 +157,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modifier Lit</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -409,11 +382,11 @@
 
         function updatee() {
 
-            const id = document.getElementById('Id').value;
-            const nomModif = document.getElementById('nomModif').value;
-            const prixModif = document.getElementById('prixModif').value;
+            const code = document.getElementById('MatriculeModif').value;
+            const nom = document.getElementById('nomModif').value;
+            const abr = document.getElementById('abrModif').value;
 
-            if(!nomModif.trim() || !prixModif.trim()){
+            if(!nom.trim() || !abr.trim()){
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
                 return false;
             }
@@ -430,18 +403,24 @@
             document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
             $.ajax({
-                url: '/api/update_specialite/'+id,
+                url: '/api/update_specialite/'+code,
                 method: 'GET',
-                data: { nom: nomModif, prix: prixModif,},
+                data: { nom: nom, abr: abr,},
                 success: function(response) {
                     var preloader = document.getElementById('preloader_ch');
                     if (preloader) {
                         preloader.remove();
                     }
 
-                    showAlert('Succès', 'Mise à jour éffectuée.','success');
-            
-                    list();
+                    if (response.existe) {
+                        showAlert('Alert', response.message , 'warning');
+                    } else if (response.success) {
+
+                        $('#Table_day').DataTable().ajax.reload(null, false);
+                        showAlert('Succès', response.message , 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
                 },
                 error: function() {
                     var preloader = document.getElementById('preloader_ch');

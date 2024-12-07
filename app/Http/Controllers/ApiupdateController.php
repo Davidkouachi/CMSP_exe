@@ -50,7 +50,6 @@ use App\Models\rdvpatient;
 use App\Models\programmemedecin;
 use App\Models\depotfacture;
 
-
 class ApiupdateController extends Controller
 {
     private function generateUniqueMatricule()
@@ -457,23 +456,46 @@ class ApiupdateController extends Controller
         return response()->json(['error' => true]);
     }
 
-    public function update_specialite(Request $request, $id)
+    public function update_specialite(Request $request, $code)
     {
-        $put = typeacte::find($id);
+        $Exist = DB::table('specialitemed')
+            ->where(function ($query) use ($request) {
+                $query->where('nomspecialite', '=', $request->nom)
+                      ->orWhere('abrspecialite', '=', $request->abr);
+            })
+            ->where('codespecialitemed', '!=', $code)
+            ->exists();
 
-        if ($put) {
-            $put->nom = $request->nom;
-            $put->prix = $request->prix;
-
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
-
+        if ($Exist) {
+            return response()->json(['existe' => true, 'message' => 'Ce type ou cette abréviation existe déjà.']);
         }
 
-        return response()->json(['error' => true]);
+
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_specialite =[
+                    'nomspecialite' => $request->nom,
+                    'abrspecialite' => $request->abr,
+                    'updated_at' => now(),
+                ];
+
+                $specialiteUpdate = DB::table('specialitemed')
+                                    ->where('codespecialitemed', '=', $code)
+                                    ->update($updateData_specialite);
+
+                if ($specialiteUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table specialitemed');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
     }
 
     public function update_depot_fac(Request $request, $id)
@@ -877,6 +899,37 @@ class ApiupdateController extends Controller
 
                 if ($garantieUpdate === 0) {
                     throw new Exception('Erreur lors de la mise à jour dans la table garantie');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function update_tarif(Request $request, $id)
+    {
+
+        DB::beginTransaction();
+
+            try {
+
+                $updateData_tarif =[
+                    'montjour' => str_replace('.', '', $request->prixj),
+                    'montnuit' => str_replace('.', '', $request->prixn),
+                    'montferie' => str_replace('.', '', $request->prixf),
+                    'updated_at' => now(),
+                ];
+
+                $tarifUpdate = DB::table('tarifs')
+                                    ->where('idtarif', '=', $id)
+                                    ->update($updateData_tarif);
+
+                if ($tarifUpdate === 0) {
+                    throw new Exception('Erreur lors de la mise à jour dans la table tarifs');
                 }
 
                 // Valider la transaction

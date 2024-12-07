@@ -237,13 +237,13 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" >Fax</label>
-                                <input type="text" class="form-control" id="faxModif" placeholder="Saisie Obligatoire">
+                                <input type="text" class="form-control" id="faxModif" placeholder="Facultatif">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label">Adresse</label>
-                                <input type="text" class="form-control" id="adresseModif" placeholder="Facultatif">
+                                <input type="text" class="form-control" id="adresseModif" placeholder="Saisie Obligatoire">
                             </div>
                         </div>
                         <div class="col-12">
@@ -706,7 +706,6 @@
                         carte.value = '';
 
                         $('#Table_day').DataTable().ajax.reload();
-                        select_assurance();
 
                         showAlert('Succès', response.message,'success');
                     } else if (response.error) {
@@ -1006,7 +1005,6 @@
                     }else if (response.fax_existe) {
                         showAlert('Alert', 'Ce fax appartient déjà a une assurance.','warning');
                     } else if (response.success) {
-                        select_assurance();
                         $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opérationn éffectué.','success');
                     } else if (response.error) {

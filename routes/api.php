@@ -46,6 +46,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/select_medecin', [ApiController::class, 'select_medecin']);
 	Route::get('/select_assureur', [ApiController::class, 'select_assureur']);
 	Route::get('/select_typegarantie', [ApiController::class, 'select_typegarantie']);
+	Route::get('/select_garantie', [ApiController::class, 'select_garantie']);
 	// recherche fin
 
 	// insert debut
@@ -80,6 +81,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/assureur_new', [ApiinsertController::class, 'assureur_new']);
 	Route::get('/type_garantie_new', [ApiinsertController::class, 'type_garantie_new']);
 	Route::get('/garantie_new', [ApiinsertController::class, 'garantie_new']);
+	Route::get('/tarif_new', [ApiinsertController::class, 'tarif_new']);
 	// insert debut
 
 	// search debut
@@ -138,7 +140,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/prelevement_Modif', [ApiupdateController::class, 'prelevement_Modif']);
 	Route::get('/update_horaire/{id}', [ApiupdateController::class, 'update_horaire']);
 	Route::get('/update_rdv/{id}', [ApiupdateController::class, 'update_rdv']);
-	Route::get('/update_specialite/{id}', [ApiupdateController::class, 'update_specialite']);
+	Route::get('/update_specialite/{code}', [ApiupdateController::class, 'update_specialite']);
 	Route::get('/update_depot_fac/{id}', [ApiupdateController::class, 'update_depot_fac']);
 	Route::get('/update_assurance/{id}', [ApiupdateController::class, 'update_assurance']);
 	Route::get('/update_date_hos/{id}', [ApiupdateController::class, 'update_date_hos']);
@@ -146,6 +148,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/update_assureur/{id}', [ApiupdateController::class, 'update_assureur']);
 	Route::get('/update_type_garantie/{code}', [ApiupdateController::class, 'update_type_garantie']);
 	Route::get('/update_garantie/{code}', [ApiupdateController::class, 'update_garantie']);
+	Route::get('/update_tarif/{id}', [ApiupdateController::class, 'update_tarif']);
 	// update debut
 
 	// delete debut
@@ -166,6 +169,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/delete_user/{matricule}', [ApideleteController::class, 'delete_user']);
 	Route::get('/delete_assurance/{id}', [ApideleteController::class, 'delete_assurance']);
 	Route::get('/delete_assureur/{id}', [ApideleteController::class, 'delete_assureur']);
+	Route::get('/delete_tarif/{id}', [ApideleteController::class, 'delete_tarif']);
 	// delete debut
 
 	// liste debut
@@ -207,6 +211,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/list_assureur_all', [ApilistController::class, 'list_assureur_all']);
 	Route::get('/list_type_garantie', [ApilistController::class, 'list_type_garantie']);
 	Route::get('/list_garantie', [ApilistController::class, 'list_garantie']);
+	Route::get('/list_tarif', [ApilistController::class, 'list_tarif']);
 	// liste debut
 
 	// statistique debut

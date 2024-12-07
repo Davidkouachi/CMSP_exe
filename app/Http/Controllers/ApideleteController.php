@@ -385,4 +385,26 @@ class ApideleteController extends Controller
             }
     }
 
+    public function delete_tarif($id)
+    {
+        DB::beginTransaction();
+
+            try {
+
+                $tarifDelete = DB::table('tarifs')
+                                ->where('idtarif', '=', $id)
+                                ->delete();
+
+                if (!$tarifDelete === 0) {
+                    throw new Exception('Erreur lors de la suppresion dans la table tarifs');
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
 }

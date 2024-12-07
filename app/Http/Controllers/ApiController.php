@@ -75,4 +75,11 @@ class ApiController extends Controller
 
         return response()->json(['type' => $type]); 
     }
+
+    public function select_garantie()
+    {
+        $garantie = DB::table('garantie')->select('codgaran','libgaran')->get();
+
+        return response()->json(['garantie' => $garantie]); 
+    }
 }

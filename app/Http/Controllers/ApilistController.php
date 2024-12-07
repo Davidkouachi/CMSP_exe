@@ -1154,4 +1154,22 @@ class ApilistController extends Controller
         ]);
     }
 
+    public function list_tarif(Request $request)
+    {
+        $tarifs = DB::table('tarifs')
+            ->join('garantie', 'tarifs.codgaran', '=', 'garantie.codgaran')
+            ->join('assurance', 'tarifs.codeassurance', '=', 'assurance.codeassurance')
+            ->select(
+                'tarifs.*',
+                'garantie.libgaran as garantie',
+                'assurance.libelleassurance as asurance',
+            )
+            ->orderBy('garantie.codgaran', 'asc')
+            ->get();
+
+        return response()->json([
+            'data' => $tarifs,
+        ]);
+    }
+
 }

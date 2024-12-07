@@ -104,7 +104,7 @@
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Code</label>
-                                                            <input type="text" class="form-control" id="code_typegarantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                            <input type="text" class="form-control" id="code_typegarantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="10">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12 mb-3 ">
@@ -133,13 +133,13 @@
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Garantie</label>
-                                                            <input type="text" class="form-control" id="nom_garantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                            <input type="text" class="form-control" id="nom_garantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="80">
                                                         </div>
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Code</label>
-                                                            <input type="text" class="form-control" id="code_garantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                            <input type="text" class="form-control" id="code_garantie" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="10">
                                                         </div>
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -255,10 +255,25 @@
                                                 <div class="row gx-3 alig-items-center justify-content-center">
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Nom de la société</label>
-                                                            <input type="text" class="form-control" id="nom" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                            <label class="form-label">Garantie</label>
+                                                            <select class="form-select select2" id="codgaran">
+                                                            </select>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row gx-3 alig-items-center justify-content-center" id="div_assurer" style="display: none;">
+                                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Assurer ?</label>
+                                                            <select class="form-select select2" id="assurer">
+                                                                <option value=""></option>
+                                                                <option value="1">Oui</option>
+                                                                <option value="0">Non</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row gx-3 alig-items-center justify-content-center" id="div_assurance" style="display: none;">
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Assurance</label>
@@ -266,16 +281,38 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row gx-3 alig-items-center justify-content-center" id="div_prix" style="display: none;">
                                                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Assureur</label>
-                                                            <select class="form-select select2" id="assureur_id">
-                                                            </select>
+                                                            <label class="form-label">Prix Jour</label>
+                                                            <div class="input-group">
+                                                                <input type="tel" class="form-control" id="prixj" placeholder="Saisie Obligatoire">
+                                                                <span class="input-group-text">Fcfa</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Prix Nuit</label>
+                                                            <div class="input-group">
+                                                                <input type="tel" class="form-control" id="prixn" placeholder="Saisie Obligatoire">
+                                                                <span class="input-group-text">Fcfa</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Prix Férier</label>
+                                                            <div class="input-group">
+                                                                <input type="tel" class="form-control" id="prixf" placeholder="Saisie Obligatoire">
+                                                                <span class="input-group-text">Fcfa</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12 mb-3 ">
                                                         <div class="d-flex gap-2 justify-content-center">
-                                                            <button id="btn_eng" class="btn btn-outline-success">
+                                                            <button id="btn_eng_tarif" class="btn btn-outline-success">
                                                                 Enregistrer
                                                             </button>
                                                         </div>
@@ -301,9 +338,12 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
-                                                                    <th scope="col">Nom</th>
+                                                                    <th scope="col">Garantie</th>
+                                                                    <th scope="col">Assurer ?</th>
                                                                     <th scope="col">Assurance</th>
-                                                                    <th scope="col">Assureur</th>
+                                                                    <th scope="col">Montant Jour</th>
+                                                                    <th scope="col">Montant Nuit</th>
+                                                                    <th scope="col">Montant Férier</th>
                                                                     <th scope="col">Actions</th>
                                                                 </tr>
                                                             </thead>
@@ -379,6 +419,76 @@
     </div>
 </div>
 
+<div class="modal fade" id="Mmodif_tarif" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mise à jour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateChambreForm">
+                    <input type="hidden" id="Id_tarif">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Prix Jour</label>
+                            <div class="input-group">
+                                <input type="tel" class="form-control" id="prixjModif" placeholder="Saisie Obligatoire">
+                                <span class="input-group-text">Fcfa</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Prix Nuit</label>
+                            <div class="input-group">
+                                <input type="tel" class="form-control" id="prixnModif" placeholder="Saisie Obligatoire">
+                                <span class="input-group-text">Fcfa</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Prix Férier</label>
+                            <div class="input-group">
+                                <input type="tel" class="form-control" id="prixfModif" placeholder="Saisie Obligatoire">
+                                <span class="input-group-text">Fcfa</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="updateBtn_tarif">Mettre à jour</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Mdelete_tarif" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delRowLabel">
+                    Confirmation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimé ce tarif ?
+                <input type="hidden" id="Id_delete_tarif">
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Non</a>
+                    <button id="deleteBtn_tarif" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{asset('assets/js/app/js/jspdfinvoicetemplate/dist/index.js')}}" ></script>
 <script src="{{asset('jsPDF-master/dist/jspdf.umd.js')}}"></script>
 
@@ -407,6 +517,8 @@
     $(document).ready(function() {
 
         select_typegarantie();
+        select_assurance();
+        select_garantie();
 
         // $("#btn_eng").on("click", eng);
         // $("#updateBtn").on("click", updatee);
@@ -418,9 +530,10 @@
         $("#btn_eng_garantie").on("click", eng_garantie);
         $("#updateBtn_garantie").on("click", updatee_garantie);
 
-        $('#btn_refresh_table_tarif').on('click', function () {
-            table_tarif.ajax.reload(null, false);
-        });
+        $("#btn_eng_tarif").on("click", eng_tarif);
+        $("#updateBtn_tarif").on("click", updatee_tarif);
+        $("#deleteBtn_tarif").on("click", deletee_tarif);
+
 
         // $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         //     // Optionnel : Recharger les données associées à l'onglet sélectionné
@@ -440,6 +553,50 @@
         //     }
         // });
 
+        var inputs = ['#prixj', '#prixn', '#prixf','#prixjModif', '#prixnModif', '#prixfModif'];
+        inputs.forEach(function (id) {
+            var inputElement = $(id); // Sélectionner l'élément avec jQuery
+
+            // Écoute de l'événement "keypress" pour autoriser uniquement les chiffres
+            inputElement.on('keypress', function (event) {
+                const key = event.key;
+
+                // Autoriser uniquement les chiffres, la touche retour arrière et supprimer
+                if (!/[0-9]/.test(key) && key !== 'Backspace' && key !== 'Delete') {
+                    event.preventDefault();
+                }
+            });
+
+            // Écoute de l'événement "input" pour formater la valeur
+            inputElement.on('input', function () {
+                this.value = formatPrice(this.value.replace(/[^0-9]/g, ''));
+            });
+        });
+
+        $('#codgaran').on('change', function() {
+
+            if (this.value == null) {
+                $('#div_assurer').hide();
+            } else {
+                $('#div_assurer').show();
+            }
+        });
+
+        $('#assurer').on('change', function() {
+
+            $('#codeassurance').val('').trigger('change');
+            $('#prixj').val('');
+            $('#prixn').val('');
+            $('#prixf').val('');
+            $('#div_prix').show();
+
+            if (this.value == 0) {
+                $('#div_assurance').hide();
+            } else if (this.value == 1) {
+                $('#div_assurance').show();
+            }
+        });
+
         function showAlert(title, message, type) {
             Swal.fire({
                 title: title,
@@ -451,13 +608,11 @@
         function formatPrice(price) 
         {
 
-            // Convert to float and round to the nearest whole number
             let number = Math.round(parseFloat(price));
             if (isNaN(number)) {
                 return '';
             }
 
-            // Format the number with dot as thousands separator
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
@@ -500,6 +655,8 @@
 
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
+
+        // -----------------------------------------------------------
 
         function select_typegarantie() 
         {
@@ -687,7 +844,7 @@
                         table_typegarantie.ajax.reload(null, false);
                         showAlert('Succès', response.message , 'success');
                     } else if (response.error) {
-                        showAlert('Erreur', reponse.message, 'error');
+                        showAlert('Erreur', response.message, 'error');
                     }
                 },
                 error: function() {
@@ -784,7 +941,7 @@
             const code_type = $("#codtypgar_garantie");
 
             if (!nom.val().trim() || !code.val().trim() || !code_type.val().trim()) {
-                showAlert('Alert', 'Veuillez saisir un code et une garantie.', 'warning');
+                showAlert('Alert', 'Veuillez remplir tous les champs.', 'warning');
                 return false;
             }
 
@@ -873,6 +1030,345 @@
                 error: function() {
                     $("#preloader_ch").remove();
                     showAlert('Erreur', 'Une erreur est survenue', 'error');
+                }
+            });
+        }
+
+        // -----------------------------------------------------------
+
+        function select_assurance() 
+        {
+            const selectElement2 = $('#codeassurance');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/assurance_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assurance;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_garantie() 
+        {
+            const selectElement2 = $('#codgaran');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/select_garantie',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.garantie;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codgaran,
+                            text: item.libgaran,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        const table_tarif = $('.Table_tarif').DataTable({
+
+            processing: true,
+            serverSide: false,
+            ajax: {
+                url: `/api/list_tarif`,
+                type: 'GET',
+                dataSrc: 'data',
+            },
+            columns: [
+                { 
+                    data: null, 
+                    render: (data, type, row, meta) => meta.row + 1,
+                    searchable: false,
+                    orderable: false,
+                },
+                { 
+                    data: 'garantie', 
+                    render: (data, type, row) => `
+                    <div class="d-flex align-items-center">
+                        <a class="d-flex align-items-center flex-column me-2">
+                            <img src="{{ asset('/assets/images/tarif.png') }}" class="img-2x rounded-circle border border-1">
+                        </a>
+                        ${data}
+                    </div>`,
+                    searchable: true, 
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => `
+                        <span class="badge ${row.codeassurance === 'NONAS' ? 'bg-danger' : 'bg-success'}">
+                            ${row.codeassurance === 'NONAS' ? `Non-assurer` : 'Assurer'}
+                        </span>
+                    `,
+                    searchable: true,
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => {
+                        return row.codeassurance == 'NONAS' ? `Néant` : `${row.asurance}`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'montjour',
+                    render: (data, type, row) => {
+                        return  `${formatPrice(data)} Fcfa` ;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'montnuit',
+                    render: (data, type, row) => {
+                        return  `${formatPrice(data)} Fcfa` ;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'montferie',
+                    render: (data, type, row) => {
+                        return  `${formatPrice(data)} Fcfa` ;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => `
+                        <div class="d-inline-flex gap-1" style="font-size:10px;">
+                            <a class="btn btn-outline-info btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mmodif_tarif" id="modif"
+                                data-id="${row.idtarif}"
+                                data-prixj="${row.montjour}"
+                                data-prixn="${row.montnuit}"
+                                data-prixf="${row.montferie}"
+                            >
+                                <i class="ri-edit-box-line"></i>
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#Mdelete_tarif" id="delete"
+                                data-id="${row.idtarif}"
+                            >
+                                <i class="ri-delete-bin-line"></i>
+                            </a>
+                        </div>
+                    `,
+                    searchable: false,
+                    orderable: false,
+                }
+            ],
+            ...dataTableConfig, 
+            initComplete: function(settings, json) {
+                initializeRowEventListeners_tarif();
+            },
+        });
+
+        function initializeRowEventListeners_tarif() {
+
+            $('.Table_tarif').on('click', '#modif', function() {
+                const id = $(this).data('id');
+                const prixj = $(this).data('prixj');
+                const prixn = $(this).data('prixn');
+                const prixf = $(this).data('prixf');
+
+                $('#Id_tarif').val(id);
+                $('#prixjModif').val(formatPrice(prixj));
+                $('#prixnModif').val(formatPrice(prixn));
+                $('#prixfModif').val(formatPrice(prixf));
+            });
+
+            $('.Table_tarif').on('click', '#delete', function() {
+                const id = $(this).data('id');
+
+                $('#Id_delete_tarif').val(id);
+            });
+        }
+
+        $('#btn_refresh_table_tarif').on('click', function () {
+            table_tarif.ajax.reload(null, false);
+        });
+
+        function eng_tarif() 
+        {
+            const garantie = $("#codgaran");
+            const assurer = $("#assurer");
+            const assurance = $("#codeassurance");
+            const prixj = $("#prixj");
+            const prixn = $("#prixn");
+            const prixf = $("#prixf");
+
+            if (!garantie.val().trim() || !assurer.val().trim() || !prixf.val().trim() || !prixj.val().trim() || !prixn.val().trim()) {
+                showAlert('Alert', 'Veuillez remplir tous les champs.', 'warning');
+                return false;
+            }
+
+            if (assurer.val().trim() == 1 && !assurance.val().trim()) {
+                showAlert('Alert', 'Veuillez selectionner une assurance.', 'warning');
+                return false;
+            }
+
+            // Show preloader
+            const preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            $("body").append(preloader_ch);
+
+            // AJAX request to create a new user
+            $.ajax({
+                url: '/api/tarif_new',
+                method: 'GET',
+                data: {
+                    garantie: garantie.val(),
+                    assurer: assurer.val(),
+                    assurance: assurance.val(),
+                    prixj: prixj.val(),
+                    prixn: prixn.val(),
+                    prixf: prixf.val(),
+                },
+                success: function(response) {
+                    $("#preloader_ch").remove();
+
+                    if (response.existe) {
+                        showAlert('Alert', response.message , 'warning');
+                    } else if (response.success) {
+
+                        garantie.val('').trigger('change');
+                        assurer.val('').trigger('change');
+                        assurance.val('').trigger('change');
+                        prixj.val('');
+                        prixn.val('');
+                        prixf.val('');
+
+                        $("#div_assurer").hide();
+                        $("#div_assurance").hide();
+                        $("#div_prix").hide();
+
+                        table_tarif.ajax.reload(null, false);
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    $("#preloader_ch").remove();
+                    showAlert('Erreur', 'Une erreur est survenue', 'error');
+                }
+            });
+        }
+
+        function updatee_tarif() 
+        {
+            const id = $('#Id_tarif').val();
+            const prixj = $("#prixjModif");
+            const prixn = $("#prixnModif");
+            const prixf = $("#prixfModif");
+
+            if (!prixj.val().trim() || !prixn.val().trim() || !prixf.val().trim()) {
+                showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
+                return false;
+            }
+
+            var modal = bootstrap.Modal.getInstance(document.getElementById('Mmodif_tarif'));
+            modal.hide();
+
+            // Show preloader
+            const preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            $("body").append(preloader_ch);
+
+            // AJAX request to create a new user
+            $.ajax({
+                url: '/api/update_tarif/'+id,
+                method: 'GET',
+                data: {
+                    prixj: prixj.val(),
+                    prixn: prixn.val(),
+                    prixf: prixf.val(),
+                },
+                success: function(response) {
+                    $("#preloader_ch").remove();
+
+                    if (response.success) {
+
+                        table_tarif.ajax.reload(null, false);
+                        showAlert('Succès', response.message , 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    $("#preloader_ch").remove();
+                    showAlert('Erreur', 'Une erreur est survenue', 'error');
+                }
+            });
+        }
+
+        function deletee_tarif() {
+
+            const id = document.getElementById('Id_delete_tarif').value;
+
+            var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete_tarif'));
+            modal.hide();
+
+            var preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            // Add the preloader to the body
+            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+            $.ajax({
+                url: '/api/delete_tarif/'+id,
+                method: 'GET',
+                success: function(response) {
+
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    if (response.success) {
+                        table_tarif.ajax.reload(null, false);
+                        showAlert('Succès', response.message, 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    showAlertList('Erreur', 'Erreur lors de la suppression.','error');
                 }
             });
         }

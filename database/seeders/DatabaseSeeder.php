@@ -97,7 +97,7 @@ class DatabaseSeeder extends Seeder
         //    taux::create(['taux' => $i]); 
         // }
 
-        $profil = DB::table('profile')->where('libprofile', 'RÉCEPTION 2')->first();
+        $profil = DB::table('profile')->where('libprofile', 'DIRECTEUR GENERALE')->first();
 
         $user = DB::table('users')->insert([
                     'api_token' => Null, 

@@ -1287,7 +1287,7 @@ class ApiinsertController extends Controller
                     'nomspecialite' => $request->nom,
                     'abrspecialite' => $request->abr,
                     'libellespecialite' => $request->nom,
-
+                    'dateenregistre' => now(),
                 ]);
 
                 if ($specialiteInserted === 0) {
@@ -2026,6 +2026,48 @@ class ApiinsertController extends Controller
                 }
 
                  // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            }
+    }
+
+    public function tarif_new(Request $request)
+    {
+
+        if ($request->assurer == 0) {
+            $codeassurance = 'NONAS';
+        } else {
+            $codeassurance = $request->assurance;
+        }
+
+        $Exist = DB::table('tarifs')
+            ->where('codgaran', '=', $request->garantie)
+            ->Where('codeassurance', '=', $codeassurance)
+            ->exists();
+
+        if ($Exist) {
+            return response()->json(['existe' => true,'message' => 'le tarif de cette garantie existe dèjà']);
+        }
+
+        DB::beginTransaction();
+
+            try {
+
+                $tarifInserted = DB::table('tarifs')->insert([
+                    'codgaran' => $request->garantie,
+                    'montjour' => str_replace('.', '', $request->prixj),
+                    'montnuit' => str_replace('.', '', $request->prixn),
+                    'montferie' => str_replace('.', '', $request->prixf),
+                    'codeassurance' => $codeassurance,
+                ]);
+
+                if ($tarifInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table tarifs');
+                }
+
                 DB::commit();
                 return response()->json(['success' => true]);
             } catch (Exception $e) {
