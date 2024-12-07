@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Consultations.</h5>
+                        <h6>CONSULTATIONS</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <h5>Réception / Liste des Consultations</h5>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                     <div class="w-100">
                         <div class="input-group">
                             <span class="input-group-text">Du</span>
-                            <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-2 months')) }}" max="{{ date('Y-m-d') }}">
+                            <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
                             <span class="input-group-text">au</span>
                             <input type="date" id="searchDate2" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
                             <a id="btn_search_table" class="btn btn-outline-success ms-auto">
@@ -78,7 +78,7 @@
                 <div class="card-body">
                     <div class="">
                         <div class="table-responsive">
-                            <table id="Table_day" class="table table-hover table-sm">
+                            <table id="Table_day" class="table align-middle table-hover m-0 truncate ">
                                 <thead>
                                     <tr>
                                         <th scope="col">N°</th>
@@ -89,90 +89,13 @@
                                         <th scope="col">Médecin</th>
                                         <th scope="col">Spécialité</th>
                                         <th scope="col">Prix</th>
+                                        <th scope="col">Date</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="CDetail" tabindex="-1" aria-modal="true" role="dialog" >
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalXlLabel">
-                    Détail facture
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="div_TableDC" style="display: none;" >
-                    <div class="row">
-                        <div class="col-xxl-3 col-sm-3 col-12">
-                            <img height="100" width="100" src="{{asset('assets/images/facture.webp')}}" alt="Bootstrap Admin Dashboard" class="img-fluid">
-                        </div>
-                        <div class="col-sm-9 col-12">
-                            <div class="text-end" id="fac_detail">
-                                
-                            </div>
-                        </div>
-                        <div class="col-12 mb-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xl-12">
-                            <div class="">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div id="div_alert_tableDC" >
-                        
-                                            </div>
-                                            <div class="table-responsive" >
-                                                <table class="table " id="TableDC">
-                                                    <thead>
-                                                        <tr>
-                                                            <th width="100px" >Code</th>
-                                                            <th colspan="2">Description</th>
-                                                            <th width="120px" >Part Assurance</th>
-                                                            <th width="50px" >Taux</th>
-                                                            <th width="100px" >Remise</th>
-                                                            <th width="120px" >Part Patient</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="message_TableDC" style="display: none;">
-                    <div class="col-12 " >
-                        <div class="mb-3" >
-                            <p class="text-center" >
-                                Aucune facture disponible
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="div_Table_loaderDC" style="display: none;">
-                    <div class="col-12 " >
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                                <strong>Chargement des données...</strong>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -390,6 +313,23 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
         $('#Table_day').DataTable({
 
             processing: true,
@@ -417,48 +357,54 @@
                     orderable: false,
                 },
                 { 
-                    data: 'code',
+                    data: 'idconsexterne',
                     searchable: true, 
                 },
                 { 
-                    data: 'matricule',
+                    data: 'numdossier',
                     searchable: true,
                 },
                 { 
-                    data: 'name',
+                    data: 'nom_patient',
                     searchable: true, 
                 },
                 { 
-                    data: 'tel', 
+                    data: 'tel_patient', 
                     render: (data) => `+225 ${data}`,
                     searchable: true, 
                 },
                 { 
-                    data: 'medecin',
+                    data: 'nom_medecin',
                     searchable: true, 
                 },
                 { 
-                    data: 'type_motif',
+                    data: 'specialite',
                     searchable: true, 
                 },
                 { 
                     data: 'montant', 
-                    render: (data) => `${data} Fcfa`,
+                    render: (data) => `${formatPriceT(data)} Fcfa`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'date', 
+                    render: (data) => `${formatDate(data)}`,
                     searchable: true, 
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#CDetail" id="Cdetail" data-id="${row.id}">
-                                    <i class="ri-eye-line"></i>
-                                </a>
-                                <a class="btn btn-outline-warning btn-sm" id="Cfacture" data-code="${row.code}">
-                                    <i class="ri-printer-line"></i>
-                                </a>
-                                <a class="btn btn-outline-info btn-sm" id="Cfiche" data-code="${row.code}">
-                                    <i class="ri-file-line"></i>
-                                </a>
+                            <a class="btn btn-outline-warning btn-sm" id="Cfacture" 
+                                data-idconsexterne="${row.idconsexterne}"
+                            >
+                                <i class="ri-printer-line"></i>
+                            </a>
+                            <a class="btn btn-outline-info btn-sm" id="Cfiche" 
+                                data-idconsexterne="${row.idconsexterne}"
+                            >
+                                <i class="ri-file-line"></i>
+                            </a>
                         </div>
                     `,
                     searchable: false,
@@ -473,140 +419,16 @@
 
         function initializeRowEventListeners() {
 
-            $('#Table_day').on('click', '#Cdetail', function() {
-                const id = $(this).data('id');
-                
-                const tableBodyD = document.querySelector('#TableDC tbody');
-                const messageDivD = document.getElementById('message_TableDC');
-                const tableDivD = document.getElementById('div_TableDC');
-                const loaderDivD = document.getElementById('div_Table_loaderDC');
-
-                messageDivD.style.display = 'none';
-                tableDivD.style.display = 'none';
-                loaderDivD.style.display = 'block';
-
-                fetch(`/api/list_facture_inpayer_d/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const factureds = data.factured;
-                        const total = data.Total;
-
-                        const id = data.ID.code_fac;
-                        const date_fac = data.ID.date_fac;
-                        const statutValue = data.ID.statut;
-                        const date_paye = data.ID.date_paye;
-
-                        const fac_detail = document.getElementById('fac_detail');
-                        fac_detail.innerHTML = '';
-
-                        const para = document.createElement('p');
-                        para.className = "mb-2";
-                        para.innerHTML = `N° Facture - <span class="text-primary">${id}</span>`;
-                        fac_detail.appendChild(para);
-
-                        const date0 = document.createElement('p');
-                        date0.className = "mb-2";
-                        date0.innerHTML = `Date de création ${formatDateHeure(date_fac)}`;
-                        fac_detail.appendChild(date0);
-
-                        if (date_paye) {
-                            const date = document.createElement('p');
-                            date.className = "mb-2";
-                            date.innerHTML = `Date de paiement ${formatDateHeure(date_paye)}`;
-                            fac_detail.appendChild(date);
-                        }
-
-                        const statutElement = document.createElement('span');
-                        if (statutValue === 'payer') {
-                            statutElement.className = "badge bg-success";
-                            statutElement.innerHTML = `Facture Réglée`;
-                        } else {
-                            statutElement.className = "badge bg-danger";
-                            statutElement.innerHTML = `Facture Non Réglée`;
-                        }
-                        fac_detail.appendChild(statutElement);
-
-                        tableBodyD.innerHTML = '';
-
-                        if (factureds.length > 0) {
-                            loaderDivD.style.display = 'none';
-                            messageDivD.style.display = 'none';
-                            tableDivD.style.display = 'block';
-
-                            factureds.forEach((item, index) => {
-                                // Create a new row
-                                const row = document.createElement('tr');
-                                // Create and append cells to the row based on your table's structure
-                                row.innerHTML = `
-                                    <td><h6>C-${item.code}</h6></td>
-                                    <td colspan="2" >
-                                        <h6>${item.nom_acte}</h6>
-                                        <p>
-                                            ${item.nom_typeacte}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary" >
-                                            ${item.part_assurance} Fcfa
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary" >
-                                            ${item.taux ?? 0}%
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary">
-                                            ${item.remise ?? 0} Fcfa
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-success" >
-                                            ${item.part_patient} Fcfa
-                                        </h6>
-                                    </td>
-                                `;
-                                // Append the row to the table body
-                                tableBodyD.appendChild(row);
-
-                            });
-
-                            const row2 = document.createElement('tr');
-                            row2.innerHTML = `
-                                <td colspan="4">&nbsp;</td>
-                                <td colspan="3" >
-                                    <h5 class="mt-1 text-success">
-                                        Total : ${formatPriceT(total.total_sum)} Fcfa
-                                    </h5>
-                                </td>
-                            `;
-                            tableBodyD.appendChild(row2);
-
-                        } else {
-                            tableDivD.style.display = 'none';
-                            messageDivD.style.display = 'block';
-                            loaderDivD.style.display = 'none';
-                            messageDivD.innerHTML = '<p class="text-danger">Aucun détail trouvé.</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors du chargement des données:', error);
-                    });
-            });
-
             $('#Table_day').on('click', '#Cfacture', function() {
-                const code = $(this).data('code');
+                const code = $(this).data('idconsexterne');
 
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
                 .then(response => response.json())
                 .then(data => {
                     // Access the 'chambre' array from the API response
-                    const patient = data.patient;
-                    const typeacte = data.typeacte;
-                    const user = data.user;
-                    const consultation = data.consultation;
+                    const facture = data.facture;
 
-                    generatePDFInvoice(patient, user, typeacte, consultation);
+                    generatePDFInvoice(facture);
 
                 })
                 .catch(error => {
@@ -615,18 +437,15 @@
             });
 
             $('#Table_day').on('click', '#Cfiche', function() {
-                const code = $(this).data('code');
+                const code = $(this).data('idconsexterne');
 
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
                 .then(response => response.json())
                 .then(data => {
                     // Access the 'chambre' array from the API response
-                    const patient = data.patient;
-                    const typeacte = data.typeacte;
-                    const user = data.user;
-                    const consultation = data.consultation;
+                    const facture = data.facture;
 
-                    generatePDFficheCons(patient, user, typeacte, consultation);
+                    generatePDFficheCons(facture);
 
                 })
                 .catch(error => {
@@ -635,12 +454,220 @@
             });
         }
 
-        function generatePDFficheCons(patient, user, typeacte, consultation) {
+        function generatePDFInvoice(facture) {
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+            const pdfFilename = "Consultation Facture N°" + facture.numfac + " du " + formatDate(facture.date);
+            doc.setProperties({
+                title: pdfFilename,
+            });
+
+            yPos = 10;
+
+            function drawConsultationSection(yPos) {
+                rightMargin = 15;
+                leftMargin = 15;
+                pdfWidth = doc.internal.pageSize.getWidth();
+
+                const titlea = "Facture";
+                doc.setFontSize(100);
+                doc.setTextColor(242, 237, 237); // Gray color for background effect
+                doc.setFont("Helvetica", "bold");
+                doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
+
+                const logoSrc = "{{asset('assets/images/logo.png')}}";
+                const logoWidth = 22;
+                const logoHeight = 22;
+                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
+
+                // Informations de l'entreprise
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                // Texte de l'entreprise
+                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
+                const titleWidth = doc.getTextWidth(title);
+                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
+                doc.text(title, titleX, yPos);
+                // Texte de l'adresse
+                doc.setFont("Helvetica", "normal");
+                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
+                const addressWidth = doc.getTextWidth(address);
+                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
+                doc.text(address, addressX, (yPos + 5));
+                // Texte du téléphone
+                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
+                const phoneWidth = doc.getTextWidth(phone);
+                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
+                doc.text(phone, phoneX, (yPos + 10));
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "normal");
+                const consultationDate = new Date(facture.date);
+                // Formatter la date et l'heure séparément
+                const formattedDate = consultationDate.toLocaleDateString();
+                // const formattedTime = consultationDate.toLocaleTimeString();
+                // doc.text("N° Dossier: " + facture.numdossier, 15, (yPos + 25));
+                doc.text("Date: " + formattedDate, 15, (yPos + 28));
+
+                //Ligne de séparation
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setLineWidth(0.5);
+                doc.setTextColor(255, 0, 0);
+                // doc.line(10, 35, 200, 35); 
+                const titleR = "FACTURE DE CONSULTATION";
+                const titleRWidth = doc.getTextWidth(titleR);
+                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
+                // Définir le padding
+                const paddingh = 0; // Padding vertical
+                const paddingw = 15; // Padding horizontal
+                // Calculer les dimensions du rectangle
+                const rectX = titleRX - paddingw; // X du rectangle
+                const rectY = (yPos + 18) - paddingh; // Y du rectangle
+                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
+                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
+                // Définir la couleur pour le cadre (noir)
+                doc.setDrawColor(0, 0, 0);
+                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
+                // Ajouter le texte centré en gras
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
+                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
+                const titleN = "N° "+ facture.numfac;
+                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
+
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDossier = " N° Dossier : "+ facture.numdossier;
+                const numDossierWidth = doc.getTextWidth(numDossier);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 28);
+
+                yPoss = (yPos + 50);
+
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
+                const patientInfo = [
+                    { label: "Nom et Prénoms", value: facture.nom_patient },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
+                ];
+
+                if (facture.assure == 1) {
+                    patientInfo.push(
+                        { label: "Assurance", value: facture.assurance },
+                        { label: "Filiation", value: facture.filiation },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "Sociéte", value: facture.societe },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
+                    );
+                }
+
+                patientInfo.forEach(info => {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss = (yPos + 50);
+
+                const medecinInfo = [
+                    { label: "N° Consultation", value: facture.idconsexterne},
+                    { label: "Medecin", value: facture.nom_medecin },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Prix Consultation", value: formatPriceT(facture.montant)+" Fcfa" },
+                ];
+
+                medecinInfo.forEach(info => {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin + 100, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss = (yPos + 90);
+
+                const compteInfo = [
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa" },
+                    ...(facture.assure == 1 
+                        ? [
+                            { label: "Part assurance", value: formatPriceT(facture.partassurance)+" Fcfa" },
+                            { label: "Taux", value: facture.taux+" %" }
+                          ] 
+                        : []),
+                    { label: "Remise", value: formatPriceT(facture.remise)+" Fcfa" },
+                ];
+
+                compteInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin + 100, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss += 1;
+
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                doc.text('Montant à payer', leftMargin + 100, yPoss);
+                doc.setFont("Helvetica", "bold");
+                doc.text(": "+formatPriceT(facture.partpatient)+" Fcfa", leftMargin + 135, yPoss);
+
+                if (facture.assure == 1 ) {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 16);
+                }else{
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 28);
+                }
+
+            }
+
+            drawConsultationSection(yPos);
+
+            doc.setFontSize(30);
+            doc.setLineWidth(0.5);
+            doc.setLineDashPattern([3, 3], 0);
+            doc.line(0, (yPos + 137), 300, (yPos + 137));
+            doc.setLineDashPattern([], 0);
+
+            drawConsultationSection(yPos + 150);
+
+
+            doc.output('dataurlnewwindow');
+        }
+
+        function generatePDFficheCons(facture) {
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            const pdfFilename = "Fiche Consultation N°" + consultation.code + " du " + formatDateHeure(consultation.created_at);
+            const pdfFilename = "Fiche Consultation N°" + facture.numfac + " du " + formatDate(facture.date);
             doc.setProperties({
                 title: pdfFilename,
             });
@@ -685,12 +712,12 @@
                 doc.text(phone, phoneX, (yPos + 10));
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "normal");
-                const consultationDate = new Date(consultation.created_at);
+                const consultationDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
                 const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
-                const formattedTime = consultationDate.toLocaleTimeString();
+                // const formattedTime = consultationDate.toLocaleTimeString();
                 doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
+                // doc.text("Heure: " + formattedTime, 15, (yPos + 30));
 
                 //Ligne de séparation
                 doc.setFontSize(15);
@@ -717,32 +744,41 @@
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(255, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+ consultation.code;
+                const titleN = "N° "+ facture.numfac;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
 
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
+                const numDossier = "N° Dossier : "+facture.idenregistremetpatient;
                 const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 25);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 25);
 
                 yPoss = (yPos + 45);
 
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
                 const patientInfo = [
-                    { label: "Medecin", value: "Dr. "+ user.name },
-                    { label: "Spécialité", value: typeacte.nom },
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age +" an(s)" },
-                    { label: "Adresse", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel },
+                    { label: "Medecin", value: facture.nom_medecin },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Nom et Prénoms", value: facture.nom_patient },
+                    { label: "Assurer", value: assurer},
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient },
                 ];
 
-                if (patient.assurer == 'oui') {
+                if (facture.assure == 1) {
                     patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
+                        { label: "Assurance", value: facture.assurance },
+                        { label: "Filiation", value: facture.filiation },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "Sociéte", value: facture.societe },
                     );
                 }
 
@@ -854,203 +890,6 @@
             }
 
             drawConsultationSection(yPos);
-
-            doc.output('dataurlnewwindow');
-        }
-
-        function generatePDFInvoice(patient, user, typeacte, consultation) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-
-            const pdfFilename = "Consultation Facture N°" + consultation.code_fac + " du " + formatDateHeure(consultation.created_at);
-            doc.setProperties({
-                title: pdfFilename,
-            });
-
-            yPos = 10;
-
-            function drawConsultationSection(yPos) {
-                rightMargin = 15;
-                leftMargin = 15;
-                pdfWidth = doc.internal.pageSize.getWidth();
-
-                const titlea = "Facture";
-                doc.setFontSize(100);
-                doc.setTextColor(242, 237, 237); // Gray color for background effect
-                doc.setFont("Helvetica", "bold");
-                doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-
-                const logoSrc = "{{asset('assets/images/logo.png')}}";
-                const logoWidth = 22;
-                const logoHeight = 22;
-                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
-
-                // Informations de l'entreprise
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("Helvetica", "bold");
-                // Texte de l'entreprise
-                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
-                const titleWidth = doc.getTextWidth(title);
-                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
-                doc.text(title, titleX, yPos);
-                // Texte de l'adresse
-                doc.setFont("Helvetica", "normal");
-                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
-                const addressWidth = doc.getTextWidth(address);
-                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
-                doc.text(address, addressX, (yPos + 5));
-                // Texte du téléphone
-                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
-                const phoneWidth = doc.getTextWidth(phone);
-                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
-                doc.text(phone, phoneX, (yPos + 10));
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "normal");
-                const consultationDate = new Date(consultation.created_at);
-                // Formatter la date et l'heure séparément
-                const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
-                const formattedTime = consultationDate.toLocaleTimeString();
-                doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
-
-                //Ligne de séparation
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setLineWidth(0.5);
-                doc.setTextColor(255, 0, 0);
-                // doc.line(10, 35, 200, 35); 
-                const titleR = "FACTURE DE CONSULTATION";
-                const titleRWidth = doc.getTextWidth(titleR);
-                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
-                // Définir le padding
-                const paddingh = 0; // Padding vertical
-                const paddingw = 15; // Padding horizontal
-                // Calculer les dimensions du rectangle
-                const rectX = titleRX - paddingw; // X du rectangle
-                const rectY = (yPos + 18) - paddingh; // Y du rectangle
-                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
-                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
-                // Définir la couleur pour le cadre (noir)
-                doc.setDrawColor(0, 0, 0);
-                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
-                // Ajouter le texte centré en gras
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
-                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+ consultation.code_fac;
-                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
-
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
-                const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
-
-                yPoss = (yPos + 50);
-
-                const patientInfo = [
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age+" an(s)" },
-                    { label: "Domicile", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel }
-                ];
-
-                if (patient.assurer == 'oui') {
-                    patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
-                    );
-                }
-
-                patientInfo.forEach(info => {
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 35, yPoss);
-                    yPoss += 7;
-                });
-
-                yPoss = (yPos + 50);
-
-                const medecinInfo = [
-                    { label: "N° Consultation", value: "C-"+consultation.code},
-                    { label: "Medecin", value: "Dr. "+user.name },
-                    { label: "Spécialité", value: typeacte.nom },
-                    { label: "Prix Consultation", value: typeacte.prix+" Fcfa" },
-                ];
-
-                medecinInfo.forEach(info => {
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin + 100, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 135, yPoss);
-                    yPoss += 7;
-                });
-
-                yPoss = (yPos + 90);
-
-                const compteInfo = [
-                    { label: "Montant Total", value: typeacte.prix + " Fcfa" },
-                    ...(parseInt(consultation.part_assurance.replace(/[^0-9]/g, '')) > 0 
-                        ? [{ label: "Part assurance", value: consultation.part_assurance + " Fcfa" }] 
-                        : []),
-                    { label: "Remise", value: consultation.remise + " Fcfa" },
-                ];
-
-
-                if (patient.taux !== null) {
-                    compteInfo.push({ label: "Taux", value: patient.taux + "%" });
-                }
-
-                compteInfo.forEach(info => {
-                    doc.setFontSize(9);
-                    doc.setFont("Helvetica", "bold");
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(info.label, leftMargin + 100, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 135, yPoss);
-                    yPoss += 7;
-                });
-
-                yPoss += 1;
-
-                doc.setFontSize(11);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("Helvetica", "bold");
-                doc.text('Montant à payer', leftMargin + 100, yPoss);
-                doc.setFont("Helvetica", "bold");
-                doc.text(": "+consultation.part_patient+" Fcfa", leftMargin + 135, yPoss);
-
-                if (patient.taux !== null) {
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.setTextColor(0, 0, 0);
-                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 16);
-                }else{
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.setTextColor(0, 0, 0);
-                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 28);
-                }
-
-            }
-
-            drawConsultationSection(yPos);
-
-            doc.setFontSize(30);
-            doc.setLineWidth(0.5);
-            doc.setLineDashPattern([3, 3], 0);
-            doc.line(0, (yPos + 137), 300, (yPos + 137));
-            doc.setLineDashPattern([], 0);
-
-            drawConsultationSection(yPos + 150);
-
 
             doc.output('dataurlnewwindow');
         }

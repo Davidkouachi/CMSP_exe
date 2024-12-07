@@ -330,21 +330,28 @@ class ApilistController extends Controller
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $consultation = detailconsultation::join('consultations', 'consultations.id', '=', 'detailconsultations.consultation_id')
-                                    ->leftJoin('users', 'users.id', '=', 'consultations.user_id')
-                                    ->join('patients', 'patients.id', '=', 'consultations.patient_id')
-                                    ->whereBetween('consultations.created_at', [$date1, $date2])
-                                    ->select(
-                                        'detailconsultations.*',
-                                        'consultations.code as code', 
-                                        'patients.np as name',
-                                        'users.name as medecin',
-                                        'users.tel as tel', 
-                                        'users.tel2 as tel2',
-                                        'patients.matricule as matricule'
-                                    )
-                                    ->orderBy('detailconsultations.created_at', 'desc')
-                                    ->get();
+        $consultation = DB::table('consultation')
+            ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->whereBetween('consultation.date', [$date1, $date2])
+            ->select(
+                'consultation.idconsexterne as idconsexterne',
+                'consultation.idenregistremetpatient as idenregistremetpatient',
+                'consultation.montant as montant',
+                'consultation.date as date',
+                'consultation.numfac as numfac',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'medecin.nomprenomsmed as nom_medecin',
+                'specialitemed.nomspecialite as specialite',
+            )
+            ->orderBy('consultation.date', 'desc')
+            ->get();
 
         return response()->json([
             'data' => $consultation,

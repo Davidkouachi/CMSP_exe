@@ -55,33 +55,46 @@ class ApipdfController extends Controller
 {
     public function fiche_consultation($code)
     {
-        $consultation = consultation::join('detailconsultations', 'detailconsultations.consultation_id', '=', 'consultations.id')
-        ->join('factures', 'factures.id', '=', 'consultations.facture_id')
-        ->where('consultations.code', '=', $code)
-        ->select(
-            'consultations.*',
-            'detailconsultations.typeacte_id as typeacte_id',
-            'detailconsultations.part_assurance as part_assurance',
-            'detailconsultations.part_patient as part_patient',
-            'detailconsultations.remise as remise',
-            'factures.code as code_fac',
-        )
-        ->first();
 
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')->leftjoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-        ->where('patients.id', '=', $consultation->patient_id)
-        ->select('patients.*', 'assurances.nom as assurance', 'tauxes.taux as taux')
-        ->first();
+        $facture = DB::table('consultation')
+            ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->leftJoin('filiation', 'patient.codefiliation', '=', 'filiation.codefiliation')
+            ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+            ->join('factures', 'consultation.numfac', '=', 'factures.numfac')
+            ->where('consultation.idconsexterne', '=', $code)
+            ->select(
+                'consultation.idconsexterne as idconsexterne',
+                'consultation.idenregistremetpatient as idenregistremetpatient',
+                'consultation.montant as montant',
+                'consultation.date as date',
+                'consultation.numfac as numfac',
+                'consultation.numbon as numbon',
+                'consultation.ticketmod as partpatient',
+                'consultation.partassurance as partassurance',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'patient.assure as assure',
+                'patient.datenaispatient as datenais',
+                'patient.telpatient as telpatient',
+                'patient.matriculeassure as matriculeassure',
+                'medecin.nomprenomsmed as nom_medecin',
+                'specialitemed.nomspecialite as specialite',
+                'factures.remise as remise',
+                'societeassure.nomsocieteassure as societe',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+                'filiation.libellefiliation as filiation',
+            )
+            ->first();
 
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        $user = user::find($consultation->user_id);
-
-        $typeacte = typeacte::find($consultation->typeacte_id);
-
-        return response()->json(['patient' => $patient, 'typeacte' => $typeacte, 'user' => $user, 'consultation' => $consultation]);
+        return response()->json(['facture' => $facture]);
     }
 
     public function facture_inpayer_cons($id)
