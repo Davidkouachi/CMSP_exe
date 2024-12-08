@@ -236,7 +236,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 
 	// List facture debut
 	Route::get('/list_facture_inpayer', [ApilistfactureController::class, 'list_facture_inpayer']);
-	Route::get('/list_facture/{date1}/{date2}/{statut}', [ApilistfactureController::class, 'list_facture']);
+	Route::get('/list_facture/{date1}/{date2}', [ApilistfactureController::class, 'list_facture']);
 	Route::get('/list_facture_hos', [ApilistfactureController::class, 'list_facture_hos']);
 	Route::get('/list_facture_hos_all/{date1}/{date2}/{statut}', [ApilistfactureController::class, 'list_facture_hos_all']);
 	Route::get('/list_facture_soinsam', [ApilistfactureController::class, 'list_facture_soinsam']);

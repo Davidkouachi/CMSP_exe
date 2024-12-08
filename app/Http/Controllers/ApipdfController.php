@@ -91,6 +91,14 @@ class ApipdfController extends Controller
                 'assurance.libelleassurance as assurance',
                 'tauxcouvertureassure.valeurtaux as taux',
                 'filiation.libellefiliation as filiation',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+                'factures.numrecu as numrecu',
+                'factures.datereglt_pat as datereglt_pat',
+                'factures.montantpat_verser as montant_verser',
+                'factures.montantpat_remis as montant_remis',
+                'factures.montantreste_pat as montant_restant',
             )
             ->first();
 

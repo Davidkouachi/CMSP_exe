@@ -89,57 +89,45 @@ class ApilistfactureController extends Controller
         ]);
     }
 
-    public function list_facture($date1, $date2,$statut)
+    public function list_facture($date1, $date2)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
-        // Fetching consultations and related facture and patient data
-        $factureQuery = consultation::join('factures', 'factures.id', '=', 'consultations.facture_id')
-                                    ->join('patients', 'patients.id', '=', 'consultations.patient_id')
-                                    ->whereBetween('factures.created_at', [$date1, $date2])
-                                    ->select(
-                                        'consultations.*',
-                                        'factures.code as code_fac',
-                                        'factures.statut as statut',
-                                        'patients.np as name',
-                                        'patients.tel as tel'
-                                    )
-                                    ->orderBy('factures.created_at', 'desc');
-        
-        // Apply status filter if not 'tous'
-        if ($statut !== 'tous') {
-            $factureQuery->where('factures.statut', '=', $statut);
-        }
 
-        // Apply pagination
-        $facture = $factureQuery->get(); // Adjust the number of items per page as needed
+        $facture = DB::table('consultation')
+            ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+            ->join('factures', 'consultation.numfac', '=', 'factures.numfac')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->whereBetween('consultation.date', [$date1, $date2])
+            ->select(
+                'consultation.idconsexterne as idconsexterne',
+                'consultation.montant as montant',
+                'consultation.date as date',
+                'consultation.numfac as numfac',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'medecin.nomprenomsmed as nom_medecin',
+                'specialitemed.nomspecialite as specialite',
+                'factures.remise as remise',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+            )
+            ->orderBy('consultation.date', 'desc')->get();
 
-        // Adding additional calculations to each facture item
         foreach ($facture as $value) {
-
-            $part_patient = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(part_patient, ".", "") + 0), 0) as total_sum'))
-                    ->first();
-
-            $part_assurance = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(part_assurance, ".", "") + 0), 0) as total_sum'))
-                    ->first();
-
-            $montant = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total_sum'))
-                    ->first();
-
-            $remise = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(remise, ".", "") + 0), 0) as total_sum'))
-                    ->first();
-
-            $value->part_patient = $part_patient->total_sum ?? 0;
-            $value->part_assurance = $part_assurance->total_sum ?? 0;
-            $value->montant = $montant->total_sum ?? 0;
-            $value->remise = $remise->total_sum ?? 0;
+            if ($value->part_patient == $value->part_patient_regler) {
+                $value->statut = 'Réglé';
+            } else {
+                $value->statut = 'Non-Réglé';
+            }
         }
 
-        // Return paginated result with additional metadata
         return response()->json([
             'data' => $facture,
         ]);

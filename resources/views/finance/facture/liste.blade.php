@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Listes des Factures.</h5>
+                        <h5>LISTES DES FACTURES</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Comptabilité / Listes des Factures.</p>
                     </div>
                 </div>
             </div>
@@ -71,26 +71,16 @@
                                         <div class=" mb-3">
                                             <div class="card-body">
                                                 <div class="row gx-3">
-                                                    <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
+                                                    <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Du</label>
-                                                            <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-2 months')) }}" max="{{ date('Y-m-d') }}">
+                                                            <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
+                                                    <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Au</label>
                                                             <input type="date" id="searchDate2" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Statut</label>
-                                                            <select class="form-select me-1" id="statut">
-                                                                <option selected value="tous">Tout</option>
-                                                                <option value="payer">Réglé</option>
-                                                                <option value="impayer">Non Réglé</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -120,10 +110,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">N°</th>
-                                                        <th scope="col">Id facture</th>
+                                                        <th scope="col">N° facture</th>
                                                         <th scope="col">Statut</th>
-                                                        <th scope="col">Nom et Prénoms</th>
-                                                        <th scope="col">Contact</th>
                                                         <th scope="col">Part Assurance</th>
                                                         <th scope="col">Part Patient</th>
                                                         <th scope="col">Remise</th>
@@ -259,60 +247,6 @@
                                     </div>
                                 </div>
                             </div> --}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="Detail_Cons" tabindex="-1" role="dialog" >
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Détail facture
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="table-responsive" id="div_TableD_Cons" style="display: none;">
-                                            <table class="table table-bordered" id="TableD_Cons">
-                                                <thead>
-                                                    <tr>
-                                                        <th width="100px" >Code</th>
-                                                        <th colspan="2">Description</th>
-                                                        <th width="120px" >Part Assurance</th>
-                                                        <th width="50px" >Taux</th>
-                                                        <th width="100px" >Remise</th>
-                                                        <th width="120px" >Part Patient</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div id="message_TableD_Cons" style="display: none;">
-                                            <p class="text-center" >
-                                                Aucune facture disponible
-                                            </p>
-                                        </div>
-                                        <div id="div_Table_loaderD_Cons" style="display: none;">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                                                <strong>Chargement des données...</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -530,12 +464,12 @@
             processing: true,
             serverSide: false,
             ajax: function(data, callback) {
+
                 const date1 = $('#searchDate1').val();
                 const date2 = $('#searchDate2').val();
-                const statut = $('#statut').val();
                 
                 $.ajax({
-                    url: `/api/list_facture/${date1}/${date2}/${statut}`,
+                    url: `/api/list_facture/${date1}/${date2}`,
                     type: 'GET',
                     success: function(response) {
                         callback({ data: response.data });
@@ -553,9 +487,9 @@
                     orderable: false,
                 },
                 {
-                    data: 'code_fac',
+                    data: 'numfac',
                     render: (data, type, row) => {
-                        const imgClass = row.statut === 'payer' ? '{{asset('assets/images/fac_payer.jpg')}}' 
+                        const imgClass = row.part_patient == row.part_patient_regler ? '{{asset('assets/images/fac_payer.jpg')}}' 
                         : '{{asset('assets/images/fac_impayer.jpg')}}';
                         return `
                             <div class="d-flex align-items-center">
@@ -571,24 +505,12 @@
                 {
                     data: 'statut',
                     render: (data, type, row) => {
-                        const badgeClass = data === 'payer' ? 'bg-success' : 'bg-danger';
-                        const badgeText = data === 'payer' ? 'Réglé' : 'Non Réglé';
+                        const badgeClass = row.statut == 'Réglé' ? 'bg-success' : 'bg-danger';
                         return `
                             <span class="badge ${badgeClass}">
-                                ${badgeText}
+                                ${data}
                             </span>
                         `;
-                    },
-                    searchable: true,
-                },
-                { 
-                    data: 'name',
-                    searchable: true,
-                },
-                {
-                    data: 'tel',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
                     },
                     searchable: true,
                 },
@@ -629,7 +551,7 @@
                     searchable: true,
                 },
                 { 
-                    data: 'created_at',
+                    data: 'date',
                     render: (data, type, row) => {
                         return data ? `${formatDateHeure(data)}` : 'Néant';
                     },
@@ -639,16 +561,19 @@
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail_Cons" id="detail_Cons"
-                                data-id="${row.id}"
+                            <a class="btn btn-outline-warning btn-sm" id="Cfacture" 
+                                data-idconsexterne="${row.idconsexterne}"
                             >
-                                <i class="ri-eye-line"></i>
+                                <i class="ri-file-line"></i>
                             </a>
-                            <a class="btn btn-outline-info btn-sm" id="printer_Cons"
-                                data-id="${row.id}"
-                            >
-                                <i class="ri-printer-line"></i>
-                            </a>
+                            ${ row.part_patient == row.part_patient_regler ?
+                                `
+                                    <a class="btn btn-outline-info btn-sm" id="printer_Cons"
+                                        data-idconsexterne="${row.idconsexterne}"
+                                    >
+                                        <i class="ri-printer-line"></i>
+                                    </a>
+                                ` : ``}
                         </div>
                     `,
                     searchable: false,
@@ -1206,6 +1131,23 @@
             return diffInDays <= 0 ? 1 : Math.round(diffInDays); 
         }
 
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
         // $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         //     const today = new Date();
         //     const twoMonthsAgo = new Date(today);
@@ -1241,113 +1183,34 @@
         function initCons() 
         {
 
-            $('.Table_Cons').on('click', '#detail_Cons', function() {
-                const id = $(this).data('id');
+            $('#Table_day').on('click', '#Cfacture', function() {
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+                // Add the preloader to the body
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                const tableBodyD = document.querySelector('#TableD_Cons tbody');
-                const messageDivD = document.getElementById('message_TableD_Cons');
-                const tableDivD = document.getElementById('div_TableD_Cons');
-                const loaderDivD = document.getElementById('div_Table_loaderD_Cons');
+                const code = $(this).data('idconsexterne');
 
-                messageDivD.style.display = 'none';
-                tableDivD.style.display = 'none';
-                loaderDivD.style.display = 'block';
+                fetch(`/api/fiche_consultation/${code}`) // API endpoint
+                .then(response => response.json())
+                .then(data => {
+                    // Access the 'chambre' array from the API response
+                    const facture = data.facture;
 
-                fetch(`/api/list_facture_inpayer_d/${id}`) // API endpoint
-                    .then(response => response.json())
-                    .then(data => {
-                        // Access the 'chambre' array from the API response
-                        const factureds = data.factured;
-                        const Total = data.Total;
-
-                        // Clear any existing rows in the table body
-                        tableBodyD.innerHTML = '';
-
-                        if (factureds.length > 0) {
-
-                            loaderDivD.style.display = 'none';
-                            messageDivD.style.display = 'none';
-                            tableDivD.style.display = 'block';
-
-                            // Loop through each item in the chambre array
-                            factureds.forEach((item, index) => {
-                                // Create a new row
-                                const row = document.createElement('tr');
-                                // Create and append cells to the row based on your table's structure
-                                row.innerHTML = `
-                                    <td><h6>C-${item.code}</h6></td>
-                                    <td colspan="2" >
-                                        <h6>${item.nom_acte}</h6>
-                                        <p>
-                                            ${item.nom_typeacte}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary" >
-                                            ${item.part_assurance} Fcfa
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary" >
-                                            ${item.taux ?? 0}%
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary">
-                                            ${item.remise ?? 0} Fcfa
-                                        </h6>
-                                    </td>
-                                    <td>
-                                        <h6 class="text-primary" >
-                                            ${item.part_patient} Fcfa
-                                        </h6>
-                                    </td>
-                                `;
-                                // Append the row to the table body
-                                tableBodyD.appendChild(row);
-
-                            });
-
-                            const row2 = document.createElement('tr');
-                            row2.innerHTML = `
-                                <td colspan="4">&nbsp;</td>
-                                <td colspan="3" >
-                                    <h5 class="mt-1 text-success">
-                                        Total : ${formatPrice(Total.total_sum)} Fcfa
-                                    </h5>
-                                </td>
-                            `;
-                            tableBodyD.appendChild(row2);
-
-                            const row3 = document.createElement('tr');
-                            row3.innerHTML = `
-                                <td colspan="7">
-                                    <h6 class="text-danger">NOTES</h6>
-                                    <p class="small m-0">
-                                        We really appreciate your business and if
-                                        there’s anything else we can do, please.
-                                        let us know! Also, should you need us to
-                                        add VAT or anything else to this order,
-                                        it’s super easy since this is a template,
-                                        so just ask!
-                                    </p>
-                                </td>
-                            `;
-
-                            tableBodyD.appendChild(row3);
-
-                        } else {
-                            loaderDivD.style.display = 'none';
-                            messageDivD.style.display = 'block';
-                            tableDivD.style.display = 'none';
+                    var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
                         }
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors du chargement des données:', error);
-                        loaderDivD.style.display = 'none';
-                        messageDivD.style.display = 'block';
-                        tableDivD.style.display = 'none';
-                    });
+
+                    generatePDFInvoice(facture);
+
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des données:', error);
+                });
             });
 
             $('.Table_Cons').on('click', '#printer_Cons', function() {
@@ -1360,23 +1223,20 @@
                 // Add the preloader to the body
                 document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                const id = $(this).data('id');
+                const code = $(this).data('idconsexterne');
 
-                fetch(`/api/facture_inpayer_cons/${id}`)
+                fetch(`/api/fiche_consultation/${code}`)
                     .then(response => response.json())
                     .then(data => {
 
-                        const patient = data.patient;
-                        const typeacte = data.typeacte;
-                        const user = data.user;
-                        const consultation = data.consultation;
+                        const facture = data.facture;
 
                         var preloader = document.getElementById('preloader_ch');
                         if (preloader) {
                             preloader.remove();
                         }
 
-                        generatePDFInvoice_Cons(patient, user, typeacte, consultation);
+                        generatePDFInvoice_Cons(facture);
                     })
                     .catch(error => {
                         console.error('Erreur lors du chargement des données:', error);
@@ -1400,19 +1260,19 @@
             table_cons.ajax.reload(null, false); 
         });
 
-        function generatePDFInvoice_Cons(patient, user, typeacte, consultation) 
+        function generatePDFInvoice_Cons(facture) 
         {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
-            const pdfFilename = "CONSULTATION Facture N°" + consultation.code_fac + " du " + formatDateHeure(consultation.created_at);
+            const pdfFilename = "CONSULTATION Facture N°" + facture.numfac + " du " + formatDateHeure(facture.date);
             doc.setProperties({
                 title: pdfFilename,
             });
 
             yPos = 10;
 
-            function formatDate(dateString) {
+            function formatDateImp(dateString) {
                 const date = new Date(dateString);
                 
                 const day = String(date.getDate()).padStart(2, '0');
@@ -1432,7 +1292,7 @@
                 leftMargin = 15;
                 pdfWidth = doc.internal.pageSize.getWidth();
 
-                if (consultation.statut_fac == 'payer') {
+                if (facture.part_patient == facture.part_patient_regler) {
                     const titlea = "Payer";
                     doc.setFontSize(100);
                     doc.setTextColor(174, 255, 165);
@@ -1473,7 +1333,7 @@
                 doc.text(phone, phoneX, (yPos + 10));
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "normal");
-                const consultationDate = new Date(consultation.created_at);
+                const consultationDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
                 const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
                 const formattedTime = consultationDate.toLocaleTimeString();
@@ -1487,13 +1347,7 @@
                 doc.setTextColor(0, 0, 0);
                 // doc.line(10, 35, 200, 35);
 
-                let titleR;
-
-                if (consultation.statut_fac === 'payer') {
-                    titleR = "RECU DE PAIEMENT";
-                } else {
-                    titleR = "FACTURE CONSULTATION";
-                }
+                const titleR = "RECU DE PAIEMENT";
                 const titleRWidth = doc.getTextWidth(titleR);
                 const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
                 // Définir le padding
@@ -1512,39 +1366,55 @@
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+ consultation.code_fac;
+                const titleN = "N° "+ facture.numrecu;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
 
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
+                const numDossier = "N° Dossier : "+ facture.numdossier;
                 const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 28);
 
-                if (consultation.statut_fac == 'payer') {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.setTextColor(0, 0, 0);
-                    const numDate = "Date de paiement : "+ formatDate(consultation.date_payer) ;
-                    const numDateWidth = doc.getTextWidth(numDate);
-                    doc.text(numDate, (doc.internal.pageSize.getWidth() - numDateWidth) / 2, yPos + 40);
-                }                    
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDate = "Date de paiement : "+ formatDateImp(facture.datereglt_pat) ;
+                const numDateWidth = doc.getTextWidth(numDate);
+                doc.text(numDate, (doc.internal.pageSize.getWidth() - numDateWidth) / 2, yPos + 40);                   
 
                 yPoss = (yPos + 50);
 
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
                 const patientInfo = [
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age+" an(s)" },
-                    { label: "Domicile", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel }
+                    { 
+                        label: "Nom et Prénoms", 
+                        value: facture.nom_patient.length > 25 
+                            ? facture.nom_patient.substring(0, 25) + '...' 
+                            : facture.nom_patient 
+                    },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
                 ];
 
-                if (patient.assurer == 'oui') {
+                if (facture.assure == 1) {
                     patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
+                        { 
+                            label: "Assurance", 
+                            value: facture.assurance.length > 25 
+                                ? facture.assurance.substring(0, 25) + '...' 
+                                : facture.assurance 
+                        },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
                     );
                 }
 
@@ -1557,37 +1427,36 @@
                     yPoss += 7;
                 });
 
-                if (consultation.statut_fac == 'payer') {
-                    yPoss = (yPos + 105);
+                yPoss = (yPos + 105);
 
-                    const payerInfo = [
-                        { label: "Montant Verser", value: (consultation.montant_verser || '0')+" Fcfa" },
-                        { label: "Montant Remis", value: (consultation.montant_remis || '0')+" Fcfa" },
-                        { label: "Reste a payé", value: (consultation.montant_restant || '0')+" Fcfa" },
-                    ];
+                const payerInfo = [
+                    { label: "Montant Verser", value: (formatPriceT(facture.montant_verser) || '0')+" Fcfa" },
+                    { label: "Montant Remis", value: (formatPriceT(facture.montant_remis) || '0')+" Fcfa" },
+                    { label: "Reste a payé", value: (formatPriceT(facture.montant_restant) || '0')+" Fcfa" },
+                ];
 
-                    payerInfo.forEach(info => {
-                        doc.setFontSize(9);
-                        doc.setFont("Helvetica", "bold");
-                        if (info.label === "Reste a payé") {
-                            doc.setTextColor(0, 0, 0); // Red color
-                        } else {
-                            doc.setTextColor(0, 0, 0); // Default color for other values
-                        }
-                        doc.text(info.label, leftMargin, yPoss);
-                        doc.setFont("Helvetica", "normal");
-                        doc.text(": " + info.value, leftMargin + 35, yPoss);
-                        yPoss += 7;
-                    });
-                }
+                payerInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
+                });
 
                 yPoss = (yPos + 50);
 
                 const medecinInfo = [
-                    { label: "N° Consultation", value: "C-"+consultation.code},
-                    { label: "Medecin", value: "Dr. "+user.name },
-                    { label: "Spécialité", value: typeacte.nom },
-                    { label: "Prix Consultation", value: typeacte.prix+" Fcfa" },
+                    { label: "N° Consultation", value: facture.idconsexterne},
+                    { 
+                        label: "Medecin", 
+                        value: facture.nom_medecin.length > 20 
+                            ? facture.nom_medecin.substring(0, 20) + '...' 
+                            : facture.nom_medecin 
+                    },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Prix Consultation", value: formatPriceT(facture.montant)+" Fcfa" },
                 ];
 
                 medecinInfo.forEach(info => {
@@ -1596,24 +1465,22 @@
                     doc.setTextColor(0, 0, 0);
                     doc.text(info.label, leftMargin + 100, yPoss);
                     doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 140, yPoss);
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
                     yPoss += 7;
                 });
 
                 yPoss = (yPos + 90);
 
                 const compteInfo = [
-                    { label: "Montant Total", value: typeacte.prix + " Fcfa" },
-                    ...(parseInt(consultation.part_assurance.replace(/[^0-9]/g, '')) > 0 
-                        ? [{ label: "Part assurance", value: consultation.part_assurance + " Fcfa" }] 
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa" },
+                    ...(facture.assure == 1 
+                        ? [
+                            { label: "Part assurance", value: formatPriceT(facture.partassurance)+" Fcfa" },
+                            { label: "Taux", value: facture.taux+" %" }
+                          ] 
                         : []),
-                    { label: "Remise", value: consultation.remise + " Fcfa" },
+                    { label: "Remise", value: formatPriceT(facture.remise)+" Fcfa" },
                 ];
-
-
-                if (patient.taux !== null) {
-                    compteInfo.push({ label: "Taux", value: patient.taux + "%" });
-                }
 
                 compteInfo.forEach(info => {
                     doc.setFontSize(9);
@@ -1621,7 +1488,7 @@
                     doc.setTextColor(0, 0, 0);
                     doc.text(info.label, leftMargin + 100, yPoss);
                     doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 140, yPoss);
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
                     yPoss += 7;
                 });
 
@@ -1632,9 +1499,9 @@
                 doc.setFont("Helvetica", "bold");
                 doc.text('Montant à payer', leftMargin + 100, yPoss);
                 doc.setFont("Helvetica", "bold");
-                doc.text(": "+consultation.part_patient+" Fcfa", leftMargin + 140, yPoss);
+                doc.text(": "+facture.part_patient+" Fcfa", leftMargin + 135, yPoss);
 
-                if (patient.taux !== null) {
+                if (facture.assure == 1) {
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
                     doc.setTextColor(0, 0, 0);
@@ -1650,6 +1517,215 @@
                 // doc.setFont("Helvetica", "bold");
                 // doc.setTextColor(0, 0, 0);
                 // doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 15);
+            }
+
+            drawConsultationSection(yPos);
+
+            doc.setFontSize(30);
+            doc.setLineWidth(0.5);
+            doc.setLineDashPattern([3, 3], 0);
+            doc.line(0, (yPos + 137), 300, (yPos + 137));
+            doc.setLineDashPattern([], 0);
+
+            drawConsultationSection(yPos + 150);
+
+
+            doc.output('dataurlnewwindow');
+        }
+
+        function generatePDFInvoice(facture) 
+        {
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+            const pdfFilename = "Consultation Facture N°" + facture.numfac + " du " + formatDate(facture.date);
+            doc.setProperties({
+                title: pdfFilename,
+            });
+
+            yPos = 10;
+
+            function drawConsultationSection(yPos) {
+                rightMargin = 15;
+                leftMargin = 15;
+                pdfWidth = doc.internal.pageSize.getWidth();
+
+                const titlea = "Facture";
+                doc.setFontSize(100);
+                doc.setTextColor(242, 237, 237); // Gray color for background effect
+                doc.setFont("Helvetica", "bold");
+                doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
+
+                const logoSrc = "{{asset('assets/images/logo.png')}}";
+                const logoWidth = 22;
+                const logoHeight = 22;
+                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
+
+                // Informations de l'entreprise
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                // Texte de l'entreprise
+                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
+                const titleWidth = doc.getTextWidth(title);
+                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
+                doc.text(title, titleX, yPos);
+                // Texte de l'adresse
+                doc.setFont("Helvetica", "normal");
+                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
+                const addressWidth = doc.getTextWidth(address);
+                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
+                doc.text(address, addressX, (yPos + 5));
+                // Texte du téléphone
+                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
+                const phoneWidth = doc.getTextWidth(phone);
+                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
+                doc.text(phone, phoneX, (yPos + 10));
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "normal");
+                const consultationDate = new Date(facture.date);
+                // Formatter la date et l'heure séparément
+                const formattedDate = consultationDate.toLocaleDateString();
+                // const formattedTime = consultationDate.toLocaleTimeString();
+                // doc.text("N° Dossier: " + facture.numdossier, 15, (yPos + 25));
+                doc.text("Date: " + formattedDate, 15, (yPos + 28));
+
+                //Ligne de séparation
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setLineWidth(0.5);
+                doc.setTextColor(255, 0, 0);
+                // doc.line(10, 35, 200, 35); 
+                const titleR = "FACTURE DE CONSULTATION";
+                const titleRWidth = doc.getTextWidth(titleR);
+                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
+                // Définir le padding
+                const paddingh = 0; // Padding vertical
+                const paddingw = 15; // Padding horizontal
+                // Calculer les dimensions du rectangle
+                const rectX = titleRX - paddingw; // X du rectangle
+                const rectY = (yPos + 18) - paddingh; // Y du rectangle
+                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
+                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
+                // Définir la couleur pour le cadre (noir)
+                doc.setDrawColor(0, 0, 0);
+                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
+                // Ajouter le texte centré en gras
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
+                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
+                const titleN = "N° "+ facture.numfac;
+                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
+
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDossier = " N° Dossier : "+ facture.numdossier;
+                const numDossierWidth = doc.getTextWidth(numDossier);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 28);
+
+                yPoss = (yPos + 50);
+
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
+                const patientInfo = [
+                    { label: "Nom et Prénoms", value: facture.nom_patient },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
+                ];
+
+                if (facture.assure == 1) {
+                    patientInfo.push(
+                        { label: "Assurance", value: facture.assurance },
+                        { label: "Filiation", value: facture.filiation },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "Sociéte", value: facture.societe },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
+                    );
+                }
+
+                patientInfo.forEach(info => {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss = (yPos + 50);
+
+                const medecinInfo = [
+                    { label: "N° Consultation", value: facture.idconsexterne},
+                    { label: "Medecin", value: facture.nom_medecin },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Prix Consultation", value: formatPriceT(facture.montant)+" Fcfa" },
+                ];
+
+                medecinInfo.forEach(info => {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin + 100, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss = (yPos + 90);
+
+                const compteInfo = [
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa" },
+                    ...(facture.assure == 1 
+                        ? [
+                            { label: "Part assurance", value: formatPriceT(facture.partassurance)+" Fcfa" },
+                            { label: "Taux", value: facture.taux+" %" }
+                          ] 
+                        : []),
+                    { label: "Remise", value: formatPriceT(facture.remise)+" Fcfa" },
+                ];
+
+                compteInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin + 100, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss += 1;
+
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                doc.text('Montant à payer', leftMargin + 100, yPoss);
+                doc.setFont("Helvetica", "bold");
+                doc.text(": "+formatPriceT(facture.partpatient)+" Fcfa", leftMargin + 135, yPoss);
+
+                if (facture.assure == 1 ) {
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 16);
+                }else{
+                    doc.setFontSize(8);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 28);
+                }
+
             }
 
             drawConsultationSection(yPos);

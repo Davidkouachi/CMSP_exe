@@ -426,6 +426,14 @@
         function initializeRowEventListeners() {
 
             $('#Table_day').on('click', '#Cfacture', function() {
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+                // Add the preloader to the body
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
                 const code = $(this).data('idconsexterne');
 
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
@@ -433,6 +441,11 @@
                 .then(data => {
                     // Access the 'chambre' array from the API response
                     const facture = data.facture;
+
+                    var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
 
                     generatePDFInvoice(facture);
 
@@ -443,6 +456,14 @@
             });
 
             $('#Table_day').on('click', '#Cfiche', function() {
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+                // Add the preloader to the body
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
                 const code = $(this).data('idconsexterne');
 
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
@@ -450,6 +471,11 @@
                 .then(data => {
                     // Access the 'chambre' array from the API response
                     const facture = data.facture;
+
+                    var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
 
                     generatePDFficheCons(facture);
 
@@ -512,11 +538,10 @@
                 doc.setFont("Helvetica", "normal");
                 const consultationDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
-                const formattedDate = consultationDate.toLocaleDateString();
-                // const formattedTime = consultationDate.toLocaleTimeString();
-                // doc.text("N° Dossier: " + facture.numdossier, 15, (yPos + 25));
-                doc.text("Date: " + formattedDate, 15, (yPos + 28));
-
+                const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
+                const formattedTime = consultationDate.toLocaleTimeString();
+                doc.text("Date: " + formattedDate, 15, (yPos + 25));
+                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
                 //Ligne de séparation
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
@@ -563,7 +588,12 @@
                 }
 
                 const patientInfo = [
-                    { label: "Nom et Prénoms", value: facture.nom_patient },
+                    { 
+                        label: "Nom et Prénoms", 
+                        value: facture.nom_patient.length > 25 
+                            ? facture.nom_patient.substring(0, 25) + '...' 
+                            : facture.nom_patient 
+                    },
                     { label: "Assurer", value: assurer },
                     { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
                     { label: "Contact", value: facture.telpatient }
@@ -571,10 +601,13 @@
 
                 if (facture.assure == 1) {
                     patientInfo.push(
-                        { label: "Assurance", value: facture.assurance },
-                        { label: "Filiation", value: facture.filiation },
+                        { 
+                            label: "Assurance", 
+                            value: facture.assurance.length > 25 
+                                ? facture.assurance.substring(0, 25) + '...' 
+                                : facture.assurance 
+                        },
                         { label: "Matricule", value: facture.matriculeassure },
-                        { label: "Sociéte", value: facture.societe },
                         { label: "N° de Bon", value: facture.numbon || 'Aucun' },
                     );
                 }
@@ -593,7 +626,12 @@
 
                 const medecinInfo = [
                     { label: "N° Consultation", value: facture.idconsexterne},
-                    { label: "Medecin", value: facture.nom_medecin },
+                    { 
+                        label: "Medecin", 
+                        value: facture.nom_medecin.length > 20 
+                            ? facture.nom_medecin.substring(0, 20) + '...' 
+                            : facture.nom_medecin 
+                    },
                     { label: "Spécialité", value: facture.specialite },
                     { label: "Prix Consultation", value: formatPriceT(facture.montant)+" Fcfa" },
                 ];
@@ -721,9 +759,9 @@
                 const consultationDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
                 const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
-                // const formattedTime = consultationDate.toLocaleTimeString();
+                const formattedTime = consultationDate.toLocaleTimeString();
                 doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                // doc.text("Heure: " + formattedTime, 15, (yPos + 30));
+                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
 
                 //Ligne de séparation
                 doc.setFontSize(15);
