@@ -129,6 +129,23 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueMatriculeCaisseEntrerSortie()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('caisse')->where('nopiece', '=', $matricule)->exists());
+
+        return $matricule;
+    }
+    private function generateUniqueMatriculeNumRecu()
+    {
+        do {
+            // Génère une chaîne aléatoire de 6 caractères (majuscule, minuscule, chiffres)
+            $matricule = Str::random(6);
+        } while (DB::table('journal')->where('numrecu', '=', $matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -1596,57 +1613,77 @@ class ApiinsertController extends Controller
 
     public function ope_caisse_new(Request $request)
     {
-        $solde_caisse = caisse::find('1');
 
-        if ($solde_caisse->statut === 'fermer') {
+        $verf = DB::table('porte_caisses')->select('statut')->where('id', '=', 1)->first();
+
+        if ($verf->statut === 'fermer') {
             return response()->json(['caisse_fermer' => true]);
         }
 
-        $solde_caisse_sans_point = str_replace('.', '', $solde_caisse->solde);
-        $montant = str_replace('.', '', $request->montant_ope);
-
-        if ($request->type_ope === 'entrer') {
-            $solde_apres = (int)$solde_caisse_sans_point + (int)$montant;
-        }else if ($request->type_ope === 'sortie') {
-            $solde_apres = (int)$solde_caisse_sans_point - (int)$montant;
-        }
-
-        if ($solde_apres < 0) {
-            return response()->json(['solde_negatif' => true]);
-        }
-
-        $add_caisse = new historiquecaisse();
-        $add_caisse->motif = $request->libelle_ope;
-        $add_caisse->montant = $this->formatWithPeriods($montant);
-
-        if ($request->type_ope === 'entrer') {
-            $add_caisse->libelle = $request->libelle_ope.'. Montant de l\'opération a été apporter par '.$request->nom_ope;
-        }else if ($request->type_ope === 'sortie') {
-            $add_caisse->libelle = $request->libelle_ope.'. Montant de l\'opération a été remis à '.$request->nom_ope;
-        }
-        
-        $add_caisse->solde_avant = $solde_caisse->solde;
-        $add_caisse->solde_apres = number_format($solde_apres, 0, '', '.');
-
-        if ($request->type_ope === 'entrer') {
-            $add_caisse->typemvt = 'Entrer de Caisse';
-        }else if ($request->type_ope === 'sortie') {
-            $add_caisse->typemvt = 'Sortie de Caisse';
-        }
-
-        $add_caisse->creer_id = $request->auth_id;
-        $add_caisse->date_ope = $request->date_ope;
+        DB::beginTransaction();
 
         try {
-                
-            if (!$add_caisse->save()) {
-                throw new \Exception('Erreur');
+
+            $montant = DB::table('caisse')
+                ->selectRaw("SUM(CASE WHEN type = 'entree' THEN montant ELSE -montant END) as solde")
+                ->value('solde');
+
+            // $montant_formate = number_format($montant, 0, ',', '.');
+
+            $nopiece = $this->generateUniqueMatriculeCaisseEntrerSortie();
+
+            $caisseInserted = DB::table('caisse')->insert([
+                'nopiece' => $nopiece,
+                'type' => $request->type_ope,
+                'libelle' => $request->libelle_ope,
+                'montant' => str_replace('.', '', $request->montant_ope),
+                'dateop' => $request->date_ope,
+                'datecreat' => now(),
+                'login' => $request->login,
+                'beneficiaire' => $request->bene_ope,
+                'annule' => 0,
+                'mail' => 0,
+            ]);
+
+            if ($caisseInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table caisse');
             }
 
-            $solde_caisse->solde = number_format($solde_apres, 0, '', '.');
+            $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            $numfac = substr(str_shuffle($characters), 0, 3);
 
-            if (!$solde_caisse->save()) {
-                throw new \Exception('Erreur');
+            $num = $this->generateUniqueMatriculeNumRecu();
+
+            if ($request->type_ope === 'entree') {
+                $type_action = 0;
+            } else if ($request->type_ope === 'sortie') {
+                $type_action = 1;
+            }
+
+            $journalInserted = DB::table('journal')->insert([
+                'idenregistremetpatient' => "Fac N°".$numfac,
+                'date' => now(),
+                'numrecu' => $num,
+                'montant_recu' => str_replace('.', '', $request->montant_ope),
+                'numjournal' => $numfac,
+                'type_action' => $type_action,
+            ]);
+
+            if ($journalInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table journal');
+            }
+
+            $solde = $montant + str_replace('.', '', $request->montant_ope);
+
+            $soldecaisseUpdated = DB::table('porte_caisses')
+                ->where('id', '=', 1)
+                ->update([
+                    'montant' => $solde,
+                    'updated_at' => now(),
+                ]);
+
+            if ($soldecaisseUpdated === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table porte_caisses');
             }
 
             DB::commit();
@@ -1654,7 +1691,7 @@ class ApiinsertController extends Controller
 
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['error' => true]);
+            return response()->json(['error' => true,'message' => $e->getMessage()]);
         }
     }
 
@@ -1774,21 +1811,35 @@ class ApiinsertController extends Controller
         DB::beginTransaction();
 
         try {
-            $caisse = caisse::find(1);
 
-            $add = new portecaisse();
-            $add->motif = 'OUVERTURE DE CAISSE';
-            $add->montant = $caisse->solde;
-            $add->creer_id = $request->auth_id;
-                
-            if (!$add->save()) {
-                throw new \Exception('Erreur');
+            $updateData_staut_caisse =[
+                'statut' => 'ouvert',
+            ];
+
+            $statut_caisseUpdate = DB::table('porte_caisses')
+                                ->where('id', '=', 1)
+                                ->update($updateData_staut_caisse);
+
+            if ($statut_caisseUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table porte_caisses');
             }
 
-            $caisse->statut = 'ouvert';
+            $montant = DB::table('caisse')
+                ->selectRaw("SUM(CASE WHEN type = 'entree' THEN montant ELSE -montant END) as solde")
+                ->value('solde');
 
-            if (!$caisse->save()) {
-                throw new \Exception('Erreur');
+            $montant_formate = number_format($montant, 0, ',', '.');
+
+            $op_caisseInserted = DB::table('caisse_resume')->insert([
+                'datecaisse' => now(),
+                'mtcaisse' => $montant,
+                'action' => 0,
+                'user' => $request->login,
+                'heurecaisse' => date('H:i:s'),
+            ]);
+
+            if ($op_caisseInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table caisse_resume');
             }
 
             try {
@@ -1805,7 +1856,7 @@ class ApiinsertController extends Controller
                 $mail->setFrom('emslp24@gmail.com', 'ESPACE MEDICO-SOCIAL LA PYRAMIDE');
                 $mail->addAddress('davidkouachi01@gmail.com');
                 $mail->Subject = 'ALERT !';
-                $mail->Body = 'OUVERTURE DE LA CAISSE, Solde de la caisse : '. $caisse->solde .' Fcfa';
+                $mail->Body = 'OUVERTURE DE LA CAISSE, Solde caisse : '. $montant_formate .' Fcfa';
                 $mail->send();
 
             } catch (Exception $e) {
@@ -1826,38 +1877,34 @@ class ApiinsertController extends Controller
         DB::beginTransaction();
 
         try {
-            $caisse = caisse::find(1);
 
-            $add = new portecaisse();
-            $add->motif = 'FERMETURE DE CAISSE';
-            $add->montant = $caisse->solde;
-            $add->creer_id = $request->auth_id;
+            $updateData_staut_caisse =[
+                'statut' => 'fermer',
+            ];
+
+            $statut_caisseUpdate = DB::table('porte_caisses')
+                                ->where('id', '=', 1)
+                                ->update($updateData_staut_caisse);
+
+            if ($statut_caisseUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table porte_caisses');
+            }
 
             $today = Carbon::today();
             $total = 0;
             $entries = 0;
             $exits = 0;
 
-            $transactions = historiquecaisse::whereDate('created_at', '=', $today)->get();
+            $transactions = DB::table('caisse')->where('mail', '=', 0)->get();
             
             foreach ($transactions as $value) {
-                if ($value->typemvt === 'Entrer de Caisse') {
+                if ($value->type === 'entree') {
                     $total += str_replace('.', '', $value->montant);
                     $entries += str_replace('.', '', $value->montant);
                 } else {
                     $total -= str_replace('.', '', $value->montant);
                     $exits += str_replace('.', '', $value->montant);
                 }
-            }
-        
-            if (!$add->save()) {
-                throw new \Exception('Erreur');
-            }
-
-            $caisse->statut = 'fermer';
-
-            if (!$caisse->save()) {
-                throw new \Exception('Erreur');
             }
 
             try {
@@ -1883,13 +1930,16 @@ class ApiinsertController extends Controller
                 $tableRows ="";
 
                 foreach ($transactions as $transaction) {
-                    $color = ($transaction['typemvt'] === 'Entrer de Caisse') ? 'green' : 'red';
-                    $montantFormatted = $transaction['typemvt'] === 'Entrer de Caisse' ? "+ {$transaction['montant']} Fcfa" : "- {$transaction['montant']} Fcfa";
 
-                    $entryCell = $transaction['typemvt'] === 'Entrer de Caisse' ? "<td style='color: {$color};'>{$montantFormatted}</td><td></td>" : "<td></td><td style='color: {$color};'>{$montantFormatted}</td>";
+                    $color = ($transaction->type === 'entree') ? 'green' : 'red';
+                    $montant = number_format($transaction->montant, 0, '.', '.');
+
+                    $montantFormatted = $transaction->type === 'entree' ? "+ {$montant} Fcfa" : "- {$montant} Fcfa";
+
+                    $entryCell = $transaction->type === 'entree' ? "<td style='color: {$color};'>{$montantFormatted}</td><td></td>" : "<td></td><td style='color: {$color};'>{$montantFormatted}</td>";
 
                     $tableRows .= "<tr>
-                        <td>{$transaction['motif']}</td>
+                        <td>{$transaction->libelle}</td>
                         {$entryCell}
                     </tr>";
                 }
@@ -1934,6 +1984,35 @@ class ApiinsertController extends Controller
 
             } catch (Exception $e) {
                 
+            }
+
+            $updateData_mail_envoyer =[
+                'mail' => 1,
+                'updated_at' => now(),
+            ];
+
+            $mail_envoyerUpdate = DB::table('caisse')
+                                ->where('mail', '=', 0)
+                                ->update($updateData_mail_envoyer);
+
+            // if ($mail_envoyerUpdate === 0) {
+            //     throw new Exception('Erreur lors de la mise à jour dans la table porte_caisses');
+            // }
+
+            $montant = DB::table('caisse')
+                ->selectRaw("SUM(CASE WHEN type = 'entree' THEN montant ELSE -montant END) as solde")
+                ->value('solde');
+
+            $op_caisseInserted = DB::table('caisse_resume')->insert([
+                'datecaisse' => date('Y-m-d'),
+                'mtcaisse' => $montant,
+                'action' => 2,
+                'user' => $request->login,
+                'heurecaisse' => date('H:i:s'),
+            ]);
+
+            if ($op_caisseInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table caisse_resume');
             }
 
             DB::commit();

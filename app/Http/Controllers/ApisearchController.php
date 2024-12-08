@@ -311,7 +311,7 @@ class ApisearchController extends Controller
 
     public function verf_caisse()
     {
-        $caisse = porte_caisse::find(1);
+        $caisse = DB::table('porte_caisses')->where('id', '=', 1)->first();
 
         return response()->json(['caisse' => $caisse]);
     }

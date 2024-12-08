@@ -729,13 +729,13 @@ class ApistatController extends Controller
         $total_sortie = 0;
 
         // 1. Consultations
-        $entrer = historiquecaisse::select(
-                DB::raw('MONTH(created_at) as month'),
+        $entrer = DB::table('caisse')->select(
+                DB::raw('MONTH(datecreat) as month'),
                 DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as montant')
             )
-            ->where('typemvt', '=', 'Entrer de Caisse')
-            ->whereYear('created_at', $yearSelect)
-            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->where('type', '=', 'entree')
+            ->whereYear('datecreat', $yearSelect)
+            ->groupBy(DB::raw('MONTH(datecreat)'))
             ->get();
 
         foreach ($entrer as $entre) {
@@ -746,13 +746,13 @@ class ApistatController extends Controller
         }
 
         // 2. Hospitalisations
-        $sortie = historiquecaisse::select(
-                DB::raw('MONTH(created_at) as month'),
+        $sortie = DB::table('caisse')->select(
+                DB::raw('MONTH(datecreat) as month'),
                 DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as montant')
             )
-            ->where('typemvt', '=', 'Sortie de Caisse')
-            ->whereYear('created_at', $yearSelect)
-            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->where('type', '=', 'sortie')
+            ->whereYear('datecreat', $yearSelect)
+            ->groupBy(DB::raw('MONTH(datecreat)'))
             ->get();
 
         foreach ($sortie as $sorti) {
@@ -762,13 +762,13 @@ class ApistatController extends Controller
             $total_sortie += $sorti->montant;
         }
 
-        $total = historiquecaisse::whereYear('created_at', $yearSelect)
-            ->groupBy(DB::raw('MONTH(created_at)'))
+        $total = DB::table('caisse')->whereYear('datecreat', $yearSelect)
+            ->groupBy(DB::raw('MONTH(datecreat)'))
             ->select(
-                DB::raw('MONTH(created_at) as month'),
+                DB::raw('MONTH(datecreat) as month'),
                 DB::raw('
-                    COALESCE(SUM(IF(typemvt = "Entrer de Caisse", REPLACE(montant, ".", "") + 0, 0)), 0) as total_entrer,
-                    COALESCE(SUM(IF(typemvt = "Sortie de Caisse", REPLACE(montant, ".", "") + 0, 0)), 0) as total_sortie
+                    COALESCE(SUM(IF(type = "entree", REPLACE(montant, ".", "") + 0, 0)), 0) as total_entrer,
+                    COALESCE(SUM(IF(type = "sortie", REPLACE(montant, ".", "") + 0, 0)), 0) as total_sortie
                 ')
             )
             ->get();

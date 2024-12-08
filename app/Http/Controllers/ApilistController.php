@@ -1018,18 +1018,15 @@ class ApilistController extends Controller
         ]);
     }
 
-    public function trace_operation($date1, $date2, $typemvt)
+    public function trace_operation($date1, $date2)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $query = DB::table('caisse')->whereBetween('datecreat', [$date1, $date2]);
-
-        if ($typemvt !== 'tous') {
-            $query->where('type', '=', $typemvt);
-        }
-
-        $trace = $query->orderBy('datecreat', 'desc')->get();
+        $trace = DB::table('caisse')
+            ->whereBetween('datecreat', [$date1, $date2])
+            ->orderBy('datecreat', 'desc')
+            ->get();
 
         return response()->json([
             'data' => $trace,

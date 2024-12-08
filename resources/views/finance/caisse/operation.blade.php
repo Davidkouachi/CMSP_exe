@@ -114,7 +114,7 @@
                                                     <label class="form-label">Type d'opération</label>
                                                     <select class="form-select" id="type_ope">
                                                         <option value="">Selectionner</option>
-                                                        <option value="entrer">Entrer d'argent</option>
+                                                        <option value="entree">Entrer d'argent</option>
                                                         <option value="sortie">Sortie d'argent</option>
                                                     </select>
                                                 </div>
@@ -131,9 +131,9 @@
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">
-                                                        Nom et Prénoms
+                                                        Bénéficiaire
                                                     </label>
-                                                    <input type="text" class="form-control" placeholder="Saisie Obligatoire" id="nom_ope" oninput="this.value = this.value.toUpperCase()">
+                                                    <input type="text" class="form-control" placeholder="Facultatif" id="bene_ope" oninput="this.value = this.value.toUpperCase()">
                                                 </div>
                                             </div>
                                             <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -142,6 +142,14 @@
                                                         Date de l'opération
                                                     </label>
                                                     <input type="date" class="form-control" id="date_ope" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        Créer par
+                                                    </label>
+                                                    <input readonly type="text" class="form-control" value="{{ Auth::user()->login }}" id="nom_ope">
                                                 </div>
                                             </div>
                                             <div class="col-12">
@@ -171,26 +179,16 @@
                                             <div class=" mb-3">
                                                 <div class="card-body">
                                                     <div class="row gx-3">
-                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
+                                                        <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Du</label>
                                                                 <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
                                                             </div>
                                                         </div>
-                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
+                                                        <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Au</label>
                                                                 <input type="date" id="searchDate2" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Type Mvt</label>
-                                                                <select class="form-select me-1" id="statutTrace">
-                                                                    <option selected value="tous">Tout</option>
-                                                                    <option value="entree">Entrer</option>
-                                                                    <option value="sortie">Sortie</option>
-                                                                </select>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 text-center" >
@@ -351,7 +349,7 @@
 
         function caisse_ouvert()
         {
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
 
             var preloader_ch = `
                 <div id="preloader_ch">
@@ -365,7 +363,7 @@
                 url: '/api/caisse_ouvert',
                 method: 'GET',
                 data: { 
-                    auth_id: auth_id,
+                    login: login,
                 },
                 success: function(response) {
 
@@ -404,7 +402,7 @@
 
         function caisse_fermer()
         {
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
 
             var preloader_ch = `
                 <div id="preloader_ch">
@@ -418,7 +416,7 @@
                 url: '/api/caisse_fermer',
                 method: 'GET',
                 data: { 
-                    auth_id: auth_id,
+                    login: login,
                 },
                 success: function(response) {
 
@@ -538,16 +536,17 @@
 
         function eng_ope()
         {
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
             const type_ope = document.getElementById("type_ope");
             const montant_ope = document.getElementById("montant_ope");
             const nom_ope = document.getElementById("nom_ope");
+            const bene_ope = document.getElementById("bene_ope");
             const libelle_ope = document.getElementById("libelle_ope");
             const date_ope = document.getElementById("date_ope");
 
             if(!type_ope.value.trim() || !montant_ope.value.trim() || !libelle_ope.value.trim() || !nom_ope.value.trim() || !date_ope.value.trim())
             {
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
+                showAlert('Alert', 'Veuillez remplir tous les champs Obligatoire SVP.', 'warning');
                 return false;
             }
 
@@ -563,12 +562,13 @@
                 url: '/api/ope_caisse_new',
                 method: 'GET',
                 data: {
-                    auth_id: auth_id,
+                    login: login,
                     type_ope: type_ope.value,
                     montant_ope: montant_ope.value,
                     nom_ope: nom_ope.value,
                     libelle_ope: libelle_ope.value,
                     date_ope: date_ope.value,
+                    bene_ope: bene_ope.value,
                 },
                 success: function(response) {
                     var preloader = document.getElementById('preloader_ch');
@@ -582,7 +582,8 @@
 
                         type_ope.value = '';
                         montant_ope.value = '';
-                        nom_ope.value = '';
+                        bene_ope.value = '';
+                        nom_ope.value = @json(Auth::user()->login);
                         libelle_ope.value = '';
                         date_ope.value = '{{ date('Y-m-d') }}';
 
@@ -620,7 +621,6 @@
 
                 const date1 = $('#searchDate1').val();
                 const date2 = $('#searchDate2').val();
-                const typemvt = $('#statutTrace').val();
 
                 if (!date1.trim() || !date2.trim()) {
                     showAlert('Alert', 'Tous les champs sont obligatoires.','warning');
@@ -635,14 +635,14 @@
                     return false;
                 }
 
-                const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
-                if (endDate - startDate > oneYearInMs) {
-                    showAlert('Erreur', 'La plage de dates ne peut pas dépasser un an.', 'error');
-                    return false;
-                }
+                // const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+                // if (endDate - startDate > oneYearInMs) {
+                //     showAlert('Erreur', 'La plage de dates ne peut pas dépasser un an.', 'error');
+                //     return false;
+                // }
                 
                 $.ajax({
-                    url: `/api/trace_operation/${date1}/${date2}/${typemvt}`,
+                    url: `/api/trace_operation/${date1}/${date2}`,
                     type: 'GET',
                     success: function(response) {
                         callback({ data: response.data });
@@ -707,7 +707,7 @@
                 },
                 { 
                     data: 'datecreat', 
-                    render: formatDate,
+                    render: formatDateHeure,
                     searchable: true, 
                 },
                 {
@@ -836,11 +836,11 @@
                     return false;
                 }
 
-                const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
-                if (endDate - startDate > oneYearInMs) {
-                    showAlert('Erreur', 'La plage de dates ne peut pas dépasser un an.', 'error');
-                    return false;
-                }
+                // const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+                // if (endDate - startDate > oneYearInMs) {
+                //     showAlert('Erreur', 'La plage de dates ne peut pas dépasser un an.', 'error');
+                //     return false;
+                // }
                 
                 $.ajax({
                     url: `/api/trace_ouvert_fermer/${date1}/${date2}`,
@@ -892,7 +892,7 @@
                 {
                     data: 'datecaisse',
                     render: function(data, type, row) {
-                        return `${formatDate(data)} ${row.heurecaisse}`; // Utilise votre fonction de formatage
+                        return `${formatDateHeure(data)}`; // Utilise votre fonction de formatage
                     },
                     searchable: false
                 }

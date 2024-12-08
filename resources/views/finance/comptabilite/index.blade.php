@@ -213,7 +213,7 @@
                     contenu.innerHTML = "";
                     contenu.innerHTML = contenu0;
 
-                    document.getElementById('h_solde').innerHTML = data.caisse.solde + " Fcfa";
+                    document.getElementById('h_solde').innerHTML = formatPrice(data.caisse.montant) + " Fcfa";
                     
                     if (data.caisse.statut == 'ouvert') {
                         document.getElementById('btn_ouvert').style.display = 'none';
@@ -237,7 +237,7 @@
 
         function caisse_ouvert()
         {
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
 
             var preloader_ch = `
                 <div id="preloader_ch">
@@ -251,7 +251,7 @@
                 url: '/api/caisse_ouvert',
                 method: 'GET',
                 data: { 
-                    auth_id: auth_id,
+                    login: login,
                 },
                 success: function(response) {
 
@@ -286,7 +286,7 @@
 
         function caisse_fermer()
         {
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
 
             var preloader_ch = `
                 <div id="preloader_ch">
@@ -300,7 +300,7 @@
                 url: '/api/caisse_fermer',
                 method: 'GET',
                 data: { 
-                    auth_id: auth_id,
+                    login: login,
                 },
                 success: function(response) {
 
@@ -400,7 +400,7 @@
             var yearSelect3 = document.getElementById('yearSelect3');
 
             var currentYear = new Date().getFullYear();
-            var startYear = 2024;
+            var startYear = 2019;
 
             for (var year = currentYear; year >= startYear; year--) {
 

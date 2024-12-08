@@ -36,7 +36,7 @@ Route::middleware(['web'])->group(function () {
 	// update fin
 });
 
-Route::middleware(['statutchambre','dateRdv'])->group(function () {
+Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 
 	// recherche debut
 	Route::get('/taux_select_patient_new', [ApiController::class, 'taux_select_patient_new']);
@@ -205,7 +205,7 @@ Route::middleware(['statutchambre','dateRdv'])->group(function () {
 	Route::get('/list_hopital_patient/{id}', [ApilistController::class, 'list_hopital_patient']);
 	Route::get('/list_soinsam_patient/{id}', [ApilistController::class, 'list_soinsam_patient']);
 	Route::get('/list_assurance_all', [ApilistController::class, 'list_assurance_all']);
-	Route::get('/trace_operation/{date1}/{date2}/{typemvt}', [ApilistController::class, 'trace_operation']);
+	Route::get('/trace_operation/{date1}/{date2}', [ApilistController::class, 'trace_operation']);
 	Route::get('/list_rdv_two_days', [ApilistController::class, 'list_rdv_two_days']);
 	Route::get('/trace_ouvert_fermer/{date1}/{date2}', [ApilistController::class, 'trace_ouvert_fermer']);
 	Route::get('/list_assureur_all', [ApilistController::class, 'list_assureur_all']);
