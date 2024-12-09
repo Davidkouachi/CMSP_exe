@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\assurance;
 use App\Models\taux;
@@ -48,105 +49,169 @@ use App\Models\historiquecaisse;
 
 class ApiinsertfactureController extends Controller
 {
-    public function facture_payer(Request $request,$code_fac)
+    private function generateUniqueMatriculeNumRecu()
+    {
+        do {
+            // Génère une chaîne aléatoire de 6 caractères (majuscule, minuscule, chiffres)
+            $matricule = Str::random(6);
+        } while (DB::table('journal')->where('numrecu', '=', "RCE".$matricule)->exists());
+
+        return $matricule;
+    }
+
+
+
+
+
+
+
+    public function facture_payer(Request $request, $numfac)
     {
 
-        $caisse_verf = caisse::find(1);
+        $verf = DB::table('porte_caisses')->select('statut')->where('id', '=', 1)->first();
 
-        if ($caisse_verf->statut === 'fermer') {
+        if ($verf->statut === 'fermer') {
             return response()->json(['caisse_fermer' => true]);
         }
 
         DB::beginTransaction();
 
-        $fac = facture::where('code', '=', $code_fac)->first();
-
         try {
 
-            if ($fac) {
+            
+            // table consultation
+            $updateData_consultation =[
+                'regle' => 1,
+                'updated_at' => now(),
+            ];
 
-                $fac->montant_verser = $request->montant_verser;
-                $fac->montant_remis = $request->montant_remis;
-                $fac->statut = 'payer';
-                $fac->date_payer = Carbon::now();
-                $fac->encaisser_id = $request->auth_id;
+            $consultationUpdate = DB::table('consultation')
+                                ->where('numfac', '=', $numfac)
+                                ->update($updateData_consultation);
 
-                if (!$fac->save()) {
-                    throw new \Exception('Erreur');
-                }
+            if ($consultationUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table consultation');
+            }
 
-                $consultation = consultation::join('detailconsultations', 'detailconsultations.consultation_id', '=', 'consultations.id')
-                ->join('factures', 'factures.id', '=', 'consultations.facture_id')
-                ->where('factures.code', '=', $code_fac)
+
+            $montant_recu = str_replace('.', '', $request->montant_verser) - str_replace('.', '', $request->montant_remis);
+
+            
+            // table caisse
+            $caisseInserted = DB::table('caisse')->insert([
+                'nopiece' => $numfac,
+                'type' => 'entree',
+                'libelle' => 'Encaissement facture consultation',
+                'montant' => $montant_recu,
+                'dateop' => now(),
+                'datecreat' => now(),
+                'login' => $request->login,
+                'annule' => 0,
+                'mail' => 0,
+            ]);
+
+            if ($caisseInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table caisse');
+            }
+
+            
+            // table journal
+            $recu = $this->generateUniqueMatriculeNumRecu();
+            $journalInserted = DB::table('journal')->insert([
+                'idenregistremetpatient' => $request->matricule,
+                'date' => now(),
+                'numrecu' => 'REC'.$recu,
+                'montant_recu' => $montant_recu,
+                'numjournal' => $recu,
+                'numfac' => $numfac,
+                'type_action' => 0,
+            ]);
+
+            if ($journalInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table journal');
+            }
+
+
+            // table factures
+            $fac = DB::table('factures')->select('montant_pat','montantregle_pat')->where('numfac', '=', $numfac)->first();
+
+            $regle = str_replace('.', '', $montant_recu) + str_replace('.', '', $fac->montantregle_pat);
+
+            $reste = str_replace('.', '', $fac->montant_pat) - $regle;
+
+            $updateData_factures =[
+                'montantregle_pat' => $montant_recu,
+                'montantpat_verser' => str_replace('.', '', $request->montant_verser),
+                'montantpat_remis' => str_replace('.', '', $request->montant_remis),
+                'montantreste_pat' => $reste,
+                'montantregle_pat' => $regle,
+                'datereglt_pat' => now(),
+                'numrecu' => 'REC'.$recu,
+                'updated_at' => now(),
+            ];
+
+            $facturesUpdate = DB::table('factures')
+                                ->where('numfac', '=', $numfac)
+                                ->update($updateData_factures);
+
+            if ($facturesUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table factures');
+            }
+
+
+            // table imprime recu
+            $facture = DB::table('consultation')
+                ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+                ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+                ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
+                ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+                ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+                ->leftJoin('filiation', 'patient.codefiliation', '=', 'filiation.codefiliation')
+                ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
+                ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+                ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+                ->join('factures', 'consultation.numfac', '=', 'factures.numfac')
+                ->where('consultation.idconsexterne', '=', $request->id)
                 ->select(
-                    'consultations.*',
-                    'detailconsultations.typeacte_id as typeacte_id',
-                    'detailconsultations.part_assurance as part_assurance',
-                    'detailconsultations.part_patient as part_patient',
-                    'detailconsultations.remise as remise',
-                    'factures.code as code_fac',
-                    'factures.date_payer as date_paye',
-                    'factures.montant_verser as montant_verser',
-                    'factures.montant_remis as montant_remis',
-                    'factures.statut as statut_fac',
-                    'factures.date_payer as date_payer',
+                    'consultation.idconsexterne as idconsexterne',
+                    'consultation.idenregistremetpatient as idenregistremetpatient',
+                    'consultation.montant as montant',
+                    'consultation.date as date',
+                    'consultation.numfac as numfac',
+                    'consultation.numbon as numbon',
+                    'consultation.ticketmod as partpatient',
+                    'consultation.partassurance as partassurance',
+                    'dossierpatient.numdossier as numdossier',
+                    'patient.nomprenomspatient as nom_patient',
+                    'patient.telpatient as tel_patient',
+                    'patient.assure as assure',
+                    'patient.datenaispatient as datenais',
+                    'patient.telpatient as telpatient',
+                    'patient.matriculeassure as matriculeassure',
+                    'medecin.nomprenomsmed as nom_medecin',
+                    'specialitemed.nomspecialite as specialite',
+                    'factures.remise as remise',
+                    'societeassure.nomsocieteassure as societe',
+                    'assurance.libelleassurance as assurance',
+                    'tauxcouvertureassure.valeurtaux as taux',
+                    'filiation.libellefiliation as filiation',
+                    'factures.montant_ass as part_assurance',
+                    'factures.montant_pat as part_patient',
+                    'factures.montantregle_pat as part_patient_regler',
+                    'factures.numrecu as numrecu',
+                    'factures.datereglt_pat as datereglt_pat',
+                    'factures.montantpat_verser as montant_verser',
+                    'factures.montantpat_remis as montant_remis',
+                    'factures.montantreste_pat as montant_restant',
                 )
                 ->first();
 
-                $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')->leftjoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-                ->where('patients.id', '=', $consultation->patient_id)
-                ->select('patients.*', 'assurances.nom as assurance', 'tauxes.taux as taux')
-                ->first();
+            DB::commit();
+            return response()->json(['success' => true, 'facture' => $facture]);
 
-                if ($patient && $patient->datenais) {
-                    $patient->age = Carbon::parse($patient->datenais)->age;
-                }
-
-                $user = user::find($consultation->user_id);
-
-                $typeacte = typeacte::find($consultation->typeacte_id);
-
-                //-----------------------------------------------
-
-                $solde_caisse = caisse::find('1');
-
-                $solde_caisse_sans_point = str_replace('.', '', $solde_caisse->solde);
-                $part_patient_sans_point = str_replace('.', '', $consultation->part_patient);
-                $solde_apres = (int)$solde_caisse_sans_point + (int)$part_patient_sans_point;
-
-                $add_caisse = new historiquecaisse();
-                $add_caisse->motif = 'ENCAISSEMENT CONSULTATION Facture N°'.$fac->code;
-                $add_caisse->montant = $consultation->part_patient;
-                $add_caisse->libelle = 'Encaissment CONSULTATION Facture N°'.$fac->code;
-                $add_caisse->solde_avant = $solde_caisse->solde;
-                $add_caisse->solde_apres = number_format($solde_apres, 0, '', '.');
-                $add_caisse->typemvt = 'Entrer de Caisse';
-                $add_caisse->creer_id = $request->auth_id;
-                $today = Carbon::today();
-                $add_caisse->date_ope = $today;
-                
-                if (!$add_caisse->save()) {
-                    throw new \Exception('Erreur');
-                }
-
-                $solde_caisse->solde = number_format($solde_apres, 0, '', '.');
-
-                if (!$solde_caisse->save()) {
-                    throw new \Exception('Erreur');
-                }
-
-                //-----------------------------------------------
-
-                DB::commit();
-                return response()->json(['success' => true, 'patient' => $patient, 'typeacte' => $typeacte, 'user' => $user, 'consultation' => $consultation]);
-
-            }else{
-                throw new \Exception('Erreur');
-            }
-            
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['error' => true]);
+            return response()->json(['error' => true,'message' => $e->getMessage()]);
         }
     }
 

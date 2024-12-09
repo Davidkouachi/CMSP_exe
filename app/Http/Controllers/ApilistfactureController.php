@@ -46,48 +46,56 @@ use App\Models\prelevement;
 
 class ApilistfactureController extends Controller
 {
-    public function list_facture_inpayer()
+    public function list_facture_inpayer($numfac)
     {
-        $facture = consultation::join('factures', 'factures.id', '=', 'consultations.facture_id')
-                            ->join('patients', 'patients.id', '=', 'consultations.patient_id')
-                            ->where('factures.statut', '=', 'impayer')
-                            ->select(
-                                'consultations.*',
-                                'factures.code as code_fac',
-                                'patients.np as name',
-                                'patients.tel as tel',
-                            )
-                            ->orderBy('factures.created_at', 'desc')
-                            ->get();               
 
-        foreach ($facture as $value) {
+        $facture = DB::table('consultation')
+            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+            ->join('factures', 'consultation.numfac', '=', 'factures.numfac')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->where('consultation.numfac', '=', $numfac)
+            ->select(
+                'consultation.idconsexterne as idconsexterne',
+                'consultation.montant as montant',
+                'consultation.date as date',
+                'consultation.numfac as numfac',
+                'dossierpatient.numdossier as numdossier',
+                'dossierpatient.idenregistremetpatient as matricule_patient',
+                'factures.remise as remise',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler'
+            )
+            ->first();
 
-            $part_patient = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(part_patient, ".", "") + 0), 0) as total_sum'))
-                    ->first();
+        if ($facture) {
+            $facture->part_patient_regler = $facture->part_patient_regler ?? 0;
 
-            $part_assurance = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(part_assurance, ".", "") + 0), 0) as total_sum'))
-                    ->first();
+            $facture->part_patient_reste = max(0, $facture->part_patient - $facture->part_patient_regler);
 
-            $montant = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total_sum'))
-                    ->first();
+            if ($facture->part_patient_reste === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'La facture est déjà totalement réglée.'
+                ], 200); // 200 car ce n'est pas une erreur technique
+            }
 
-            $remise = detailconsultation::where('consultation_id', '=', $value->id)
-                    ->select(DB::raw('COALESCE(SUM(REPLACE(remise, ".", "") + 0), 0) as total_sum'))
-                    ->first();
+            return response()->json([
+                'status' => 'success',
+                'data' => $facture
+            ], 200);
 
-            $value->part_patient = $part_patient->total_sum ?? 0 ;
-            $value->part_assurance = $part_assurance->total_sum ?? 0 ;
-            $value->montant = $montant->total_sum ?? 0 ;
-            $value->remise = $remise->total_sum ?? 0 ;
+        } else {
+            // Aucun résultat trouvé
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Facture introuvable.'
+            ], 404);
         }
 
-        return response()->json([
-            'data' => $facture,
-        ]);
     }
+
 
     public function list_facture($date1, $date2)
     {
@@ -108,6 +116,7 @@ class ApilistfactureController extends Controller
                 'consultation.montant as montant',
                 'consultation.date as date',
                 'consultation.numfac as numfac',
+                'consultation.regle as statut',
                 'dossierpatient.numdossier as numdossier',
                 'patient.nomprenomspatient as nom_patient',
                 'patient.telpatient as tel_patient',
@@ -122,10 +131,12 @@ class ApilistfactureController extends Controller
 
         foreach ($facture as $value) {
             if ($value->part_patient == $value->part_patient_regler) {
-                $value->statut = 'Réglé';
+                $value->statut_regle = 'Oui';
             } else {
-                $value->statut = 'Non-Réglé';
+                $value->statut_regle = 'Non';
             }
+
+            $value->part_patient_reste = abs($value->part_patient - $value->part_patient_regler);
         }
 
         return response()->json([

@@ -268,8 +268,6 @@
                                     </div>
                                 </div> --}}
                                 <div class="card-body">
-                                    <div id="div_alert_tableP">
-                                    </div>
                                     <div class="">
                                         <div class="table-responsive">
                                             <table id="Table_day" class="table align-middle table-hover m-0 truncate">

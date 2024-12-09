@@ -45,7 +45,7 @@
                                     Consulation(s)
                                 </a>
                             </li>
-                            {{-- <li class="nav-item" role="presentation">
+                            <li class="nav-item" role="presentation">
                                 <a class="nav-link text-white" id="tab-twoA2" data-bs-toggle="tab" href="#twoA2" role="tab" aria-controls="twoA2" aria-selected="false" tabindex="-1">
                                     <i class="ri-article-line me-2"></i>
                                     Examen(s)
@@ -62,7 +62,7 @@
                                     <i class="ri-article-line me-2"></i>
                                     Soins Ambulatoire(s)
                                 </a>
-                            </li> --}}
+                            </li>
                         </ul>
                         <div class="tab-content" id="customTabContent">
                             <div class="card-header" style="margin-top: -20px;margin-bottom: -40px;">
@@ -111,11 +111,12 @@
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col">N° facture</th>
-                                                        <th scope="col">Statut</th>
+                                                        <th scope="col">Facture Réglé ?</th>
                                                         <th scope="col">Part Assurance</th>
                                                         <th scope="col">Part Patient</th>
                                                         <th scope="col">Remise</th>
                                                         <th scope="col">Total</th>
+                                                        <th scope="col">Reste à payer</th>
                                                         <th scope="col">Date de création</th>
                                                         <th scope="col">Actions</th>
                                                     </tr>
@@ -127,8 +128,8 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="tab-pane fade" id="twoA2" role="tabpanel" aria-labelledby="tab-twoA2"> 
-                                <div class="card-header d-flex align-items-center justify-content-between">
+                            <div class="tab-pane fade" id="twoA2" role="tabpanel" aria-labelledby="tab-twoA2"> 
+                                {{-- <div class="card-header d-flex align-items-center justify-content-between">
                                     <h5 class="card-title">
                                         Examen(s)
                                     </h5>
@@ -165,10 +166,18 @@
                                             </table>
                                         </div>
                                     </div>
+                                </div> --}}
+                                <div class="error-container">
+                                    <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
+                                    <h5 class="fw-light mb-4">
+                                        Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
+                                        <br>
+                                        Merci de votre patience !
+                                    </h5>
                                 </div>
-                            </div> --}}
-                            {{-- <div class="tab-pane fade" id="twoA3" role="tabpanel" aria-labelledby="tab-twoA3">
-                                <div class="card-header d-flex align-items-center justify-content-between">
+                            </div>
+                            <div class="tab-pane fade" id="twoA3" role="tabpanel" aria-labelledby="tab-twoA3">
+                                {{-- <div class="card-header d-flex align-items-center justify-content-between">
                                     <h5 class="card-title">
                                         Hospitalisation(s)
                                     </h5>
@@ -205,10 +214,18 @@
                                             </table>
                                         </div>
                                     </div>
+                                </div> --}}
+                                <div class="error-container">
+                                    <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
+                                    <h5 class="fw-light mb-4">
+                                        Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
+                                        <br>
+                                        Merci de votre patience !
+                                    </h5>
                                 </div>
-                            </div> --}}
-                            {{-- <div class="tab-pane fade" id="twoA4" role="tabpanel" aria-labelledby="tab-twoA4">
-                                <div class="card-header d-flex align-items-center justify-content-between">
+                            </div>
+                            <div class="tab-pane fade" id="twoA4" role="tabpanel" aria-labelledby="tab-twoA4">
+                                {{-- <div class="card-header d-flex align-items-center justify-content-between">
                                     <h5 class="card-title">
                                         Soins Amulatoire(s)
                                     </h5>
@@ -245,8 +262,16 @@
                                             </table>
                                         </div>
                                     </div>
+                                </div> --}}
+                                <div class="error-container">
+                                    <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
+                                    <h5 class="fw-light mb-4">
+                                        Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
+                                        <br>
+                                        Merci de votre patience !
+                                    </h5>
                                 </div>
-                            </div> --}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -503,9 +528,9 @@
                     searchable: true,
                 },
                 {
-                    data: 'statut',
+                    data: 'statut_regle',
                     render: (data, type, row) => {
-                        const badgeClass = row.statut == 'Réglé' ? 'bg-success' : 'bg-danger';
+                        const badgeClass = row.statut_regle == 'Oui' ? 'bg-success' : 'bg-danger';
                         return `
                             <span class="badge ${badgeClass}">
                                 ${data}
@@ -550,6 +575,15 @@
                     },
                     searchable: true,
                 },
+                {
+                    data: 'part_patient_reste',
+                    render: (data, type, row) => {
+                        const value = data ? formatPrice(data) : 0;
+                        const color = 'text-dark';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
                 { 
                     data: 'date',
                     render: (data, type, row) => {
@@ -566,7 +600,7 @@
                             >
                                 <i class="ri-file-line"></i>
                             </a>
-                            ${ row.part_patient == row.part_patient_regler ?
+                            ${ row.part_patient_regler > 0 || (row.part_patient_regler != null && row.part_patient_regler > 0) ?
                                 `
                                     <a class="btn btn-outline-info btn-sm" id="printer_Cons"
                                         data-idconsexterne="${row.idconsexterne}"
@@ -1247,7 +1281,7 @@
         $('#btn_refresh_table_Cons').on('click', function () {
             const today = new Date();
             const twoMonthsAgo = new Date(today);
-            twoMonthsAgo.setMonth(today.getMonth() - 2);
+            twoMonthsAgo.setMonth(today.getMonth() - 1);
 
             $('#searchDate1').val(formatDateSearch(twoMonthsAgo));
             $('#searchDate2').val(formatDateSearch(today));
@@ -1292,19 +1326,11 @@
                 leftMargin = 15;
                 pdfWidth = doc.internal.pageSize.getWidth();
 
-                if (facture.part_patient == facture.part_patient_regler) {
-                    const titlea = "Payer";
-                    doc.setFontSize(100);
-                    doc.setTextColor(174, 255, 165);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-                }else{
-                    const titlea = "Impayer";
-                    doc.setFontSize(100);
-                    doc.setTextColor(252, 173, 159);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-                }
+                const titlea = "RECU";
+                doc.setFontSize(100);
+                doc.setTextColor(242, 237, 237);
+                doc.setFont("Helvetica", "bold");
+                doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
 
                 const logoSrc = "{{asset('assets/images/logo.png')}}";
                 const logoWidth = 22;
@@ -1449,6 +1475,7 @@
 
                 const medecinInfo = [
                     { label: "N° Consultation", value: facture.idconsexterne},
+                    { label: "N° Facture", value: facture.numfac},
                     { 
                         label: "Medecin", 
                         value: facture.nom_medecin.length > 20 
@@ -1499,18 +1526,18 @@
                 doc.setFont("Helvetica", "bold");
                 doc.text('Montant à payer', leftMargin + 100, yPoss);
                 doc.setFont("Helvetica", "bold");
-                doc.text(": "+facture.part_patient+" Fcfa", leftMargin + 135, yPoss);
+                doc.text(": "+formatPriceT(facture.part_patient)+" Fcfa", leftMargin + 135, yPoss);
 
                 if (facture.assure == 1) {
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
                     doc.setTextColor(0, 0, 0);
-                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 16);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() + " ( NB: recu valable pour 15 jours uniquement pour la même consultation de la même pathologie )" , 5, yPoss + 16);
                 }else{
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
                     doc.setTextColor(0, 0, 0);
-                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, yPoss + 28);
+                    doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() + " ( NB: recu valable pour 15 jours uniquement pour la même consultation de la même pathologie )" , 5, yPoss + 28);
                 }
 
                 // doc.setFontSize(10);

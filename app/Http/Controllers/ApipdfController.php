@@ -55,7 +55,6 @@ class ApipdfController extends Controller
 {
     public function fiche_consultation($code)
     {
-
         $facture = DB::table('consultation')
             ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
             ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
