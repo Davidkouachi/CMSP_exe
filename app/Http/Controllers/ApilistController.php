@@ -130,22 +130,29 @@ class ApilistController extends Controller
     {
         $today = Carbon::today();
 
-        $consultation = detailconsultation::join('consultations', 'consultations.id', '=', 'detailconsultations.consultation_id')
-                                    ->leftJoin('users', 'users.id', '=', 'consultations.user_id')
-                                    ->join('patients', 'patients.id', '=', 'consultations.patient_id')
-                                    ->join('factures', 'factures.id', '=', 'consultations.facture_id')
-                                    ->select(
-                                        'detailconsultations.*',
-                                        'consultations.code as code', 
-                                        'factures.statut as statut_fac', 
-                                        'patients.np as name', 
-                                        'users.tel as tel', 
-                                        'users.tel2 as tel2',
-                                        'patients.matricule as matricule'
-                                    )
-                                    ->whereDate('detailconsultations.created_at', '=', $today)
-                                    ->orderBy('detailconsultations.created_at', 'desc')
-                                    ->get();
+        $consultation = DB::table('consultation')
+            ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->whereDate('consultation.date', $today)
+            ->select(
+                'consultation.idconsexterne as idconsexterne',
+                'consultation.montant as montant',
+                'consultation.date as date',
+                'consultation.numfac as numfac',
+                'consultation.regle as regle',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'patient.assure as assure',
+                'medecin.nomprenomsmed as nom_medecin',
+                'specialitemed.nomspecialite as specialite',
+            )
+            ->orderBy('consultation.date', 'desc')
+            ->get();
 
         return response()->json([
             'data' => $consultation,
@@ -318,6 +325,7 @@ class ApilistController extends Controller
                 'filiation.libellefiliation as filiation',
                 'dossierpatient.numdossier as numdossier',
             )
+            ->orderBy('patient.dateenregistrement','desc')
             ->get();
 
         return response()->json([
@@ -332,7 +340,7 @@ class ApilistController extends Controller
 
         $consultation = DB::table('consultation')
             ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
-            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
             ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
             ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
             ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
@@ -343,9 +351,11 @@ class ApilistController extends Controller
                 'consultation.montant as montant',
                 'consultation.date as date',
                 'consultation.numfac as numfac',
+                'consultation.regle as regle',
                 'dossierpatient.numdossier as numdossier',
                 'patient.nomprenomspatient as nom_patient',
                 'patient.telpatient as tel_patient',
+                'patient.assure as assure',
                 'medecin.nomprenomsmed as nom_medecin',
                 'specialitemed.nomspecialite as specialite',
             )

@@ -53,18 +53,16 @@ class ApistatController extends Controller
     {
         $today = Carbon::today();
 
-        $nbre_patient_day = consultation::whereDate('created_at', '=', $today)->count();
+        $nbre_patient_day = DB::table('consultation')->whereDate('date', '=', $today)->count();
 
-        $nbre_patient_assurer_day = consultation::join('patients', 'patients.id', '=', 'consultations.patient_id')->whereDate('consultations.created_at', '=', $today)->where('patients.assurer', '=', 'oui')->count();
+        $nbre_patient_assurer_day = DB::table('consultation')->join('patient', 'patient.idenregistremetpatient', '=', 'consultation.idenregistremetpatient')->whereDate('consultation.date', '=', $today)->where('patient.assure', '=', 1)->count();
 
-        $nbre_patient_nassurer_day = consultation::join('patients', 'patients.id', '=', 'consultations.patient_id')->whereDate('consultations.created_at', '=', $today)->where('patients.assurer', '=', 'non')->count();
+        $nbre_patient_nassurer_day = DB::table('consultation')->join('patient', 'patient.idenregistremetpatient', '=', 'consultation.idenregistremetpatient')->whereDate('consultation.date', '=', $today)->where('patient.assure', '=', 0)->count();
 
-        // Get the total sum, ensuring it defaults to 0 if nothing is found
-        $prix_cons_day = detailconsultation::whereDate('created_at', '=', $today)
+        $prix_cons_day = DB::table('consultation')->whereDate('date', '=', $today)
             ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total_sum'))
             ->first();
 
-        // If no result or null, default the sum to 0
         $total_sum = $prix_cons_day->total_sum ?? 0;
 
         return response()->json([
@@ -73,7 +71,6 @@ class ApistatController extends Controller
             'nbre_patient_nassurer_day' => $nbre_patient_nassurer_day,
             'prix_cons_day' => $total_sum
         ]);
-
     }
 
     public function statistique_caisse()
@@ -100,29 +97,30 @@ class ApistatController extends Controller
 
     public function statistique_reception_cons()
     {
-        $today = Carbon::today();
-
-        $typeacte = typeacte::join('actes', 'actes.id', '=', 'typeactes.acte_id')
-                            ->where('actes.nom', '=', 'CONSULTATION')
-                            ->select('typeactes.*')
-                            ->get();
+        $typeacte = DB::table('tarifs')
+            ->join('garantie', 'tarifs.codgaran', '=', 'garantie.codgaran')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->select('garantie.codgaran as codgaran','garantie.libgaran as libgaran')
+            ->distinct()
+            // ->groupBy('garantie.codgaran', 'garantie.libgaran')
+            ->get();
 
         foreach ($typeacte as $value) {
-            $stats = detailconsultation::where('typeacte_id', '=', $value->id)
-                        ->whereDate('created_at', '=', $today)
-                        ->select(DB::raw('
-                            COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as part_total,
-                            COALESCE(SUM(REPLACE(part_patient, ".", "") + 0), 0) as part_patient,
-                            COALESCE(SUM(REPLACE(part_assurance, ".", "") + 0), 0) as part_assurance
-                        '))
-                        ->first();
+            $stats = DB::table('consultation')
+                ->where('codeacte', '=', $value->codgaran)
+                ->select(DB::raw('
+                    COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as part_total,
+                    COALESCE(SUM(REPLACE(ticketmod, ".", "") + 0), 0) as part_patient,
+                    COALESCE(SUM(REPLACE(partassurance, ".", "") + 0), 0) as part_assurance
+                '))
+                ->first();
 
-            $nbre = detailconsultation::where('typeacte_id', '=', $value->id)->whereDate('created_at', '=', $today)->count();
+            $nbre = DB::table('consultation')->where('codeacte', '=', $value->codgaran)->count();
 
-            $value->part_patient = $stats->part_patient ?? 0;
-            $value->part_assurance = $stats->part_assurance ?? 0;
-            $value->total = $stats->part_total ?? 0;
-            $value->nbre = $nbre ?? 0;
+            $value->part_patient = $stats->part_patient;
+            $value->part_assurance = $stats->part_assurance;
+            $value->total = $stats->part_total;
+            $value->nbre = $nbre;
 
         }
 
@@ -131,21 +129,25 @@ class ApistatController extends Controller
 
     public function statistique_cons()
     {
-        $typeacte = typeacte::join('actes', 'actes.id', '=', 'typeactes.acte_id')
-                            ->where('actes.nom', '=', 'CONSULTATION')
-                            ->select('typeactes.*')
-                            ->get();
+        $typeacte = DB::table('tarifs')
+            ->join('garantie', 'tarifs.codgaran', '=', 'garantie.codgaran')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->select('garantie.codgaran as codgaran','garantie.libgaran as libgaran')
+            ->distinct()
+            // ->groupBy('garantie.codgaran', 'garantie.libgaran')
+            ->get();
 
         foreach ($typeacte as $value) {
-            $stats = detailconsultation::where('typeacte_id', '=', $value->id)
-                        ->select(DB::raw('
-                            COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as part_total,
-                            COALESCE(SUM(REPLACE(part_patient, ".", "") + 0), 0) as part_patient,
-                            COALESCE(SUM(REPLACE(part_assurance, ".", "") + 0), 0) as part_assurance
-                        '))
-                        ->first();
+            $stats = DB::table('consultation')
+                ->where('codeacte', '=', $value->codgaran)
+                ->select(DB::raw('
+                    COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as part_total,
+                    COALESCE(SUM(REPLACE(ticketmod, ".", "") + 0), 0) as part_patient,
+                    COALESCE(SUM(REPLACE(partassurance, ".", "") + 0), 0) as part_assurance
+                '))
+                ->first();
 
-            $nbre = detailconsultation::where('typeacte_id', '=', $value->id)->count();
+            $nbre = DB::table('consultation')->where('codeacte', '=', $value->codgaran)->count();
 
             $value->part_patient = $stats->part_patient;
             $value->part_assurance = $stats->part_assurance;
@@ -168,7 +170,7 @@ class ApistatController extends Controller
         
         for ($i = 0; $i < 7; $i++) {
             $date = $startOfWeek->copy()->addDays($i);
-            $count = consultation::whereDate('created_at', $date)->count();
+            $count = DB::table('consultation')->whereDate('date', $date)->count();
             $weeklyCounts[] = $count;
         }
 
@@ -179,7 +181,7 @@ class ApistatController extends Controller
     {
         $currentWeekCount = $this->getWeeklyConsultations()->getData();
         
-        $lastWeekCount = consultation::whereBetween('created_at', [
+        $lastWeekCount = DB::table('consultation')->whereBetween('date', [
             now()->subWeek()->startOfWeek(), 
             now()->subWeek()->endOfWeek()
         ])->count();

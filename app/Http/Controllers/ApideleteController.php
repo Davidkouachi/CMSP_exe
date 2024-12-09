@@ -274,37 +274,31 @@ class ApideleteController extends Controller
         return response()->json(['error' => true]);
     }
 
-    public function delete_Cons($id)
+    public function delete_Cons($numfac)
     {
-        $put = detailconsultation::find($id);
+        $put = DB::table('consultation')->where('numfac', '=', $numfac)->exists();
 
         if (!$put) {
-            return response()->json(['error' => true, 'message' => 'Detail consultation non trouvé']);
+            return response()->json(['error' => true, 'message' => 'Consultation non trouvé']);
         }
 
         DB::beginTransaction();
 
         try {
             // Trouver la consultation associée
-            $id_cons = consultation::find($put->consultation_id);
-            if (!$id_cons) {
+            $id_cons = DB::table('consultation')->where('numfac', '=', $numfac)->delete();
+            if ($id_cons === 0) {
                 return response()->json(['error' => true, 'message' => 'Consultation non trouvée']);
             }
 
             // Trouver la facture associée à la consultation
-            $id_facture = facture::find($id_cons->facture_id);
-            if (!$id_facture) {
+            $id_facture = DB::table('factures')->where('numfac', '=', $numfac)->delete();
+            if ($id_facture === 0) {
                 return response()->json(['error' => true, 'message' => 'Facture non trouvée']);
             }
 
-            // Suppression dans l'ordre : détail consultation, consultation, puis facture
-            if ($put->delete() && $id_cons->delete() && $id_facture->delete()) {
-                DB::commit(); // Validation de la transaction si tout s'est bien passé
-                return response()->json(['success' => true, 'message' => 'Suppression effectuée avec succès']);
-            } else {
-                DB::rollBack(); // Annulation en cas de problème
-                return response()->json(['error' => true, 'message' => 'Erreur lors de la suppression']);
-            }
+            DB::commit(); // Validation de la transaction si tout s'est bien passé
+            return response()->json(['success' => true, 'message' => 'Suppression effectuée avec succès']);
         } catch (Exception $e) {
             DB::rollBack(); // Annulation en cas d'exception
             return response()->json(['error' => true, 'message' => $e->getMessage()]);

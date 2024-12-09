@@ -275,7 +275,7 @@
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col">Nom et Prénoms</th>
-                                                        <th scope="col">N° Dossier</th>
+                                                        <th scope="col">N° matricule</th>
                                                         <th scope="col">Date de naissance</th>
                                                         <th scope="col">Age</th>
                                                         <th scope="col">Assurer</th>

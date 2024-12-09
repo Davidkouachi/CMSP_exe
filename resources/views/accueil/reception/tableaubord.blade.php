@@ -27,7 +27,7 @@
                     <div class="mh-230">
                         <div class="text-white">
                             <h6>Bienvenue,</h6>
-                            <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
+                            <h2>Mr/Mme {{Auth::user()->login}}</h2>
                             <h5>Les statistiques d'aujourd'hui.</h5>
                             <div class="mt-4 row gx-3">
                                 <div class="d-flex align-items-center col-xxl-3 col-lg-3 col-md-6 col-sm-6 col-12 mb-3 ">
@@ -181,35 +181,20 @@
                                             </h5>
                                         </div>
                                         <div class="row gx-3">
-                                            <div class="col-sm-12">
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Période</label>
-                                                    <div class="m-0">
-                                                        <div class="form-check form-check-inline">
-                                                            <input checked class="form-check-input" type="radio" id="jourO" name="periode_consul" value="jour ouvrable">
-                                                            <label class="form-check-label" for="jourO">Jour Ouvrable</label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" id="Nuit" name="periode_consul" value="nuit">
-                                                            <label class="form-check-label" for="Nuit">Nuit</label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" id="jourF" name="periode_consul" value="jour ferier">
-                                                            <label class="form-check-label" for="jourF">Jour Ferié</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xxl-3 col-lg-4 col-sm-6" style="display: none;">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Motif</label>
-                                                    <select class="form-select" id="acte_id">
+                                                    <select class="form-select select2" id="periode">
+                                                        <option value=""></option>
+                                                        <option value="0">Jour</option>
+                                                        <option value="1">Nuit</option>
+                                                        <option value="2">Férier</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-xxl-3 col-lg-4 col-sm-6" id="div_typeacteS" style="display: block;">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Spécialité</label>
+                                                    <label class="form-label">Acte</label>
                                                     <select class="form-select select2" id="typeacte_idS">
                                                     </select>
                                                 </div>
@@ -228,7 +213,7 @@
                                                         <span class="input-group-text">
                                                             N°
                                                         </span>
-                                                        <input type="text" class="form-control" id="mumcode">
+                                                        <input type="tel" class="form-control" id="mumcode">
                                                     </div>
                                                 </div>
                                             </div>
@@ -312,121 +297,155 @@
                                 <div class="card-header">
                                     <h5 class="card-title text-center">Formulaire Nouveau Patient</h5>
                                 </div>
-                                <div class="row gx-3">
-                                    <div class="col-12">
-                                            <div class=" mb-0">
-                                                <div class="card-body">
-                                                    <div class="text-center">
-                                                        <a class="d-flex align-items-center flex-column">
-                                                            <img src="{{asset('assets/images/user8.png')}}" class="img-7x rounded-circle border border-3">
-                                                        </a>
-                                                    </div>
+                                <div class="card-header">
+                                    <div class="text-center">
+                                        <a class="d-flex align-items-center flex-column">
+                                            <img src="{{asset('assets/images/user8.png')}}" class="img-7x rounded-circle border border-3">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body border border-1 rounded-2 mb-3">
+                                    <div class="row gx-3">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">Informations personnelles</h5>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Sexe</label>
+                                                <select class="form-select select2" id="patient_sexe_new">
+                                                    <option value=""></option>
+                                                    <option value="M">Masculin</option>
+                                                    <option value="F">Féminin</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="patient_nom_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Prénoms</label>
+                                                <input type="text" class="form-control" id="patient_prenom_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Date de naissance
+                                                </label>
+                                                <input type="date" class="form-control" placeholder="Selectionner une date" id="patient_datenaiss_new" max="{{ date('Y-m-d') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Contact 1</label>
+                                                <input type="tel" class="form-control" id="patient_tel_new" placeholder="Saisie Obligatoire" maxlength="10">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Contact 2</label>
+                                                <input type="tel" class="form-control" id="patient_tel2_new" placeholder="facultatif" maxlength="10">
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Résidence</label>
+                                                <input type="text" class="form-control" id="patient_residence_new" placeholder="Saisie obligatoire">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body border border-1 rounded-2 mb-3">
+                                    <div class="row gx-3 align-items-center justify-content-center">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">Informations Assurance</h5>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Assurer</label>
+                                                <select class="form-select" id="assure">
+                                                    <option value="">Selectionner</option>
+                                                    <option value="0">Non</option>
+                                                    <option value="1">Oui</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row gx-3" id="div_assurer" style="display: none;">
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Filiation</label>
+                                                    <select class="form-select select2" id="patient_codefiliation_new">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Assurance</label>
+                                                    <select class="form-select select2" id="patient_codeassurance_new">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Matricule assurance</label>
+                                                    <input type="text" class="form-control" id="patient_matriculeA_new" placeholder="Saisie Obligatoire">
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Taux</label>
+                                                    <select class="form-select select2" id="patient_idtauxcouv_new">
+                                                        <option value="">Sélectionner un taux</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Société</label>
+                                                    <select class="form-select select2" id="patient_codesocieteassure_new">
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nom et Prénoms</label>
-                                            <input type="text" class="form-control" id="patient_np_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
-                                        </div>
                                     </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Date de naissance
-                                            </label>
-                                            <input type="date" class="form-control" placeholder="Selectionner une date" id="patient_datenaiss_new">
+                                </div>
+                                <div class="card-body border border-1 rounded-2 mb-3">
+                                    <div class="row gx-3">
+                                        <div class="card-header">
+                                            <h5 class="card-title text-center">En Cas d'urgence</h5>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="patient_email_new" placeholder="facultatif">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact</label>
-                                            <input type="tel" class="form-control" id="patient_tel_new" placeholder="Saisie Obligatoire" maxlength="10">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact 2</label>
-                                            <input type="tel" class="form-control" id="patient_tel2_new" placeholder="facultatif" maxlength="10">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Adresse</label>
-                                            <input type="text" class="form-control" id="patient_adresse_new" placeholder="facultatif">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Sexe</label>
-                                            <select class="form-select" id="patient_sexe_new">
-                                                <option value="">Selectionner</option>
-                                                <option value="Mr">Homme</option>
-                                                <option value="Mme">Femme</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Assurer</label>
-                                            <select class="form-select" id="assurer">
-                                                <option selected value="non">Non</option>
-                                                <option value="oui">Oui</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row gx-3" id="div_assurer" style="display: none;" >
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Filiation</label>
-                                                <select class="form-select" id="patient_filiation_new">
-                                                    <option value="">Selectionner</option>
-                                                    <option value="Adhérent(e)">Adhérent(e)</option>
-                                                    <option value="Bénéficiaire">Bénéficiaire</option>
-                                                    <option value="Conjoint(e)">Conjoint(e)</option>
-                                                </select>
+                                                <label class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="patient_nomu_new" placeholder="facultatif" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Assurance</label>
-                                                <select class="form-select select2" id="patient_assurance_id_new">
-                                                </select>
+                                                <label class="form-label">Contact 1</label>
+                                                <input type="tel" class="form-control" id="patient_telu_new" placeholder="facultatif" maxlength="10">
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label class="form-label">Matricule assurance</label>
-                                                <input type="text" class="form-control" id="patient_matriculeA_new" placeholder="Saisie Obligatoire">
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Taux</label>
-                                                <select class="form-select select2" id="patient_taux_id_new">
-                                                    <option value="">Sélectionner un taux</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Société</label>
-                                                <select class="form-select select2" id="patient_societe_id_new">
-                                                </select>
+                                                <label class="form-label">Contact 2</label>
+                                                <input type="tel" class="form-control" id="patient_telu2_new" placeholder="facultatif" maxlength="10">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <button id="btn_eng_patient" class="btn btn-success">
-                                                Enregistrer
-                                            </button>
+                                </div>
+                                <div class="card-body mb-3">
+                                    <div class="row gx-3">
+                                        <div class="col-sm-12 mb-3">
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button id="btn_eng_patient" class="btn btn-success">
+                                                    Enregistrer
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -466,7 +485,7 @@
                             </div>
                             <div class="tab-pane fade" id="threeAAA" role="tabpanel" aria-labelledby="tab-threeAAA">
                                 <div class="card-header">
-                                    <h5 class="card-title text-center">Formulaire Nouvelle Scoiété</h5>
+                                    <h5 class="card-title text-center">Formulaire Nouvelle Societe</h5>
                                 </div>
                                 <div class="card-header">
                                     <div class="text-center">
@@ -475,121 +494,101 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="row gx-3 ">
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nom de la société</label>
-                                            <input type="text" class="form-control" id="nom_societe" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                <div class="card-body" >
+                                    <div class="row gx-3 alig-items-center justify-content-center">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nom de la société</label>
+                                                <input type="text" class="form-control" id="nom_societe" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email_societe" placeholder="facultatif">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Assurance</label>
+                                                <select class="form-select select2" id="codeassurance_societe">
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact</label>
-                                            <input type="tel" class="form-control" id="tel_societe" placeholder="Saisie Obligatoire" maxlength="10">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Assureur</label>
+                                                <select class="form-select select2" id="assureur_id_societe">
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact 2</label>
-                                            <input type="tel" class="form-control" id="tel2_societe" placeholder="facultatif" maxlength="10">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Adresse</label>
-                                            <input type="text" class="form-control" id="adresse_societe" placeholder="Saisie Obligatoire">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Fax</label>
-                                            <input type="text" class="form-control" id="fax_societe" placeholder="Saisie Obligatoire">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Situation Géographique</label>
-                                            <input type="text" class="form-control" id="sgeo_societe" placeholder="Saisie Obligatoire">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 mb-3">
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <button id="btn_eng_societe" class="btn btn-outline-success">
-                                                Enregistrer
-                                            </button>
+                                        <div class="col-sm-12 mb-3 ">
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button id="btn_eng_societe" class="btn btn-outline-success">
+                                                    Enregistrer
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="frewAAA" role="tabpanel" aria-labelledby="tab-frewAAA">
                                 <div class="card-header">
-                                    <h5 class="card-title text-center">Formulaire Nouvelle Assurance</h5>
+                                    <h5 class="card-title text-center">
+                                        Formulaire Nouvelle Assurance
+                                    </h5>
                                 </div>
-                                <div class="row gx-3">
-                                    <div class="col-12">
-                                        <div class=" mb-0">
-                                            <div class="card-body">
-                                                <div class="text-center">
-                                                    <a class="d-flex align-items-center flex-column">
-                                                        <img src="{{asset('assets/images/assurance3.jpg')}}" class="img-7x rounded-circle border border-3">
-                                                    </a>
-                                                </div>
+                                <div class="card-header">
+                                    <div class="text-center">
+                                        <a class="d-flex align-items-center flex-column">
+                                            <img src="{{asset('assets/images/assurance3.jpg')}}" class="img-7x rounded-circle border border-3">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body" >
+                                    <div class="row gx-3">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="nom_assurance_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nom</label>
-                                            <input type="text" class="form-control" id="nom_assurance_new" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input required type="email" class="form-control" id="email_assurance_new" placeholder="Saisie Obligatoire">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input required type="email" class="form-control" id="email_assurance_new" placeholder="Saisie Obligatoire">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Contact</label>
+                                                <input type="tel" class="form-control" id="tel_assurance_new" placeholder="Saisie Obligatoire" maxlength="10">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact</label>
-                                            <input type="tel" class="form-control" id="tel_assurance_new" placeholder="Saisie Obligatoire" maxlength="10">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label" >Fax</label>
+                                                <input type="text" class="form-control" id="fax_assurance_new" placeholder="Facultatif">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact 2</label>
-                                            <input type="tel" class="form-control" id="tel2_assurance_new" placeholder="Facultatif" maxlength="10">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Adresse</label>
+                                                <input type="text" class="form-control" id="adresse_assurance_new" placeholder="Saisie Obligatoire">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label" >Fax</label>
-                                            <input type="text" class="form-control" id="fax_assurance_new" placeholder="Facultatif">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Adresse</label>
-                                            <input type="text" class="form-control" id="adresse_assurance_new" placeholder="Facultatif">
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Localisation</label>
                                                 <input type="text" class="form-control" id="carte_assurance_new" placeholder="Saisie Obligatoire">
                                             </div>
                                         </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <button id="btn_eng_assurance" class="btn btn-success">
-                                                Enregistrer
-                                            </button>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Description</label>
+                                                <input type="text" class="form-control" id="desc_assurance_new" placeholder="Facultatif">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button id="btn_eng_assurance" class="btn btn-success">
+                                                    Enregistrer
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -617,7 +616,7 @@
                 <div class="card-body">
                     <div class="">
                         <div class="table-responsive">
-                            <table id="Table_day" class="table table-hover table-sm Table_day_cons">
+                            <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_day_cons">
                                 <thead>
                                     <tr>
                                         <th scope="col">N°</th>
@@ -625,9 +624,11 @@
                                         <th scope="col">N° dossier</th>
                                         <th scope="col">Nom et Prénoms</th>
                                         <th scope="col">Contact</th>
-                                        <th scope="col">Motif</th>
-                                        <th scope="col">Détail</th>
+                                        <th scope="col">Médecin</th>
+                                        <th scope="col">Spécialité</th>
                                         <th scope="col">Prix</th>
+                                        <th scope="col">N° Facture</th>
+                                        <th scope="col">Date</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -742,15 +743,18 @@
 @include('select2')
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    $(document).ready(function() {
 
         Statistique();
         Activity_cons();
         Activity_cons_count();
         select_patient();
+        select_list_medecin();
+        select_assureur();
+        select_assurance();
         select_taux();
-        select_societe_patient();
-        select_assurance_patient();
+        select_societe();
+        select_filiation();
 
         // ------------------------------------------------------------------
 
@@ -759,8 +763,8 @@
         $("#btn_eng_societe").on("click", eng_societe);
         $("#btn_eng_assurance").on("click", eng_assurance);
         $("#btn_eng_patient").on("click", eng_patient);
-        $("#btn_update_rdv").on("click", update_rdv);
-        $("#btn_delete_rdv").on("click", delete_rdv);
+        // $("#btn_update_rdv").on("click", update_rdv);
+        // $("#btn_delete_rdv").on("click", delete_rdv);
         $("#deleteBtnCons").on("click", delete_cons);
 
         $('#btn_affiche_stat').on('click', function() {
@@ -783,7 +787,7 @@
 
         // ------------------------------------------------------------------
 
-        var inputs = ['tel_assurance_new', 'tel2_assurance_new', 'patient_tel_new', 'patient_tel2_new', 'taux_remise', 'montant_assurance', 'montant_patient','tel_societe','tel2_societe'];
+        var inputs = ['patient_tel_new', 'patient_tel2_new', 'patient_telu_new', 'patient_telu2_new','tel_assurance_new','mumcode'];
         inputs.forEach(function(id) {
             var inputElement = document.getElementById(id); // Get each element by its ID
 
@@ -801,6 +805,14 @@
             });
         });
 
+        $('#assure').on('change', function() {
+            if ($(this).val() === '1') {
+                $('#div_assurer').css('display', 'flex');
+            } else {
+                $('#div_assurer').css('display', 'none');
+            }
+        });
+
         document.getElementById('taux_remise').addEventListener('input', function() {
             this.value = formatPrice(this.value);
             if (this.value !== ''){
@@ -815,15 +827,6 @@
                 document.getElementById('div_remise').style.display = 'block';
             }else{
                 document.getElementById('div_remise').style.display = 'none';
-            }
-        });
-
-        document.getElementById('assurer').addEventListener('change', function() {
-
-            if (this.value == 'oui'){
-                document.getElementById("div_assurer").style.display = "flex";
-            }else{
-                document.getElementById("div_assurer").style.display = "none";
             }
         });
 
@@ -929,6 +932,23 @@
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
         // ------------------------------------------------------------------
 
         function select_patient()
@@ -950,8 +970,8 @@
                 success: function(data) {
                     data.name.forEach(item => {
                         const option = $('<option>', {
-                            value: item.id,
-                            text: item.np
+                            value: item.idenregistremetpatient,
+                            text: item.nomprenomspatient
                         });
                         selectElement.append(option);
                     });
@@ -966,7 +986,6 @@
         {
             document.getElementById('div_typeacteS').style.display = 'block';
             document.getElementById('div_medecin').style.display = 'block';
-            document.getElementById('acte_id').value = '1';
 
             document.getElementById('montant_assurance').value = '0';
             document.getElementById('taux_remise').value = '0';
@@ -1005,11 +1024,13 @@
                     } else if (response.success) {
                         // showAlert('Succés', 'Patient trouvé.', 'success');
 
+                        $('#medecin_id').val('').trigger('change');
+
                         addGroup(response.patient);
 
                         document.getElementById("div_info_consul").style.display = 'block';
 
-                        if (response.patient.assurer == 'oui') {
+                        if (response.patient.assure == 1) {
                             // Le patient a un taux d'assurance
                             document.getElementById("input_part_assurance").style.display = 'block';
                             document.getElementById("div_assurance_utiliser").style.display = 'block';
@@ -1072,31 +1093,48 @@
                 </div>
                 <div class="col-xxl-3 col-lg-4 col-sm-6">
                     <div class="mb-3">
+                        <label class="form-label" for="email">N° dossier</label>
+                        <input id="patient_numdossier" value="${data.numdossier}" readonly class="form-control">
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-lg-4 col-sm-6">
+                    <div class="mb-3">
                         <label class="form-label" for="email">Nom et Prénoms</label>
-                        <input value="${data.np}" readonly class="form-control">
+                        <input value="${data.nomprenomspatient}" readonly class="form-control">
                     </div>
                 </div>
                 <div class="col-xxl-3 col-lg-4 col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" for="tel">Contact</label>
-                        <input value="+225 ${data.tel}" readonly class="form-control">
+                        <input value="${data.telpatient}" readonly class="form-control">
                     </div>
                 </div>
                 <div class="col-xxl-3 col-lg-4 col-sm-6">
                     <div class="mb-3">
                         <label class="form-label">Assurer</label>
-                        <input value="${data.assurer}" readonly class="form-control">
+                        <input value="${data.assure == 1 ? `Oui` : `Non`}" readonly class="form-control">
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-lg-4 col-sm-6" hidden>
+                    <div class="mb-3">
+                        <input id="patient_codeassurance" value="${data.codeassurance}" readonly class="form-control">
                     </div>
                 </div>
             `;
 
             // Check if the patient has insurance and add the additional fields
-            if (data.assurer === 'oui') {
+            if (data.assure === 1) {
                 groupe.innerHTML += `
                     <div class="col-xxl-3 col-lg-4 col-sm-6">
                         <div class="mb-3">
                             <label class="form-label" for="adresse">Assurance</label>
                             <input value="${data.assurance}" readonly class="form-control" placeholder="Néant">
+                        </div>
+                    </div>
+                    <div class="col-xxl-3 col-lg-4 col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="adresse">Matricule assurance</label>
+                            <input value="${data.matriculeassure}" readonly class="form-control" placeholder="Néant">
                         </div>
                     </div>
                     <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -1159,83 +1197,165 @@
             dynamicFields.empty();
             
             $('#div_info_consul').hide();
+            $('#periode').val('').trigger('change');
+            $('#typeacte_id').val('').trigger('change');
+            $('#id_patient').val('').trigger('change');
+            $('#medecin_id').val('').trigger('change');
             select_patient();
         }
 
         // ------------------------------------------------------------------
 
-        function select_taux()
+        function select_assurance() 
         {
-            const selectElement = document.getElementById('patient_taux_id_new');
-            selectElement.innerHTML = '';
+            const selectElement2 = $('#codeassurance_societe');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner un taux';
-            selectElement.appendChild(defaultOption);
-            // Vérifie que l'élément select existe
-            if (selectElement) {
-                // Effectuer une requête pour récupérer les taux
-                fetch('/api/taux_select_patient_new')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(taux => {
-                            const option = document.createElement('option');
-                            option.value = taux.id; // Assure-toi que 'id' est la clé correcte
-                            option.textContent = taux.taux+'%'; // Assure-toi que 'nom' est la clé correcte
-                            selectElement.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des taux:', error));
-            }
-        }
+            const selectElement3 = $('#patient_codeassurance_new');
+            selectElement3.empty();
+            selectElement3.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
 
-        function select_societe_patient()
-        {
-            const selectElement = document.getElementById('patient_societe_id_new');
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner une société';
-            selectElement.appendChild(defaultOption);
-            // Vérifie que l'élément select existe
-            if (selectElement) {
-                // Effectuer une requête pour récupérer les taux
-                fetch('/api/societe_select_patient_new')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(societe => {
-                            const option = document.createElement('option');
-                            option.value = societe.id; // Assure-toi que 'id' est la clé correcte
-                            option.textContent = societe.nom; // Assure-toi que 'nom' est la clé correcte
-                            selectElement.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des societes:', error));
-            }
-        }
+            $.ajax({
+                url: '/api/assurance_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assurance;
 
-        function select_assurance_patient()
-        {
-            const selectElement = document.getElementById('patient_assurance_id_new');
-            // Clear existing options
-            selectElement.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner une Assurance';
-            selectElement.appendChild(defaultOption);
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
 
-            fetch('/api/assurance_select_patient_new')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(assurance => {
-                        const option = document.createElement('option');
-                        option.value = assurance.id; // Ensure 'id' is the correct key
-                        option.textContent = assurance.nom; // Ensure 'nom' is the correct key
-                        selectElement.appendChild(option);
+                        selectElement3.append($('<option>', {
+                            value: item.codeassurance,
+                            text: item.libelleassurance,
+                        }));
                     });
-                })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_assureur() 
+        {
+            const selectElement2 = $('#assureur_id_societe');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/select_assureur',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.assureur;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codeassureur,
+                            text: item.libelle_assureur,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_taux() 
+        {
+            const selectElement2 = $('#patient_idtauxcouv_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/taux_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.taux;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.idtauxcouv,
+                            text: item.valeurtaux + '%',
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_societe() 
+        {
+            const selectElement2 = $('#patient_codesocieteassure_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/societe_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.societe;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codesocieteassure,
+                            text: item.nomsocieteassure,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
+        function select_filiation() 
+        {
+            const selectElement2 = $('#patient_codefiliation_new');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/filiation_select_patient_new',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.filiation;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codefiliation,
+                            text: item.libellefiliation,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
         }
 
         function select_list_medecin()
@@ -1245,7 +1365,7 @@
             selectElement.innerHTML = '';
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner un medecin';
+            defaultOption.textContent = 'Selectionner';
             selectElement.appendChild(defaultOption);
 
             fetch('/api/select_list_medecin')
@@ -1254,48 +1374,18 @@
                     const medecins = data.medecin;
                     medecins.forEach((item, index) => {
                         const option = document.createElement('option');
-                        option.value = `${item.id}`; // Ensure 'id' is the correct key
-                        option.textContent = `Dr. ${item.name}`; // Ensure 'nom' is the correct key
+                        option.value = `${item.codemedecin}`; // Ensure 'id' is the correct key
+                        option.textContent = `${item.nomprenomsmed}`; // Ensure 'nom' is the correct key
                         selectElement.appendChild(option);
                     });
                 })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
-        }
-
-        function select_list_acte() {
-            const selectElement = document.getElementById('acte_id');
-
-            // Clear existing options
-            selectElement.innerHTML = '';
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Sélectionner';
-            selectElement.appendChild(defaultOption);
-
-            $.ajax({
-                url: '/api/list_acte',
-                method: 'GET',
-                success: function(response) {
-                    data = response.acte;
-                    data.forEach(acte => {
-                        const option = document.createElement('option');
-                        option.value = acte.id; // Ensure 'id' is the correct key
-                        option.textContent = acte.nom; // Ensure 'nom' is the correct key
-                        selectElement.appendChild(option);
-                    });
-                },
-                error: function() {
-                    // showAlert('danger', 'Impossible de generer le code automatiquement');
-                }
-            });
+                .catch(error => console.error('Erreur lors du chargement des medecins:', error));
         }
 
         function select_list_typeacte() {
             const divTypeActe = $('#div_typeacteS'); // Le div principal
             const divMedecin = $('#div_medecin');
             const typeActeSelect = $('#typeacte_idS');
-            const acteId = '1';
 
             const montant_assurance = $('#montant_assurance');
             const taux_remise = $('#taux_remise');
@@ -1309,6 +1399,7 @@
             montant_total.val('');
             montant_patient.val('');
 
+            const codeassurance = $('#patient_codeassurance').val();
             const patient_taux = $('#patient_taux');
 
             typeActeSelect.empty();
@@ -1319,204 +1410,310 @@
             typeActeSelect.append($('<option>', { value: '', text: 'Sélectionner' }));
 
             // Valider si acteId est valide avant de faire la requête AJAX
-            if (acteId) {
-                $.ajax({
-                    url: '/api/select_typeacte/' + acteId,
-                    method: 'GET',
-                    success: function(response) {
-                        const data = response.typeacte;
 
-                        if (data && data.length > 0) {
-                            // Remplir le select avec les données de la réponse
-                            $.each(data, function(_, typeacte) {
-                                typeActeSelect.append($('<option>', {
-                                    value: typeacte.id,
-                                    text: typeacte.nom,
-                                    'data-prix': typeacte.prix
-                                }));
-                            });
+            $.ajax({
+                url: '/api/select_typeacte/' + codeassurance,
+                method: 'GET',
+                success: function(response) {
+                    const data = response.typeacte;
 
-                            divTypeActe.show();
-                            divMedecin.show();
-
-                            // Appeler la fonction pour charger la liste des médecins
-                            select_list_medecin();
-
-                        } else {
-                            // Ajouter une option "Aucun données disponible" si aucune donnée
+                    if (data && data.length > 0) {
+                        // Remplir le select avec les données de la réponse
+                        data.forEach(function(item) {
                             typeActeSelect.append($('<option>', {
-                                value: '',
-                                text: 'Aucun données disponible'
+                                value: item.codgaran,
+                                text: item.libgaran,
+                                'data-prixj': item.prixj,
+                                'data-prixn': item.prixn,
+                                'data-prixf': item.prixf,
                             }));
-                            divTypeActe.hide();
-                        }
-                    },
-                    error: function() {
-                        console.error("Erreur lors du chargement des types d'actes");
+                        });
+
+                        divTypeActe.show();
+                        divMedecin.show();                            
+
+                    } else {
+                        // Ajouter une option "Aucun données disponible" si aucune donnée
+                        typeActeSelect.append($('<option>', {
+                            value: '',
+                            text: 'Aucun données disponible'
+                        }));
+                        divTypeActe.hide();
                     }
-                });
+                },
+                error: function() {
+                    console.error("Erreur lors du chargement des types d'actes");
+                }
+            });
 
-                typeActeSelect.on('change', function() {
-                    const selectedOption = $(this).find('option:selected');
-                    const prix = selectedOption.data('prix');
+            const periode = $('#periode');
 
-                    if (prix) {
+            typeActeSelect.on('change', function() {
+
+                if (periode.val() == '') {
+                    showAlert('Alert', 'Veuillez selectionner la période.', 'info');
+                    return;
+                }
+
+                const selectedOption = $(this).find('option:selected');
+
+                let prix;
+
+                if (periode.val() == 0) {
+                    prix = selectedOption.data('prixj');
+                } else if (periode.val() == 1) {
+                    prix = selectedOption.data('prixn');
+                } else if (periode.val() == 2) {
+                    prix = selectedOption.data('prixf');
+                }
+
+                if (prix) {
+                    calculateAndFormatAmounts(prix, patient_taux.val());
+                } else {
+                    montant_total.val('');
+                    montant_assurance.val('');
+                    montant_patient.val(''); // Vider le champ si aucun prix valide
+                }
+            });
+
+            const appliq_remise = $('#appliq_remise');
+            const auS = $('#assurance_utiliser');
+
+            auS.on('change', function() {
+
+                if (periode.val() == '') {
+                    showAlert('Alert', 'Veuillez selectionner la période.', 'info');
+                    return;
+                }
+
+                const selectedOption = typeActeSelect.find('option:selected');
+
+                let prix;
+
+                if (periode.val() == 0) {
+                    prix = selectedOption.data('prixj');
+                } else if (periode.val() == 1) {
+                    prix = selectedOption.data('prixn');
+                } else if (periode.val() == 2) {
+                    prix = selectedOption.data('prixf');
+                }
+
+                taux_remise.val(0);
+
+                if (prix) {
+                    if (this.value === 'oui') {
+                        appliq_remise.find('option[value="assurance"]').show();
                         calculateAndFormatAmounts(prix, patient_taux.val());
                     } else {
-                        montant_total.val('');
-                        montant_assurance.val('');
-                        montant_patient.val(''); // Vider le champ si aucun prix valide
+                        appliq_remise.val('patient');
+                        appliq_remise.find('option[value="assurance"]').hide();
+                        calculateAndFormatAmounts(prix, 0); // Calculer sans taux d'assurance
                     }
-                });
+                } else {
+                    montant_total.val('');
+                    montant_assurance.val('');
+                    montant_patient.val('');
+                }
+            });
 
-                const appliq_remise = $('#appliq_remise');
-                const auS = $('#assurance_utiliser');
+            periode.on('change', function() {
 
-                auS.on('change', function() {
-                    const selectedOption = typeActeSelect.find('option:selected');
-                    const prix = selectedOption.data('prix');
+                const selectedOption = typeActeSelect.find('option:selected');
 
-                    taux_remise.val(0);
+                let prix;
 
-                    if (prix) {
-                        if (this.value === 'oui') {
-                            appliq_remise.find('option[value="assurance"]').show();
-                            calculateAndFormatAmounts(prix, patient_taux.val());
-                        } else {
-                            appliq_remise.val('patient');
-                            appliq_remise.find('option[value="assurance"]').hide();
-                            calculateAndFormatAmounts(prix, 0); // Calculer sans taux d'assurance
-                        }
+                if (this.value == 0) {
+                    prix = selectedOption.data('prixj');
+                } else if (this.value == 1) {
+                    prix = selectedOption.data('prixn');
+                } else if (this.value == 2) {
+                    prix = selectedOption.data('prixf');
+                }
+
+                taux_remise.val(0);
+
+                if (prix) {
+                    if (auS.val() === 'oui') {
+                        appliq_remise.find('option[value="assurance"]').show();
+                        calculateAndFormatAmounts(prix, patient_taux.val());
                     } else {
-                        montant_total.val('');
-                        montant_assurance.val('');
-                        montant_patient.val('');
+                        appliq_remise.val('patient');
+                        appliq_remise.find('option[value="assurance"]').hide();
+                        calculateAndFormatAmounts(prix, 0); // Calculer sans taux d'assurance
                     }
-                });
-            }
+                } else {
+                    montant_total.val('');
+                    montant_assurance.val('');
+                    montant_patient.val('');
+                }
+            });
+
         }
 
+        // function calculateAndFormatAmounts(prix, patient_taux) {
+        //     if (prix) {
+
+        //         if (typeof prix !== 'string') {
+        //             prix = prix.toString(); // Convertir en chaîne
+        //         }
+
+        //         let prixFloat = parseFloat(prix.replace(/[.,]/g, ''));
+
+        //         if (isNaN(prixFloat)) {
+        //             console.error('Invalid price value');
+        //             $('#montant_total').val(''); // Vider le champ si le prix est invalide
+        //             return;
+        //         }
+
+        //         $('#montant_total').val(formatPrice(prix));
+
+        //         const au = $('#assurance_utiliser');
+        //         let tauxFloat = parseFloat(patient_taux);
+
+        //         if (au.val() === 'non') {
+        //             tauxFloat = 0;
+        //         } else if (isNaN(tauxFloat)) {
+        //             tauxFloat = 0;
+        //         }
+
+        //         if (tauxFloat === 0) {
+        //             $('#montant_assurance').val('0');
+        //             $('#montant_patient').val(formatPrice(prixFloat.toString()));
+        //             $('#montant_patient_hidden').val(formatPrice(prixFloat.toString()));
+        //             $('#montant_assurance_hidden').val('0');
+        //         } else {
+        //             let montantAssurance = Math.round((tauxFloat / 100) * prixFloat);
+        //             let montantPatient = Math.round(prixFloat - montantAssurance);
+
+
+        //             $('#montant_assurance').val(formatPrice(montantAssurance.toString()));
+        //             $('#montant_patient').val(formatPrice(montantPatient.toString()));
+
+        //             $('#montant_patient_hidden').val(formatPrice(montantPatient.toString()));
+        //             $('#montant_assurance_hidden').val(formatPrice(montantAssurance.toString()));
+        //         }
+        //     } else {
+        //         $('#montant_total').val('');
+        //     }
+        // }
+
         function calculateAndFormatAmounts(prix, patient_taux) {
+            // Vérifiez si le prix est défini et non null
             if (prix) {
+                console.log('Prix:', prix);
+                // Assurez-vous que prix est une chaîne
+                if (typeof prix !== 'string') {
+                    prix = prix.toString();
+                }
+
+                // Supprimez les séparateurs (ex : 1.000,00 => 100000)
                 let prixFloat = parseFloat(prix.replace(/[.,]/g, ''));
+
+                // Vérifiez si la conversion est valide
                 if (isNaN(prixFloat)) {
-                    console.error('Invalid price value');
+                    console.error('Invalid price value:', prix);
                     $('#montant_total').val(''); // Vider le champ si le prix est invalide
                     return;
                 }
 
-                $('#montant_total').val(formatPrice(prix));
+                // Formater et afficher le prix total
+                $('#montant_total').val(formatPrice(prixFloat.toString()));
 
+                // Vérifiez si l'assurance est utilisée
                 const au = $('#assurance_utiliser');
                 let tauxFloat = parseFloat(patient_taux);
 
                 if (au.val() === 'non') {
-                    tauxFloat = 0;
-                } else if (isNaN(tauxFloat)) {
-                    tauxFloat = 0;
+                    tauxFloat = 0; // Pas d'assurance utilisée
+                } else if (isNaN(tauxFloat) || tauxFloat < 0 || tauxFloat > 100) {
+                    console.warn('Invalid patient_taux value:', patient_taux);
+                    tauxFloat = 0; // Défaut : pas de taux
                 }
+
+                // Calcul des montants
+                let montantAssurance = 0;
+                let montantPatient = 0;
 
                 if (tauxFloat === 0) {
-                    $('#montant_assurance').val('0');
-                    $('#montant_patient').val(formatPrice(prixFloat.toString()));
-                    $('#montant_patient_hidden').val(formatPrice(prixFloat.toString()));
-                    $('#montant_assurance_hidden').val('0');
+                    montantPatient = prixFloat;
                 } else {
-                    let montantAssurance = Math.round((tauxFloat / 100) * prixFloat);
-                    let montantPatient = Math.round(prixFloat - montantAssurance);
-
-
-                    $('#montant_assurance').val(formatPrice(montantAssurance.toString()));
-                    $('#montant_patient').val(formatPrice(montantPatient.toString()));
-
-                    $('#montant_patient_hidden').val(formatPrice(montantPatient.toString()));
-                    $('#montant_assurance_hidden').val(formatPrice(montantAssurance.toString()));
+                    montantAssurance = Math.round((tauxFloat / 100) * prixFloat);
+                    montantPatient = Math.round(prixFloat - montantAssurance);
                 }
+
+                // Debugging : Affichez les valeurs calculées dans la console
+                // console.log('Prix Float:', prixFloat);
+                // console.log('Taux:', tauxFloat);
+                // console.log('Montant Assurance:', montantAssurance);
+                // console.log('Montant Patient:', montantPatient);
+
+                // Mettez à jour les champs correspondants
+                $('#montant_assurance').val(formatPrice(montantAssurance.toString()));
+                $('#montant_patient').val(formatPrice(montantPatient.toString()));
+                $('#montant_patient_hidden').val(formatPrice(montantPatient.toString()));
+                $('#montant_assurance_hidden').val(formatPrice(montantAssurance.toString()));
             } else {
+                // Si aucun prix n'est défini, vider les champs
                 $('#montant_total').val('');
+                $('#montant_assurance').val('');
+                $('#montant_patient').val('');
+                $('#montant_patient_hidden').val('');
+                $('#montant_assurance_hidden').val('');
             }
         }
 
+
         // ------------------------------------------------------------------
 
-        function eng_societe()
+        function eng_societe() 
         {
-            const nom = document.getElementById("nom_societe");
-            const email = document.getElementById("email_societe");
-            const adresse = document.getElementById("adresse_societe");
-            const fax = document.getElementById("fax_societe");
-            const tel = document.getElementById("tel_societe");
-            const tel2 = document.getElementById("tel2_societe");
-            const sgeo = document.getElementById("sgeo_societe");
+            const nom = $("#nom_societe");
+            const codeassurance= $("#codeassurance_societe");
+            const assureur_id = $("#assureur_id_societe");
 
-            if(!nom.value.trim() || !email.value.trim() || !adresse.value.trim() || !fax.value.trim() || !tel.value.trim() || !sgeo.value.trim())
-            {
+            if (!codeassurance.val().trim() || !nom.val().trim() || !assureur_id.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
 
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value.trim())) { 
-                showAlert('Alert', 'Email incorrect.','warning');
-                return false;
-            }
-
-
-            if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.','warning');
-                return false;
-            }
-
-            var preloader_ch = `
+            // Show preloader
+            const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            $("body").append(preloader_ch);
 
+            // AJAX request to create a new user
             $.ajax({
                 url: '/api/societe_new',
                 method: 'GET',
-                data: { 
-                    nom: nom.value,
-                    email: email.value,
-                    adresse: adresse.value,
-                    fax: fax.value,
-                    tel: tel.value,
-                    tel2: tel2.value || null,
-                    sgeo: sgeo.value,
+                data: {
+                    codeassurance: codeassurance.val(),
+                    nom: nom.val(),
+                    assureur_id: assureur_id.val(),
                 },
                 success: function(response) {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    if (response.warning) {
-                        showAlert('Alert', 'Cette société existe déjà.', 'warning');
+                    $("#preloader_ch").remove();
+
+                    if (response.existe) {
+                        showAlert('Alert', 'Cette société existe déjà', 'warning');
                     } else if (response.success) {
-                        showAlert('Succès', 'Société Enregistrée.', 'success');
+
+                        nom.val('');
+                        codeassurance.val('').trigger('change');
+                        assureur_id.val('').trigger('change');
+
+                        select_societe();
+
+                        showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.','error');
+                        showAlert('Erreur', response.message, 'error');
                     }
-
-                    nom.value = '';
-                    email.value = '';
-                    adresse.value = '';
-                    fax.value = '';
-                    tel.value = '';
-                    tel2.value = '';
-                    sgeo.value = '';
-
-                    select_societe_patient();
                 },
                 error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
-                    societeInput.value = '';
+                    $("#preloader_ch").remove();
+                    showAlert('Erreur', 'Une erreur est survenue', 'error');
                 }
             });
         }
@@ -1528,12 +1725,12 @@
             var nom = document.getElementById("nom_assurance_new");
             var email = document.getElementById("email_assurance_new");
             var phone = document.getElementById("tel_assurance_new");
-            var phone2 = document.getElementById("tel2_assurance_new");
             var adresse = document.getElementById("adresse_assurance_new");
             var fax = document.getElementById("fax_assurance_new");
             var carte = document.getElementById("carte_assurance_new");
+            var desc = document.getElementById("desc_assurance_new");
 
-            if (!nom.value.trim() || !email.value.trim() || !phone.value.trim() || !carte.value.trim()) {
+            if (!nom.value.trim() || !email.value.trim() || !phone.value.trim() || !carte.value.trim() || !carte.value.trim() || !adresse.value.trim()) {
                 showAlert('Alert', 'Tous les champs obligatoires n\'ont pas été rempli.','warning');
                 return false; 
             }
@@ -1545,7 +1742,7 @@
             }
 
 
-            if (phone.value.length !== 10 || (phone2.value !== '' && phone2.value.length !== 10)) {
+            if (phone.value.length !== 10) {
                 showAlert('Alert', 'Contact incomplet.','warning');
                 return false;
             }
@@ -1560,24 +1757,25 @@
 
             $.ajax({
                 url: '/api/assurance_new',
-                method: 'GET',  // Use 'POST' for data creation
+                method: 'GET',
                 data: { 
                     nom: nom.value, 
                     email: email.value, 
                     tel: phone.value, 
-                    tel2: phone2.value || null, 
+                    desc: desc.value || null, 
                     fax: fax.value || null, 
-                    adresse: adresse.value || null,
+                    adresse: adresse.value,
                     carte: carte.value,
                 },
                 success: function(response) {
+
                     var preloader = document.getElementById('preloader_ch');
                     if (preloader) {
                         preloader.remove();
                     }
                     
                     if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà a une assurance.','warning');
+                        showAlert('Alert', 'Ce numéro de contact appartient déjà a une assurance.','warning');
                     }else if (response.email_existe) {
                         showAlert('Alert', 'Ce email appartient déjà a une assurance.','warning');
                     }else if (response.nom_existe) {
@@ -1585,20 +1783,22 @@
                     }else if (response.fax_existe) {
                         showAlert('Alert', 'Ce fax appartient déjà a une assurance.','warning');
                     } else if (response.success) {
-                        showAlert('Succès', 'Assurance Enregistrée.','success');
+
+                        nom.value = '';
+                        email.value = '';
+                        phone.value = '';
+                        desc.value = '';
+                        fax.value = '';
+                        adresse.value = '';
+                        carte.value = '';
+
+                        select_assurance();
+
+                        showAlert('Succès', response.message,'success');
                     } else if (response.error) {
                         showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.','error');
                     }
 
-                    nom.value = '';
-                    email.value = '';
-                    phone.value = '';
-                    phone2.value = '';
-                    fax.value = '';
-                    adresse.value = '';
-                    carte.value = '';
-
-                    select_assurance_patient();
                 },
                 error: function() {
 
@@ -1617,85 +1817,125 @@
         function eng_patient() {
             const divAssurer = $("#div_assurer");
 
-            const nom = $("#patient_np_new").val().trim();
-            const email = $("#patient_email_new").val().trim();
-            const phone = $("#patient_tel_new").val().trim();
-            const phone2 = $("#patient_tel2_new").val().trim();
-            const adresse = $("#patient_adresse_new").val().trim();
-            const assurer = $('#assurer').val();
-            const datenais = $("#patient_datenaiss_new").val().trim();
-            const sexe = $("#patient_sexe_new").val().trim();
-            const filiation = $("#patient_filiation_new").val().trim();
-            const matricule_assurance = $("#patient_matriculeA_new").val().trim();
-            const assurance_id = $("#patient_assurance_id_new").val().trim();
-            const taux_id = $("#patient_taux_id_new").val().trim();
-            const societe_id = $("#patient_societe_id_new").val().trim();
+            let nom = $("#patient_nom_new");
+            let prenom = $("#patient_prenom_new");
+            let sexe = $("#patient_sexe_new");
+            let datenais = $("#patient_datenaiss_new");
+            let phone = $("#patient_tel_new");
+            let phone2 = $("#patient_tel2_new");
+            let residence = $("#patient_residence_new");
+            let assurer = $("#assure");
+
+            let filiation = $("#patient_codefiliation_new");
+            let matricule_assurance = $("#patient_matriculeA_new");
+            let assurance_id = $("#patient_codeassurance_new");
+            let taux_id = $("#patient_idtauxcouv_new");
+            let societe_id = $("#patient_codesocieteassure_new");
+
+            let nomu = $("#patient_nomu_new");
+            let telu = $("#patient_telu_new");
+            let telu2 = $("#patient_telu2_new");
 
             // Validation des champs obligatoires
-            if (!nom || !phone || !datenais || !sexe) {
-                showAlert('Alert', 'Tous les champs sont obligatoires.', 'warning');
+            if (!nom.val().trim() || !prenom.val().trim() || !phone.val().trim() || !datenais.val().trim() || !sexe.val().trim() || !residence.val().trim() || !assurer.val().trim()) {
+                showAlert("Alert", "Veuillez remplir tous les champs obligatoires.", "warning");
                 return false;
             }
 
             // Validation de l'email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email && !emailRegex.test(email)) {
-                showAlert('Alert', 'Email incorrect.', 'warning');
-                return false;
-            }
+            // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // if (email.val().trim() && !emailRegex.test(email.val().trim())) {
+            //     showAlert("Alert", "Email incorrect.", "warning");
+            //     return false;
+            // }
 
             // Validation des numéros de téléphone
-            if (phone.length !== 10 || (phone2 && phone2.length !== 10)) {
-                showAlert('Alert', 'Contact incomplet.', 'warning');
+            if (phone.val().length !== 10 ) {
+                showAlert("Alert", "Contact 1 incomplet.", "warning");
                 return false;
             }
 
-            // Validation des champs d'assurance
-            if (assurer === 'oui' && (!assurance_id || !taux_id || !societe_id || !filiation || !matricule_assurance)) {
-                showAlert('Alert', 'Veuillez remplir tous les champs relatifs à l\'assurance', 'warning');
+            if (phone2.val() && phone2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 incomplet.", "warning");
                 return false;
             }
 
-            // Afficher le préchargeur
+            if (telu.val() && telu.val().length !== 10) {
+                showAlert("Alert", "Contact 1 en cas d'urgence incomplet.", "warning");
+                return false;
+            }
+
+            if (telu2.val() && telu2.val().length !== 10) {
+                showAlert("Alert", "Contact 2 en cas d'urgence incomplet.", "warning");
+                return false;
+            }
+
+            // Validation des champs relatifs à l'assurance
+            if (assurer.val() === "1") {
+                if (!assurance_id.val() || !taux_id.val() || !societe_id.val() || !filiation.val() || !matricule_assurance.val()) {
+                    showAlert("Alert", "Veuillez remplir tous les champs relatifs à l'assurance.", "warning");
+                    return false;
+                }
+            }
+
+            // Préchargement
             const preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
                 </div>
             `;
-            $('body').append(preloader_ch);
+            $("body").append(preloader_ch);
 
+            // Envoi AJAX
             $.ajax({
-                url: '/api/patient_new',
-                method: 'GET', // Utiliser 'POST' pour la création de données
+                url: "/api/patient_new",
+                method: "GET", // POST pour créer les données
                 data: {
-                    nom: nom,
-                    email: email || null,
-                    tel: phone,
-                    tel2: phone2 || null,
-                    adresse: adresse || null,
-                    assurer: assurer,
-                    assurance_id: assurance_id || null,
-                    taux_id: taux_id || null,
-                    societe_id: societe_id || null,
-                    datenais: datenais,
-                    sexe: sexe,
-                    filiation: filiation || null,
-                    matricule_assurance: matricule_assurance || null,
+                    nom: nom.val(),
+                    prenom: prenom.val(),
+                    tel: phone.val(),
+                    tel2: phone2.val() || null,
+                    residence: residence.val(),
+                    assurer: assurer.val(),
+                    assurance_id: assurance_id.val() || null,
+                    taux_id: taux_id.val() || null,
+                    societe_id: societe_id.val() || null,
+                    datenais: datenais.val(),
+                    sexe: sexe.val(),
+                    filiation: filiation.val() || null,
+                    matricule_assurance: matricule_assurance.val() || null,
+                    nomu: nomu.val() || null,
+                    telu: telu.val() || null,
+                    telu2: telu2.val() || null,
                 },
-                success: function(response) {
-                    $('#preloader_ch').remove();
+                success: function (response) {
+                    // Supprimer le préchargement
 
-                    if (response.tel_existe) {
-                        showAlert('Alert', 'Ce numéro de téléphone appartient déjà à un patient.', 'warning');
-                    } else if (response.email_existe) {
-                        showAlert('Alert', 'Cet email appartient déjà à un patient.', 'warning');
-                    } else if (response.nom_existe) {
-                        showAlert('Alert', 'Ce patient existe déjà.', 'warning');
-                    } else if (response.success) {
-                        // Réinitialiser les champs de saisie
-                        $('#patient_np_new, #patient_email_new, #patient_tel_new, #patient_tel2_new, #patient_adresse_new, #patient_datenaiss_new, #patient_sexe_new, #patient_filiation_new, #patient_matriculeA_new').val('');
-                        $('#patient_assurance_id_new, #patient_taux_id_new, #patient_societe_id_new').val('');
-                        $('#assurer').val('non').trigger('change');
+                    if (response.success) {
+
+                        var newTab = new bootstrap.Tab(document.getElementById('tab-oneAAA'));
+                        newTab.show();
+
+                        // Réinitialisation des champs
+                        nom.val("");
+                        prenom.val("");
+                        phone.val("");
+                        phone2.val("");
+                        residence.val("");
+                        datenais.val("");
+                        sexe.val("").trigger('change');
+
+                        nomu.val("");
+                        telu.val("");
+                        telu2.val("");
+
+                        filiation.val("").trigger('change');
+                        matricule_assurance.val("");
+                        assurance_id.val("").trigger('change');
+                        taux_id.val("").trigger('change');
+                        societe_id.val("").trigger('change');
+                        assurer.val("").trigger('change');
+
                         divAssurer.hide();
 
                         const selectElement = $('#id_patient');
@@ -1713,33 +1953,34 @@
                             method: 'GET',
                             dataType: 'json',
                             success: function(data) {
+
                                 data.name.forEach(item => {
                                     const option = $('<option>', {
-                                        value: item.id,
-                                        text: item.np
+                                        value: item.idenregistremetpatient,
+                                        text: item.nomprenomspatient
                                     });
                                     selectElement.append(option);
-
-                                    if (item.id == response.id) {
-                                        selectElement.val(response.id).trigger('change');
-                                    }
                                 });
+
+                                $("#preloader_ch").remove();
+
+                                $('#id_patient').val(response.id).trigger('changer')
+
                             },
                             error: function() {
                                 console.error('Erreur lors du chargement des patients');
                             }
                         });
 
-                        // Afficher le nouvel onglet de consultation
-                        const newConsultationTab = new bootstrap.Tab(document.getElementById('tab-oneAAA'));
-                        newConsultationTab.show();
+                        showAlert("Succès", response.message, "success");
                     } else if (response.error) {
-                        showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
+                        showAlert("Alert", response.message, "error");
                     }
                 },
-                error: function() {
-                    $('#preloader_ch').remove();
-                    showAlert('Alert', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
+                error: function () {
+
+                    $("#preloader_ch").remove();
+                    showAlert("Alert", "Une erreur est survenue lors de l'enregistrement.", "error");
                 }
             });
         }
@@ -1763,51 +2004,64 @@
                     orderable: false,
                 },
                 { 
-                    data: 'code',
-                    searchable: true,
-                },
-                { 
-                    data: 'matricule',
-                    searchable: true,
-                },
-                { 
-                    data: 'name',
+                    data: 'idconsexterne',
                     searchable: true, 
                 },
                 {
-                    data: 'tel',
+                    data: 'numdossier',
                     render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
+                        return data ? `${data}` : 'Aucun';
                     },
                     searchable: true,
                 },
                 { 
-                    data: 'motif',
+                    data: 'nom_patient',
                     searchable: true, 
                 },
                 { 
-                    data: 'type_motif',
+                    data: 'tel_patient', 
+                    render: (data) => `+225 ${data}`,
                     searchable: true, 
                 },
-                {
-                    data: 'montant',
-                    render: (data, type, row) => {
-                        return data ? `${data} Fcfa` : '0 Fcfa';
-                    },
-                    searchable: true,
+                { 
+                    data: 'nom_medecin',
+                    searchable: true, 
+                },
+                { 
+                    data: 'specialite',
+                    searchable: true, 
+                },
+                { 
+                    data: 'montant', 
+                    render: (data) => `${formatPriceT(data)} Fcfa`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'numfac', 
+                    render: (data) => `${data}`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'date', 
+                    render: (data) => `${formatDate(data)}`,
+                    searchable: true, 
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm" id="facture" data-code="${row.code}">
+                            <a class="btn btn-outline-warning btn-sm" id="Cfacture" 
+                                data-idconsexterne="${row.idconsexterne}"
+                            >
                                 <i class="ri-printer-line"></i>
                             </a>
-                            <a class="btn btn-outline-info btn-sm" id="fiche" data-code="${row.code}">
+                            <a class="btn btn-outline-info btn-sm" id="Cfiche" 
+                                data-idconsexterne="${row.idconsexterne}"
+                            >
                                 <i class="ri-file-line"></i>
                             </a>
-                            ${row.statut_fac == 'impayer' ?  
-                            `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#MdeleteCons" id="deleteCons" data-id="${row.id}">
+                            ${row.regle == 0 ?  
+                            `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#MdeleteCons" id="deleteCons" data-numfac="${row.numfac}">
                                 <i class="ri-delete-bin-line"></i>
                             </a>` : ``}
                         </div>
@@ -1824,8 +2078,7 @@
 
         function initializeRowEventListenersCons() {
 
-            $('.Table_day_cons').on('click', '#facture', function() {
-
+            $('.Table_day_cons').on('click', '#Cfacture', function() {
                 var preloader_ch = `
                     <div id="preloader_ch">
                         <div class="spinner_preloader_ch"></div>
@@ -1834,23 +2087,20 @@
                 // Add the preloader to the body
                 document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                const code = $(this).data('code');
-                
+                const code = $(this).data('idconsexterne');
+
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
                 .then(response => response.json())
                 .then(data => {
                     // Access the 'chambre' array from the API response
-                    const patient = data.patient;
-                    const typeacte = data.typeacte;
-                    const user = data.user;
-                    const consultation = data.consultation;
+                    const facture = data.facture;
 
                     var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+                        if (preloader) {
+                            preloader.remove();
+                        }
 
-                    generatePDFInvoice(patient, user, typeacte, consultation);
+                    generatePDFInvoice(facture);
 
                 })
                 .catch(error => {
@@ -1858,8 +2108,7 @@
                 });
             });
 
-            $('.Table_day_cons').on('click', '#fiche', function() {
-
+            $('.Table_day_cons').on('click', '#Cfiche', function() {
                 var preloader_ch = `
                     <div id="preloader_ch">
                         <div class="spinner_preloader_ch"></div>
@@ -1868,23 +2117,20 @@
                 // Add the preloader to the body
                 document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                const code = $(this).data('code');
-                
+                const code = $(this).data('idconsexterne');
+
                 fetch(`/api/fiche_consultation/${code}`) // API endpoint
                 .then(response => response.json())
                 .then(data => {
                     // Access the 'chambre' array from the API response
-                    const patient = data.patient;
-                    const typeacte = data.typeacte;
-                    const user = data.user;
-                    const consultation = data.consultation;
+                    const facture = data.facture;
 
                     var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+                        if (preloader) {
+                            preloader.remove();
+                        }
 
-                    generatePDFficheCons(patient, user, typeacte, consultation);
+                    generatePDFficheCons(facture);
 
                 })
                 .catch(error => {
@@ -1893,9 +2139,9 @@
             });
 
             $('.Table_day_cons').on('click', '#deleteCons', function() {
-                const id = $(this).data('id');
+                const numfac = $(this).data('numfac');
 
-                $('#IddeleteCons').val(id);
+                $('#IddeleteCons').val(numfac);
             });
         }
 
@@ -1904,22 +2150,22 @@
         });
 
         function eng_consultation() {
-            const auth_id = {{ Auth::user()->id }};
+
+            const login = @json(Auth::user()->login);
             const id_patient = $('#id_patient').val();
             const assurance_utiliser = $('#assurance_utiliser').val();
-            const acte_id = '1';
             const typeacte_idS = $('#typeacte_idS').val();
             const medecin_id = $('#medecin_id').val();
-            const periode = $('input[name="periode_consul"]:checked').val();
+            const periode = $('#periode').val();
             const montant_assurance = $('#montant_assurance').val();
             const montant_patient = $('#montant_patient').val();
             const taux_remise = $('#taux_remise').val() || '0';
             const montant_total = $('#montant_total').val();
             const mumcode = $('#mumcode').val() || null;
 
-            const jourO = $('#jourO');
-            const jourF = $('#jourF');
-            const nuit = $('#Nuit');
+            const codeassurance = $('#patient_codeassurance').val() || null;
+            const patient_numdossier = $('#patient_numdossier').val() || null;
+            const patient_taux = $('#patient_taux').val();
 
             // Validation des champs obligatoires
             if (!typeacte_idS || !medecin_id || !taux_remise.trim()) {
@@ -1945,7 +2191,6 @@
                 method: 'GET', // Utiliser 'POST' pour créer des données
                 data: {
                     id_patient: id_patient,
-                    acte_id: acte_id,
                     typeacte_id: typeacte_idS,
                     user_id: medecin_id,
                     periode: periode,
@@ -1956,33 +2201,30 @@
                     appliq_remise: $('#appliq_remise').val(),
                     mumcode: mumcode,
                     assurance_utiliser: assurance_utiliser,
-                    auth_id: auth_id,
+                    login: login,
+                    codeassurance: codeassurance,
+                    patient_numdossier: patient_numdossier,
+                    patient_taux: patient_taux,
                 },
                 success: function(response) {
                     $('#preloader_ch').remove();
                     
                     if (response.success) {
-                        jourO.prop('checked', true);
-                        jourF.prop('checked', false);
-                        nuit.prop('checked', false);
 
                         $('#div_info_patient').empty();
                         $('#div_info_consul').hide();
                         $('#mumcode').val('');
-
-                        const { patient, typeacte, user, consultation } = response;
 
                         if ($('#stat_consultation').html().trim() !== "") {
                             Statistique_cons();
                         }
 
                         table_cons.ajax.reload(null, false);
+
                         Statistique();
                         Reset();
                         Activity_cons();
                         Activity_cons_count();
-                        
-                        generatePDFficheCons(patient, user, typeacte, consultation);
 
                         showAlert('Succès', 'Patient Enregistrée.', 'success');
 
@@ -1999,7 +2241,7 @@
 
         function delete_cons() {
 
-            const id = document.getElementById('IddeleteCons').value;
+            const numfac = document.getElementById('IddeleteCons').value;
 
             var modal = bootstrap.Modal.getInstance(document.getElementById('MdeleteCons'));
             modal.hide();
@@ -2013,7 +2255,7 @@
             document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
             $.ajax({
-                url: '/api/delete_Cons/'+id,
+                url: '/api/delete_Cons/'+numfac,
                 method: 'GET',
                 success: function(response) {
 
@@ -2137,7 +2379,7 @@
                                             </div>
                                             <div class="d-flex flex-column">
                                                 <h5 class="lh-1">
-                                                    ${item.nom}
+                                                    ${item.libgaran}
                                                 </h5>
                                                 <p class="m-0">
                                                     ${item.nbre} Consultation(s)
@@ -2301,234 +2543,12 @@
 
         // ------------------------------------------------------------------
 
-        function generatePDFficheCons(patient, user, typeacte, consultation) {
+        function generatePDFInvoice(facture) {
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            const pdfFilename = "Fiche Consultation N°" + consultation.code + " du " + formatDateHeure(consultation.created_at);
-            doc.setProperties({
-                title: pdfFilename,
-            });
-
-            yPos = 10;
-
-            function drawConsultationSection(yPos) {
-                rightMargin = 15;
-                leftMargin = 15;
-                pdfWidth = doc.internal.pageSize.getWidth();
-
-                const titlea = "Fiche";
-                doc.setFontSize(100);
-                doc.setTextColor(242, 237, 237); // Gray color for background effect
-                doc.setFont("Helvetica", "bold");
-                doc.text(titlea, 120, yPos + 150, { align: 'center', angle: 40 });
-
-                const logoSrc = "{{asset('assets/images/logo.png')}}";
-                const logoWidth = 22;
-                const logoHeight = 22;
-                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
-
-                // Informations de l'entreprise
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("Helvetica", "bold");
-                // Texte de l'entreprise
-                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
-                const titleWidth = doc.getTextWidth(title);
-                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
-                doc.text(title, titleX, yPos);
-                // Texte de l'adresse
-                doc.setFont("Helvetica", "normal");
-                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
-                const addressWidth = doc.getTextWidth(address);
-                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
-                doc.text(address, addressX, (yPos + 5));
-                // Texte du téléphone
-                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
-                const phoneWidth = doc.getTextWidth(phone);
-                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
-                doc.text(phone, phoneX, (yPos + 10));
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "normal");
-                const consultationDate = new Date(consultation.created_at);
-                // Formatter la date et l'heure séparément
-                const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
-                const formattedTime = consultationDate.toLocaleTimeString();
-                doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
-
-                //Ligne de séparation
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setLineWidth(0.5);
-                doc.setTextColor(255, 0, 0);
-                // doc.line(10, 35, 200, 35); 
-                const titleR = "FICHE DE CONSULTATION";
-                const titleRWidth = doc.getTextWidth(titleR);
-                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
-                // Définir le padding
-                const paddingh = 0; // Padding vertical
-                const paddingw = 15; // Padding horizontal
-                // Calculer les dimensions du rectangle
-                const rectX = titleRX - paddingw; // X du rectangle
-                const rectY = (yPos + 18) - paddingh; // Y du rectangle
-                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
-                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
-                // Définir la couleur pour le cadre (noir)
-                doc.setDrawColor(0, 0, 0);
-                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
-                // Ajouter le texte centré en gras
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
-                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+ consultation.code;
-                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
-
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
-                const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 25);
-
-                yPoss = (yPos + 45);
-
-                const patientInfo = [
-                    { label: "Medecin", value: "Dr. "+ user.name },
-                    { label: "Spécialité", value: typeacte.nom },
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age +" an(s)" },
-                    { label: "Adresse", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel },
-                ];
-
-                if (patient.assurer == 'oui') {
-                    patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
-                    );
-                }
-
-                patientInfo.forEach(info => {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 35, yPoss);
-                    yPoss += 7;
-                });
-
-                doc.setFontSize(30);
-                doc.setLineWidth(0.5);
-                doc.line(10, yPoss, 200, yPoss);
-
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(255, 0, 0);
-                const rendu = "Compte Rendu";
-                const titleRr = doc.getTextWidth(rendu);
-                const titlerendu = (doc.internal.pageSize.getWidth() - titleRr) / 2;
-                doc.text(rendu, titlerendu, yPoss + 10);
-                // Dessiner une ligne sous le texte pour le souligner
-                const underlineY = yPoss + 12; // Ajustez cette valeur selon vos besoins
-                doc.setDrawColor(255, 0, 0);
-                doc.setLineWidth(0.5); // Épaisseur de la ligne
-                doc.line(titlerendu, underlineY, titlerendu + titleRr, underlineY);
-
-                yPoss += 25;
-                hPoss = yPoss;
-                doc.setTextColor(0, 0, 0);
-
-                const pInfo1 = [
-                    { label: "TA", value: "..........." },
-                    { label: "Poids", value: "..........." },
-                ];
-
-                pInfo1.forEach(info => {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 15, yPoss);
-                    yPoss += 7;
-                });
-
-                const pInfo2 = [
-                    { label: "BD", value: "..........." },
-                    { label: "Pouls", value: "..........." },
-                ];
-
-                pInfo2.forEach(info => {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin + 40, yPoss - 14);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 55, yPoss - 14);
-                    yPoss += 7;
-                });
-
-                const pInfo3 = [
-                    { label: "BG", value: "..........." },
-                    { label: "Taille", value: "..........." },
-                ];
-
-                pInfo3.forEach(info => {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin + 75, yPoss - 28);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 90, yPoss - 28);
-                    yPoss += 7;
-                });
-
-                const pInfo4 = [
-                    { label: "Temp", value: "..........." },
-                ];
-
-                pInfo4.forEach(info => {
-                    doc.setFontSize(10);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin + 110, yPoss - 42);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 125, yPoss - 42);
-                    yPoss += 7;
-                });
-
-                hPoss += 25;
-
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(225, 0, 0);
-                const motif = "Motif";
-                const titleRm = doc.getTextWidth(motif);
-                const titlemotif = (doc.internal.pageSize.getWidth() - titleRm) / 2;
-                doc.text(motif, titlemotif, hPoss);
-                // Dessiner une ligne sous le texte pour le souligner
-                const underlineYm = hPoss + 2; // Ajustez cette valeur selon vos besoins
-                doc.setDrawColor(225, 0, 0);
-                doc.setLineWidth(0.5); // Épaisseur de la ligne
-                doc.line(titlemotif, underlineYm, titlemotif + titleRm, underlineYm);
-
-                doc.setFontSize(8);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(0, 0, 0);
-                doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, 295);
-
-            }
-
-            drawConsultationSection(yPos);
-
-            doc.output('dataurlnewwindow');
-        }
-
-        function generatePDFInvoice(patient, user, typeacte, consultation) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
-            const pdfFilename = "Consultation Facture N°" + consultation.code_fac + " du " + formatDateHeure(consultation.created_at);
+            const pdfFilename = "Consultation Facture N°" + facture.numfac + " du " + formatDate(facture.date);
             doc.setProperties({
                 title: pdfFilename,
             });
@@ -2573,13 +2593,12 @@
                 doc.text(phone, phoneX, (yPos + 10));
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "normal");
-                const consultationDate = new Date(consultation.created_at);
+                const consultationDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
                 const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
                 const formattedTime = consultationDate.toLocaleTimeString();
                 doc.text("Date: " + formattedDate, 15, (yPos + 25));
                 doc.text("Heure: " + formattedTime, 15, (yPos + 30));
-
                 //Ligne de séparation
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
@@ -2605,36 +2624,55 @@
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(255, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+ consultation.code_fac;
+                const titleN = "N° "+ facture.numfac;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
 
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
+                const numDossier = facture.numdossier ? " N° Dossier : " + facture.numdossier : " N° Dossier : Aucun";
                 const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 28);
 
                 yPoss = (yPos + 50);
 
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
                 const patientInfo = [
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age+" an(s)" },
-                    { label: "Domicile", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel }
+                    { 
+                        label: "Nom et Prénoms", 
+                        value: facture.nom_patient.length > 25 
+                            ? facture.nom_patient.substring(0, 25) + '...' 
+                            : facture.nom_patient 
+                    },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
                 ];
 
-                if (patient.assurer == 'oui') {
+                if (facture.assure == 1) {
                     patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
+                        { 
+                            label: "Assurance", 
+                            value: facture.assurance.length > 25 
+                                ? facture.assurance.substring(0, 25) + '...' 
+                                : facture.assurance 
+                        },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
                     );
                 }
 
                 patientInfo.forEach(info => {
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
                     doc.text(info.label, leftMargin, yPoss);
                     doc.setFont("Helvetica", "normal");
                     doc.text(": " + info.value, leftMargin + 35, yPoss);
@@ -2644,15 +2682,21 @@
                 yPoss = (yPos + 50);
 
                 const medecinInfo = [
-                    { label: "N° Consultation", value: "C-"+consultation.code},
-                    { label: "Medecin", value: "Dr. "+user.name },
-                    { label: "Spécialité", value: typeacte.nom },
-                    { label: "Prix Consultation", value: typeacte.prix+" Fcfa" },
+                    { label: "N° Consultation", value: facture.idconsexterne},
+                    { 
+                        label: "Medecin", 
+                        value: facture.nom_medecin.length > 20 
+                            ? facture.nom_medecin.substring(0, 20) + '...' 
+                            : facture.nom_medecin 
+                    },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Prix Consultation", value: formatPriceT(facture.montant)+" Fcfa" },
                 ];
 
                 medecinInfo.forEach(info => {
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
                     doc.text(info.label, leftMargin + 100, yPoss);
                     doc.setFont("Helvetica", "normal");
                     doc.text(": " + info.value, leftMargin + 135, yPoss);
@@ -2662,17 +2706,15 @@
                 yPoss = (yPos + 90);
 
                 const compteInfo = [
-                    { label: "Montant Total", value: typeacte.prix + " Fcfa" },
-                    ...(parseInt(consultation.part_assurance.replace(/[^0-9]/g, '')) > 0 
-                        ? [{ label: "Part assurance", value: consultation.part_assurance + " Fcfa" }] 
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa" },
+                    ...(facture.assure == 1 
+                        ? [
+                            { label: "Part assurance", value: formatPriceT(facture.partassurance)+" Fcfa" },
+                            { label: "Taux", value: facture.taux+" %" }
+                          ] 
                         : []),
-                    { label: "Remise", value: consultation.remise + " Fcfa" },
+                    { label: "Remise", value: formatPriceT(facture.remise)+" Fcfa" },
                 ];
-
-
-                if (patient.taux !== null) {
-                    compteInfo.push({ label: "Taux", value: patient.taux + "%" });
-                }
 
                 compteInfo.forEach(info => {
                     doc.setFontSize(9);
@@ -2691,9 +2733,9 @@
                 doc.setFont("Helvetica", "bold");
                 doc.text('Montant à payer', leftMargin + 100, yPoss);
                 doc.setFont("Helvetica", "bold");
-                doc.text(": "+consultation.part_patient+" Fcfa", leftMargin + 135, yPoss);
+                doc.text(": "+formatPriceT(facture.partpatient)+" Fcfa", leftMargin + 135, yPoss);
 
-                if (patient.taux !== null) {
+                if (facture.assure == 1 ) {
                     doc.setFontSize(8);
                     doc.setFont("Helvetica", "bold");
                     doc.setTextColor(0, 0, 0);
@@ -2721,335 +2763,567 @@
             doc.output('dataurlnewwindow');
         }
 
-        // -----------------------------------------------------------------
+        function generatePDFficheCons(facture) {
 
-        const table_rdv = $('.Table_day_rdv').DataTable({
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-            processing: true,
-            serverSide: false,
-            ajax: {
-                url: `/api/list_rdv_day`,
-                type: 'GET',
-                dataSrc: 'data',
-            },
-            columns: [
-                { 
-                    data: null, 
-                    render: (data, type, row, meta) => meta.row + 1,
-                    searchable: false,
-                    orderable: false,
-                },
-                { 
-                    data: 'patient', 
-                    render: (data, type, row) => `
-                    <div class="d-flex align-items-center">
-                        <a class="d-flex align-items-center flex-column me-2">
-                            <img src="/assets/images/rdv1.png" class="img-2x rounded-circle border border-1">
-                        </a>
-                        ${data}
-                    </div>`,
-                    searchable: true, 
-                },
-                {
-                    data: 'patient_tel',
-                    render: (data, type, row) => {
-                        return data ? `+225 ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                {
-                    data: 'medecin',
-                    render: (data, type, row) => {
-                        return data ? `Dr. ${data}` : 'Néant';
-                    },
-                    searchable: true,
-                },
-                { 
-                    data: 'specialite',
-                    searchable: true, 
-                },
-                { 
-                    data: 'date',
-                    render: formatDate,
-                    searchable: true, 
-                },
-                {
-                    data: 'statut',
-                    render: (data, type, row) => `
-                        <span class="badge ${data === 'en attente' ? 'bg-danger' : 'bg-success'}">
-                            ${data === 'en attente' ? 'En Attente' : 'Terminer'}
-                        </span>
-                    `,
-                    searchable: true,
-                },
-                { 
-                    data: 'created_at',
-                    render: formatDateHeure,
-                    searchable: true, 
-                },
-                {
-                    data: null,
-                    render: (data, type, row) => `
-                        <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm rounded-5 edit-btn" data-motif="${row.motif}" data-bs-toggle="modal" data-bs-target="#Detail_motif" id="motif">
-                                <i class="ri-eye-line"></i>
-                            </a>
-                            ${row.statut == 'en attente' ? 
-                            `<a class="btn btn-outline-info btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Modif_Rdv_modal" id="modif"
-                                data-id="${row.id}"
-                                data-date="${row.date}"
-                                data-patient="${row.patient}"
-                                data-motif="${row.motif}"
-                                data-medecin="${row.medecin}"
-                                data-specialite="${row.specialite}"
-                                data-horaires='${JSON.stringify(row.horaires)}'>
-                               <i class="ri-edit-line"></i>
-                            </a>
-                            <a class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete" data-id="${row.id}">
-                                <i class="ri-delete-bin-line"></i>
-                            </a>` :
-                            `` }
-                        </div>
-                    `,
-                    searchable: false,
-                    orderable: false,
+            const pdfFilename = "Fiche Consultation N°" + facture.numfac + " du " + formatDate(facture.date);
+            doc.setProperties({
+                title: pdfFilename,
+            });
+
+            yPos = 10;
+
+            function drawConsultationSection(yPos) {
+                rightMargin = 15;
+                leftMargin = 15;
+                pdfWidth = doc.internal.pageSize.getWidth();
+
+                const titlea = "Fiche";
+                doc.setFontSize(100);
+                doc.setTextColor(242, 237, 237); // Gray color for background effect
+                doc.setFont("Helvetica", "bold");
+                doc.text(titlea, 120, yPos + 150, { align: 'center', angle: 40 });
+
+                const logoSrc = "{{asset('assets/images/logo.png')}}";
+                const logoWidth = 22;
+                const logoHeight = 22;
+                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
+
+                // Informations de l'entreprise
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                // Texte de l'entreprise
+                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
+                const titleWidth = doc.getTextWidth(title);
+                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
+                doc.text(title, titleX, yPos);
+                // Texte de l'adresse
+                doc.setFont("Helvetica", "normal");
+                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
+                const addressWidth = doc.getTextWidth(address);
+                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
+                doc.text(address, addressX, (yPos + 5));
+                // Texte du téléphone
+                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
+                const phoneWidth = doc.getTextWidth(phone);
+                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
+                doc.text(phone, phoneX, (yPos + 10));
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "normal");
+                const consultationDate = new Date(facture.date);
+                // Formatter la date et l'heure séparément
+                const formattedDate = consultationDate.toLocaleDateString(); // Formater la date
+                const formattedTime = consultationDate.toLocaleTimeString();
+                doc.text("Date: " + formattedDate, 15, (yPos + 25));
+                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
+
+                //Ligne de séparation
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setLineWidth(0.5);
+                doc.setTextColor(255, 0, 0);
+                // doc.line(10, 35, 200, 35); 
+                const titleR = "FICHE DE CONSULTATION";
+                const titleRWidth = doc.getTextWidth(titleR);
+                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
+                // Définir le padding
+                const paddingh = 0; // Padding vertical
+                const paddingw = 15; // Padding horizontal
+                // Calculer les dimensions du rectangle
+                const rectX = titleRX - paddingw; // X du rectangle
+                const rectY = (yPos + 18) - paddingh; // Y du rectangle
+                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
+                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
+                // Définir la couleur pour le cadre (noir)
+                doc.setDrawColor(0, 0, 0);
+                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
+                // Ajouter le texte centré en gras
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
+                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
+                const titleN = "N° "+ facture.numfac;
+                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
+
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDossier = facture.numdossier ? " N° Dossier : " + facture.numdossier : " N° Dossier : Aucun";
+                const numDossierWidth = doc.getTextWidth(numDossier);
+                doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 25);
+
+                yPoss = (yPos + 45);
+
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
                 }
-            ],
-            ...dataTableConfig, 
-            initComplete: function(settings, json) {
-                initializeRowEventListenersRdv();
-            },
-        });
 
-        function initializeRowEventListenersRdv() {
+                const patientInfo = [
+                    { label: "Medecin", value: facture.nom_medecin },
+                    { label: "Spécialité", value: facture.specialite },
+                    { label: "Nom et Prénoms", value: facture.nom_patient },
+                    { label: "Assurer", value: assurer},
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient },
+                ];
 
-            $('.Table_day_rdv').on('click', '#modif', function() {
-                const id = $(this).data('id');
-                const date = $(this).data('date');
-                const patient = $(this).data('patient');
-                const motif = $(this).data('motif');
-                const medecin = $(this).data('medecin');
-                const specialite = $(this).data('specialite');
+                if (facture.assure == 1) {
+                    patientInfo.push(
+                        { label: "Assurance", value: facture.assurance },
+                        { label: "Filiation", value: facture.filiation },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "Sociéte", value: facture.societe },
+                    );
+                }
 
-                $('#id_rdvM').val(id);
-
-                const today = new Date();
-                const formattedToday = today.toISOString().split('T')[0];
-                $('#date_rdvM').val(date).attr('min', formattedToday);
-
-                $('#patient_rdvM').val(patient);
-                $('#motif_rdvM').val(motif);
-                $('#medecin_rdvM').val(medecin);
-                $('#specialite_rdvM').val(specialite);
-
-                const horairesData = $(this).data('horaires');
-                const allowedDays = horairesData ? horairesData.map(horaire => horaire.jour) : [];
-
-                $('#date_rdvM').on('change', function(event) {
-                    const selectedDate = new Date(event.target.value);
-                    const selectedDay = selectedDate.getDay();
-
-                    const dayMapping = {
-                        'DIMANCHE': 0,
-                        'LUNDI': 1,
-                        'MARDI': 2,
-                        'MERCREDI': 3,
-                        'JEUDI': 4,
-                        'VENDREDI': 5,
-                        'SAMEDI': 6
-                    };
-
-                    const isValidDay = allowedDays.some(day => dayMapping[day] === selectedDay);
-
-                    if (!isValidDay) {
-                        // Vérification si date_rdvM est une valeur valide
-                        let formattedDate = "";
-                        if (date_rdvM && !isNaN(new Date(date_rdvM).getTime())) {
-                            // Si date_rdvM est valide, formater la date
-                            formattedDate = new Date(date_rdvM).toISOString().split('T')[0];
-                        } else {
-                            // Si date_rdvM n'est pas valide, utilisez la date du jour comme fallback
-                            formattedDate = new Date().toISOString().split('T')[0];
-                        }
-
-                        // Remettre la date dans le champ de saisie
-                        $('#date_rdvM').val(formattedDate);
-                        
-                        // Afficher le message d'alerte
-                        showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
-                    }
+                patientInfo.forEach(info => {
+                    doc.setFontSize(10);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
                 });
-            });
 
-            $('.Table_day_rdv').on('click', '#motif', function() {
-                const motif = $(this).data('motif');
-                // Handle the 'Delete' button click
-                const modal = document.getElementById('modal_Detail_motif');
-                modal.innerHTML = '';
+                doc.setFontSize(30);
+                doc.setLineWidth(0.5);
+                doc.line(10, yPoss, 200, yPoss);
 
-                const div = document.createElement('div');
-                div.innerHTML = `
-                       <div class="row gx-3">
-                            <div class="col-12">
-                                <div class=" mb-3">
-                                    <div class="card-body">
-                                        <ul class="list-group">
-                                            <li class="list-group-item active text-center" aria-current="true">
-                                                Motif
-                                            </li>
-                                            <li class="list-group-item">
-                                                ${motif} 
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>     
-                `;
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(255, 0, 0);
+                const rendu = "Compte Rendu";
+                const titleRr = doc.getTextWidth(rendu);
+                const titlerendu = (doc.internal.pageSize.getWidth() - titleRr) / 2;
+                doc.text(rendu, titlerendu, yPoss + 10);
+                // Dessiner une ligne sous le texte pour le souligner
+                const underlineY = yPoss + 12; // Ajustez cette valeur selon vos besoins
+                doc.setDrawColor(255, 0, 0);
+                doc.setLineWidth(0.5); // Épaisseur de la ligne
+                doc.line(titlerendu, underlineY, titlerendu + titleRr, underlineY);
 
-                modal.appendChild(div);
-            });
+                yPoss += 25;
+                hPoss = yPoss;
+                doc.setTextColor(0, 0, 0);
 
-            $('.Table_day_rdv').on('click', '#delete', function() {
-                const id = $(this).data('id');
-                
-                $('#Iddelete').val(id);
-            });
-        }
+                const pInfo1 = [
+                    { label: "TA", value: "..........." },
+                    { label: "Poids", value: "..........." },
+                ];
 
-        $('#btn_refresh_table_rdv').on('click', function () {
-            table_rdv.ajax.reload(null, false);
-        });
+                pInfo1.forEach(info => {
+                    doc.setFontSize(10);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 15, yPoss);
+                    yPoss += 10;
+                });
 
-        function delete_rdv() {
+                const pInfo2 = [
+                    { label: "BD", value: "..........." },
+                    { label: "Pouls", value: "..........." },
+                ];
 
-            const id = document.getElementById('Iddelete').value;
+                pInfo2.forEach(info => {
+                    doc.setFontSize(10);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin + 40, yPoss - 20);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 55, yPoss - 20);
+                    yPoss += 10;
+                });
 
-            var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
-            modal.hide();
+                const pInfo3 = [
+                    { label: "BG", value: "..........." },
+                    { label: "Taille", value: "..........." },
+                ];
 
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+                pInfo3.forEach(info => {
+                    doc.setFontSize(10);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin + 75, yPoss - 40);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 90, yPoss - 40);
+                    yPoss += 10;
+                });
 
-            $.ajax({
-                url: '/api/delete_rdv/'+id,
-                method: 'GET',
-                success: function(response) {
+                const pInfo4 = [
+                    { label: "Temp", value: "..........." },
+                ];
 
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+                pInfo4.forEach(info => {
+                    doc.setFontSize(10);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin + 110, yPoss - 60);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 125, yPoss - 60);
+                    yPoss += 10;
+                });
 
-                    if (response.success) {
-                        $('.Table_day_rdv').DataTable().ajax.reload(null, false);
-                        count_rdv_two_day();
-                        showAlert('Succès', 'Rendez-Vous annulé.','success');
-                    } else if (response.error) {
-                        showAlert("ERREUR", 'Une erreur est survenue', "error");
-                    }
-                
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+                hPoss += 25;
 
-                    showAlert('Erreur', 'Erreur lors de la suppression.','error');
-                }
-            });
-        }
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(225, 0, 0);
+                const motif = "Motif";
+                const titleRm = doc.getTextWidth(motif);
+                const titlemotif = (doc.internal.pageSize.getWidth() - titleRm) / 2;
+                doc.text(motif, titlemotif, hPoss);
+                // Dessiner une ligne sous le texte pour le souligner
+                const underlineYm = hPoss + 2; // Ajustez cette valeur selon vos besoins
+                doc.setDrawColor(225, 0, 0);
+                doc.setLineWidth(0.5); // Épaisseur de la ligne
+                doc.line(titlemotif, underlineYm, titlemotif + titleRm, underlineYm);
 
-        function update_rdv()
-        {
-            const id = document.getElementById('id_rdvM').value;
-            const date_rdv = document.getElementById('date_rdvM');
-            const motif_rdv = document.getElementById('motif_rdvM');
+                doc.setFontSize(8);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                doc.text("Imprimer le "+new Date().toLocaleDateString()+" à "+new Date().toLocaleTimeString() , 5, 295);
 
-            if (!date_rdv.value.trim() || !motif_rdv.value.trim()) {
-                showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
-                return false;
             }
 
-            var modal = bootstrap.Modal.getInstance(document.getElementById('Modif_Rdv_modal'));
-            modal.hide();
+            drawConsultationSection(yPos);
 
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            doc.output('dataurlnewwindow');
+        }
 
-            $.ajax({
-                url: '/api/update_rdv/' + id,
-                method: 'GET',
-                data:{
-                    date: date_rdv.value,
-                    motif: motif_rdv.value,
-                },
-                success: function(response) {
+        // -----------------------------------------------------------------
 
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+        // const table_rdv = $('.Table_day_rdv').DataTable({
+
+        //     processing: true,
+        //     serverSide: false,
+        //     ajax: {
+        //         url: `/api/list_rdv_day`,
+        //         type: 'GET',
+        //         dataSrc: 'data',
+        //     },
+        //     columns: [
+        //         { 
+        //             data: null, 
+        //             render: (data, type, row, meta) => meta.row + 1,
+        //             searchable: false,
+        //             orderable: false,
+        //         },
+        //         { 
+        //             data: 'patient', 
+        //             render: (data, type, row) => `
+        //             <div class="d-flex align-items-center">
+        //                 <a class="d-flex align-items-center flex-column me-2">
+        //                     <img src="/assets/images/rdv1.png" class="img-2x rounded-circle border border-1">
+        //                 </a>
+        //                 ${data}
+        //             </div>`,
+        //             searchable: true, 
+        //         },
+        //         {
+        //             data: 'patient_tel',
+        //             render: (data, type, row) => {
+        //                 return data ? `+225 ${data}` : 'Néant';
+        //             },
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: 'medecin',
+        //             render: (data, type, row) => {
+        //                 return data ? `Dr. ${data}` : 'Néant';
+        //             },
+        //             searchable: true,
+        //         },
+        //         { 
+        //             data: 'specialite',
+        //             searchable: true, 
+        //         },
+        //         { 
+        //             data: 'date',
+        //             render: formatDate,
+        //             searchable: true, 
+        //         },
+        //         {
+        //             data: 'statut',
+        //             render: (data, type, row) => `
+        //                 <span class="badge ${data === 'en attente' ? 'bg-danger' : 'bg-success'}">
+        //                     ${data === 'en attente' ? 'En Attente' : 'Terminer'}
+        //                 </span>
+        //             `,
+        //             searchable: true,
+        //         },
+        //         { 
+        //             data: 'created_at',
+        //             render: formatDateHeure,
+        //             searchable: true, 
+        //         },
+        //         {
+        //             data: null,
+        //             render: (data, type, row) => `
+        //                 <div class="d-inline-flex gap-1" style="font-size:10px;">
+        //                     <a class="btn btn-outline-warning btn-sm rounded-5 edit-btn" data-motif="${row.motif}" data-bs-toggle="modal" data-bs-target="#Detail_motif" id="motif">
+        //                         <i class="ri-eye-line"></i>
+        //                     </a>
+        //                     ${row.statut == 'en attente' ? 
+        //                     `<a class="btn btn-outline-info btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Modif_Rdv_modal" id="modif"
+        //                         data-id="${row.id}"
+        //                         data-date="${row.date}"
+        //                         data-patient="${row.patient}"
+        //                         data-motif="${row.motif}"
+        //                         data-medecin="${row.medecin}"
+        //                         data-specialite="${row.specialite}"
+        //                         data-horaires='${JSON.stringify(row.horaires)}'>
+        //                        <i class="ri-edit-line"></i>
+        //                     </a>
+        //                     <a class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete" data-id="${row.id}">
+        //                         <i class="ri-delete-bin-line"></i>
+        //                     </a>` :
+        //                     `` }
+        //                 </div>
+        //             `,
+        //             searchable: false,
+        //             orderable: false,
+        //         }
+        //     ],
+        //     ...dataTableConfig, 
+        //     initComplete: function(settings, json) {
+        //         initializeRowEventListenersRdv();
+        //     },
+        // });
+
+        // function initializeRowEventListenersRdv() {
+
+        //     $('.Table_day_rdv').on('click', '#modif', function() {
+        //         const id = $(this).data('id');
+        //         const date = $(this).data('date');
+        //         const patient = $(this).data('patient');
+        //         const motif = $(this).data('motif');
+        //         const medecin = $(this).data('medecin');
+        //         const specialite = $(this).data('specialite');
+
+        //         $('#id_rdvM').val(id);
+
+        //         const today = new Date();
+        //         const formattedToday = today.toISOString().split('T')[0];
+        //         $('#date_rdvM').val(date).attr('min', formattedToday);
+
+        //         $('#patient_rdvM').val(patient);
+        //         $('#motif_rdvM').val(motif);
+        //         $('#medecin_rdvM').val(medecin);
+        //         $('#specialite_rdvM').val(specialite);
+
+        //         const horairesData = $(this).data('horaires');
+        //         const allowedDays = horairesData ? horairesData.map(horaire => horaire.jour) : [];
+
+        //         $('#date_rdvM').on('change', function(event) {
+        //             const selectedDate = new Date(event.target.value);
+        //             const selectedDay = selectedDate.getDay();
+
+        //             const dayMapping = {
+        //                 'DIMANCHE': 0,
+        //                 'LUNDI': 1,
+        //                 'MARDI': 2,
+        //                 'MERCREDI': 3,
+        //                 'JEUDI': 4,
+        //                 'VENDREDI': 5,
+        //                 'SAMEDI': 6
+        //             };
+
+        //             const isValidDay = allowedDays.some(day => dayMapping[day] === selectedDay);
+
+        //             if (!isValidDay) {
+        //                 // Vérification si date_rdvM est une valeur valide
+        //                 let formattedDate = "";
+        //                 if (date_rdvM && !isNaN(new Date(date_rdvM).getTime())) {
+        //                     // Si date_rdvM est valide, formater la date
+        //                     formattedDate = new Date(date_rdvM).toISOString().split('T')[0];
+        //                 } else {
+        //                     // Si date_rdvM n'est pas valide, utilisez la date du jour comme fallback
+        //                     formattedDate = new Date().toISOString().split('T')[0];
+        //                 }
+
+        //                 // Remettre la date dans le champ de saisie
+        //                 $('#date_rdvM').val(formattedDate);
+                        
+        //                 // Afficher le message d'alerte
+        //                 showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
+        //             }
+        //         });
+        //     });
+
+        //     $('.Table_day_rdv').on('click', '#motif', function() {
+        //         const motif = $(this).data('motif');
+        //         // Handle the 'Delete' button click
+        //         const modal = document.getElementById('modal_Detail_motif');
+        //         modal.innerHTML = '';
+
+        //         const div = document.createElement('div');
+        //         div.innerHTML = `
+        //                <div class="row gx-3">
+        //                     <div class="col-12">
+        //                         <div class=" mb-3">
+        //                             <div class="card-body">
+        //                                 <ul class="list-group">
+        //                                     <li class="list-group-item active text-center" aria-current="true">
+        //                                         Motif
+        //                                     </li>
+        //                                     <li class="list-group-item">
+        //                                         ${motif} 
+        //                                     </li>
+        //                                 </ul>
+        //                             </div>
+        //                         </div>
+        //                     </div>
+        //                 </div>     
+        //         `;
+
+        //         modal.appendChild(div);
+        //     });
+
+        //     $('.Table_day_rdv').on('click', '#delete', function() {
+        //         const id = $(this).data('id');
+                
+        //         $('#Iddelete').val(id);
+        //     });
+        // }
+
+        // $('#btn_refresh_table_rdv').on('click', function () {
+        //     table_rdv.ajax.reload(null, false);
+        // });
+
+        // function delete_rdv() {
+
+        //     const id = document.getElementById('Iddelete').value;
+
+        //     var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
+        //     modal.hide();
+
+        //     var preloader_ch = `
+        //         <div id="preloader_ch">
+        //             <div class="spinner_preloader_ch"></div>
+        //         </div>
+        //     `;
+        //     // Add the preloader to the body
+        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+        //     $.ajax({
+        //         url: '/api/delete_rdv/'+id,
+        //         method: 'GET',
+        //         success: function(response) {
+
+        //             var preloader = document.getElementById('preloader_ch');
+        //             if (preloader) {
+        //                 preloader.remove();
+        //             }
+
+        //             if (response.success) {
+        //                 $('.Table_day_rdv').DataTable().ajax.reload(null, false);
+        //                 count_rdv_two_day();
+        //                 showAlert('Succès', 'Rendez-Vous annulé.','success');
+        //             } else if (response.error) {
+        //                 showAlert("ERREUR", 'Une erreur est survenue', "error");
+        //             }
+                
+        //         },
+        //         error: function() {
+        //             var preloader = document.getElementById('preloader_ch');
+        //             if (preloader) {
+        //                 preloader.remove();
+        //             }
+
+        //             showAlert('Erreur', 'Erreur lors de la suppression.','error');
+        //         }
+        //     });
+        // }
+
+        // function update_rdv()
+        // {
+        //     const id = document.getElementById('id_rdvM').value;
+        //     const date_rdv = document.getElementById('date_rdvM');
+        //     const motif_rdv = document.getElementById('motif_rdvM');
+
+        //     if (!date_rdv.value.trim() || !motif_rdv.value.trim()) {
+        //         showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
+        //         return false;
+        //     }
+
+        //     var modal = bootstrap.Modal.getInstance(document.getElementById('Modif_Rdv_modal'));
+        //     modal.hide();
+
+        //     var preloader_ch = `
+        //         <div id="preloader_ch">
+        //             <div class="spinner_preloader_ch"></div>
+        //         </div>
+        //     `;
+        //     // Add the preloader to the body
+        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+        //     $.ajax({
+        //         url: '/api/update_rdv/' + id,
+        //         method: 'GET',
+        //         data:{
+        //             date: date_rdv.value,
+        //             motif: motif_rdv.value,
+        //         },
+        //         success: function(response) {
+
+        //             var preloader = document.getElementById('preloader_ch');
+        //             if (preloader) {
+        //                 preloader.remove();
+        //             }
                     
-                    if (response.success) {
+        //             if (response.success) {
 
-                        $('.Table_day_rdv').DataTable().ajax.reload(null, false);
-                        count_rdv_two_day();
-                        showAlert("ALERT", 'Mise à jour éffectué', "success");
+        //                 $('.Table_day_rdv').DataTable().ajax.reload(null, false);
+        //                 count_rdv_two_day();
+        //                 showAlert("ALERT", 'Mise à jour éffectué', "success");
 
-                    } else if (response.error) {
-                        showAlert("ERREUR", 'Une erreur est survenue', "error");
-                    }
+        //             } else if (response.error) {
+        //                 showAlert("ERREUR", 'Une erreur est survenue', "error");
+        //             }
 
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
+        //         },
+        //         error: function() {
+        //             var preloader = document.getElementById('preloader_ch');
+        //             if (preloader) {
+        //                 preloader.remove();
+        //             }
 
-                    showAlert("ERREUR", 'Une erreur est survenue lors de l\'enregistrement', "error");
-                }
-            });
-        }
+        //             showAlert("ERREUR", 'Une erreur est survenue lors de l\'enregistrement', "error");
+        //         }
+        //     });
+        // }
 
-        function count_rdv_two_day() {
+        // function count_rdv_two_day() {
 
-                fetch('/api/count_rdv_two_day')
-                    .then(response => response.json())
-                    .then(data => {
-                        const nbre = data.nbre || 0;
+        //         fetch('/api/count_rdv_two_day')
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 const nbre = data.nbre || 0;
 
-                        document.getElementById('div_two_rdv').innerHTML = '';
+        //                 document.getElementById('div_two_rdv').innerHTML = '';
 
-                        if (nbre > 0) {
+        //                 if (nbre > 0) {
 
-                            const div = `
-                                <div class="sidebar-contact" style="background-color: red;">
-                                    <a class="text-white" href="{{route('rdv_two_day')}}">
-                                        <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
-                                        <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
-                                        <i class="ri-calendar-schedule-line"></i>
-                                    </a>
-                                </div>
-                            `;
+        //                     const div = `
+        //                         <div class="sidebar-contact" style="background-color: red;">
+        //                             <a class="text-white" href="{{route('rdv_two_day')}}">
+        //                                 <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
+        //                                 <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
+        //                                 <i class="ri-calendar-schedule-line"></i>
+        //                             </a>
+        //                         </div>
+        //                     `;
 
-                            document.getElementById('div_two_rdv').innerHTML = div;
-                        }
-                    })
-                    .catch(error => console.error('Error fetching data:', error));
-        }
+        //                     document.getElementById('div_two_rdv').innerHTML = div;
+        //                 }
+        //             })
+        //             .catch(error => console.error('Error fetching data:', error));
+        // }
 
     });
 </script>

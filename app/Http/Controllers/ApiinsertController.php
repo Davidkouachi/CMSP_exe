@@ -146,6 +146,14 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueFactureCons()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('consultation')->where('numfac', '=', 'FCE'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -381,7 +389,7 @@ class ApiinsertController extends Controller
 
                 
                 DB::commit();
-                return response()->json(['success' => true, 'message' => 'Opération éffectuée']);
+                return response()->json(['success' => true, 'id' => 'P'.$matricule]);
             } catch (Exception $e) {
                 DB::rollback();
                 return response()->json(['error' => true, 'message' => $e->getMessage()]);
@@ -558,99 +566,71 @@ class ApiinsertController extends Controller
     public function new_consultation(Request $request)
     {
 
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-        ->where('patients.id', '=', $request->id_patient)
-        ->select('patients.*', 'assurances.nom as assurance')
-        ->first();
-
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        if (!$patient) {
-            return response()->json(['error' => true]);
-        }
-
-        $typeacte = typeacte::find($request->typeacte_id);
-
-        if (!$typeacte) {
-            return response()->json(['error' => true]);
-        }
-
-        $acte = acte::find($request->acte_id);
-
-        if (!$acte) {
-            return response()->json(['error' => true]);
-        }
-
-        $user = user::find($request->user_id);
-
-        if (!$user) {
-            return response()->json(['error' => true]);
-        }
-
-        $code = $this->generateUniqueMatricule();
-
-        $codeFac = $this->generateUniqueFacture();
-
-        $today = Carbon::today();
-
         DB::beginTransaction();
 
-        try {
+            try {
 
-            $fac = new facture();
-            $fac->code = $codeFac;
-            $fac->statut = 'impayer';
-            $fac->acte = 'CONSULTATION';
-            $fac->creer_id = $request->auth_id;
+                $numfac = $this->generateUniqueFactureCons();
 
-            if (!$fac->save()) {
-                throw new \Exception('Erreur');
+                $consultationInserted = DB::table('consultation')->insert([
+                    'idenregistremetpatient' => $request->id_patient,
+                    'numbon' => $request->mumcode,
+                    'montant' => str_replace('.', '', $request->total),
+                    'taux' => $request->patient_taux,
+                    'ticketmod' => str_replace('.', '', $request->montant_patient),
+                    'partassurance' => str_replace('.', '', $request->montant_assurance),
+                    'codemedecin' => $request->user_id,
+                    'codeacte' => $request->typeacte_id,
+                    'regle' => 0,
+                    'date' => now(),
+                    'facimprime' => 0,
+                    'numfac' => 'FCE'.$numfac,
+                ]);
+
+                if ($consultationInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table consultation');
+                }
+
+                // if ($request->appliq_remise == 'patient') {
+                //     $type_remise = 1
+                // }
+
+                $facturesInserted = DB::table('factures')->insert([
+                    'numfac' => 'FCE'.$numfac,
+                    'idenregistremetpatient' => $request->id_patient,
+                    'montanttotal' => str_replace('.', '', $request->total),
+                    'remise' => str_replace('.', '', $request->taux_remise),
+                    'type_remise' => 0,
+                    'calcul_applique' => 0,
+                    'taux_applique' => $request->patient_taux,
+                    'montant_ass' => str_replace('.', '', $request->montant_assurance),
+                    'montant_pat' => str_replace('.', '', $request->montant_patient),
+                    'montantregle_ass' => 0,
+                    'montantregle_pat' => 0,
+                    'montantpat_verser' => 0,
+                    'montantpat_remis' => 0,
+                    'montantreste_ass' => str_replace('.', '', $request->montant_assurance),
+                    'montantreste_pat' => str_replace('.', '', $request->montant_patient),
+                    'solde_ass' => 0,
+                    'solde_pat' => 0,
+                    'codeassurance' => $request->codeassurance,
+                    'datefacture' => now(),
+                    'type_facture' => 1,
+                    'timbre_fiscal' => 0,
+                    'a_encaisser' => 0,
+                ]);
+
+                if ($facturesInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table factures');
+                }
+
+                // Valider la transaction
+                DB::commit();
+                return response()->json(['success' => true]);
+            } catch (Exception $e) {
+                DB::rollback();
+                return response()->json(['error' => true, 'message' => $e->getMessage()]);
             }
-
-            $add = new consultation();
-            $add->patient_id = $patient->id; 
-            $add->user_id = $user->id;
-            $add->facture_id = $fac->id; 
-            $add->matricule_patient = $patient->matricule;
-            $add->code = $code;
-            $add->num_bon = $request->mumcode;
-
-            if ($patient->assurer === 'non') {
-                $add->assurance_utiliser = 'non';
-            }else{
-                $add->assurance_utiliser = $request->assurance_utiliser;
-            }
-
-            if (!$add->save()) {
-                throw new \Exception('Erreur');
-            }
-
-            $add2 = new detailconsultation();
-            $add2->consultation_id = $add->id;
-            $add2->typeacte_id = $typeacte->id;
-            $add2->part_assurance = $request->montant_assurance;
-            $add2->part_patient = $request->montant_patient;
-            $add2->remise = $request->taux_remise;
-            $add2->motif = $acte->nom;
-            $add2->montant = $typeacte->prix;
-            $add2->type_motif = $typeacte->nom;
-            $add2->libelle = '';
-            $add2->periode = $request->periode;
-            $add2->appliq_remise = $request->appliq_remise;
-
-            if (!$add2->save()) {
-                throw new \Exception('Erreur');
-            }
-
-            DB::commit();
-            return response()->json(['success' => true,'patient' => $patient,'typeacte' => $typeacte,'user' => $user,'consultation' => $add]);
-            
-        } catch (Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => true]);
-        }
     }
 
     public function new_typeadmission(Request $request)

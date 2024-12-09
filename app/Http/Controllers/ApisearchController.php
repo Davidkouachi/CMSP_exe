@@ -44,25 +44,62 @@ use App\Models\porte_caisse;
 
 class ApisearchController extends Controller
 {
+    private function generateUniqueMatriculeDossierDC()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('dossierpatient')->where('numdossier', '=', 'DC'.$matricule)->exists());
+
+        return $matricule;
+    }
+
+
+
+
+
     public function rech_patient(Request $request)
     {
-        $patient = patient::leftJoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-                       ->leftJoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-                       ->leftJoin('societes', 'societes.id', '=', 'patients.societe_id')
-                       ->where('patients.id', '=', $request->id)
-                       ->select(
-                            'patients.*', 
-                            'assurances.nom as assurance', 
-                            'tauxes.taux as taux', 
-                            'societes.nom as societe')
-                       ->first();
+
+        $patient = DB::table('patient')
+            ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->leftJoin('filiation', 'patient.codefiliation', '=', 'filiation.codefiliation')
+            ->leftJoin('dossierpatient', 'patient.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->where('patient.idenregistremetpatient', '=', $request->id)
+            ->select(
+                'patient.*', 
+                'societeassure.nomsocieteassure as societe',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+                'filiation.libellefiliation as filiation',
+                'dossierpatient.numdossier as numdossier',
+            )
+            ->orderBy('patient.dateenregistrement','desc')
+            ->first();
 
         if ($patient) {
+
+            if ($patient->numdossier == null || $patient->numdossier == '') {
+                
+                $numdossier_new = $this->generateUniqueMatriculeDossierDC();
+
+                $dossierPatientInserted = DB::table('dossierpatient')->insert([
+                    'numdossier' => 'DC'.$numdossier_new,
+                    'idenregistremetpatient' => $patient->idenregistremetpatient,
+                    'datecrea' => now(),
+                    'codetypedossier' => 'DC',
+                ]);
+
+                if ($dossierPatientInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table dossierpatient');
+                }
+            }
+
             return response()->json(['success' => true, 'patient' => $patient]);
         }else{
             return response()->json(['existep' => true]);
         }
-
     }
 
     public function rech_patient_hos($code)
@@ -158,9 +195,24 @@ class ApisearchController extends Controller
         return response()->json(['specialite' => $specialite]); 
     }
 
-    public function select_typeacte($id)
+    public function select_typeacte($codeassurance)
     {
-        $typeacte = typeacte::where('acte_id', '=', $id)->get();
+
+        $typeacte = DB::table('tarifs')
+            ->join('garantie', 'tarifs.codgaran', '=', 'garantie.codgaran')
+            ->where('garantie.codtypgar', '=', 'CONS')
+            ->where('tarifs.codeassurance', '=', $codeassurance)
+            ->select(
+                'garantie.codgaran as codgaran',
+                'garantie.libgaran as libgaran',
+                'tarifs.montjour as prixj',
+                'tarifs.montnuit as prixn',
+                'tarifs.montferie as prixf',
+                'tarifs.codeassurance as codeassurance',
+            )
+            // ->distinct()
+            // ->groupBy('garantie.codgaran', 'garantie.libgaran')
+            ->get();
 
         return response()->json(['typeacte' => $typeacte]); 
     }
@@ -182,7 +234,7 @@ class ApisearchController extends Controller
 
     public function name_patient_reception()
     {
-        $name = Patient::select('id', 'np')->get();
+        $name = DB::table('patient')->select('idenregistremetpatient', 'nomprenomspatient')->get();
                        
         return response()->json(['name' => $name]);
     }
@@ -319,7 +371,7 @@ class ApisearchController extends Controller
     public function select_list_medecin()
     {
 
-        $medecin = user::where('role', '=', 'MEDECIN')->select('name','id')->get();
+        $medecin = DB::table('medecin')->select('codemedecin','nomprenomsmed')->get();
 
         return response()->json(['medecin' => $medecin]);
     }

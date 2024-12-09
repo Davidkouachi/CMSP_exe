@@ -57,7 +57,7 @@ class ApipdfController extends Controller
     {
         $facture = DB::table('consultation')
             ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
-            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
             ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
             ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
             ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')

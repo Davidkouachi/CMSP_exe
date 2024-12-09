@@ -105,11 +105,36 @@
     </div>
 </div>
 
+<div class="modal fade" id="MdeleteCons" tabindex="-1" aria-labelledby="delRowLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delRowLabel">
+                    Confirmation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimé cette consultation ?
+                <input type="hidden" id="IddeleteCons">
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Non</a>
+                    <button id="deleteBtnCons" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{asset('assets/js/app/js/jspdfinvoicetemplate/dist/index.js')}}" ></script>
 <script src="{{asset('jsPDF-master/dist/jspdf.umd.js')}}"></script>
 
 <script>
     $(document).ready(function() {
+
+        $("#deleteBtnCons").on("click", delete_cons);
 
         $('#btn_search_table').on('click', function() {
             $('#Table_day').DataTable().ajax.reload();
@@ -194,6 +219,14 @@
                 return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`; // Format as dd/mm/yyyy hh:mm:ss
         }
 
+        function showAlert(title, message, type) {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: type,
+            });
+        }
+
         // ------------------------------------------------------------------
 
         function Statistique_cons() {
@@ -236,7 +269,7 @@
                                             </div>
                                             <div class="d-flex flex-column">
                                                 <h5 class="lh-1">
-                                                    ${item.nom}
+                                                    ${item.libgaran}
                                                 </h5>
                                                 <p class="m-0">
                                                     ${item.nbre} Consultation(s)
@@ -361,8 +394,11 @@
                     data: 'idconsexterne',
                     searchable: true, 
                 },
-                { 
+                {
                     data: 'numdossier',
+                    render: (data, type, row) => {
+                        return data ? `${data}` : 'Aucun';
+                    },
                     searchable: true,
                 },
                 { 
@@ -411,6 +447,10 @@
                             >
                                 <i class="ri-file-line"></i>
                             </a>
+                            ${row.regle == 0 ?  
+                            `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#MdeleteCons" id="deleteCons" data-numfac="${row.numfac}">
+                                <i class="ri-delete-bin-line"></i>
+                            </a>` : ``}
                         </div>
                     `,
                     searchable: false,
@@ -483,6 +523,12 @@
                 .catch(error => {
                     console.error('Erreur lors du chargement des données:', error);
                 });
+            });
+
+            $('#Table_day').on('click', '#deleteCons', function() {
+                const numfac = $(this).data('numfac');
+
+                $('#IddeleteCons').val(numfac);
             });
         }
 
@@ -573,7 +619,7 @@
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = " N° Dossier : "+ facture.numdossier;
+                const numDossier = facture.numdossier ? " N° Dossier : " + facture.numdossier : " N° Dossier : Aucun";
                 const numDossierWidth = doc.getTextWidth(numDossier);
                 doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 28);
 
@@ -794,7 +840,7 @@
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : "+facture.idenregistremetpatient;
+                const numDossier = facture.numdossier ? " N° Dossier : " + facture.numdossier : " N° Dossier : Aucun";
                 const numDossierWidth = doc.getTextWidth(numDossier);
                 doc.text(numDossier, (pdfWidth - rightMargin - numDossierWidth) + 5, yPos + 25);
 
@@ -936,6 +982,50 @@
             drawConsultationSection(yPos);
 
             doc.output('dataurlnewwindow');
+        }
+
+        function delete_cons() {
+
+            const numfac = document.getElementById('IddeleteCons').value;
+
+            var modal = bootstrap.Modal.getInstance(document.getElementById('MdeleteCons'));
+            modal.hide();
+
+            var preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            // Add the preloader to the body
+            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+            $.ajax({
+                url: '/api/delete_Cons/'+numfac,
+                method: 'GET',
+                success: function(response) {
+
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload(null, true);
+                        showAlert('Succès', 'Opération éffectuée.','success');
+                    } else if (response.error) {
+                        showAlert("ERREUR", 'Echec de l\'opération', "error");
+                    }
+                
+                },
+                error: function() {
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    showAlert('Erreur', 'Erreur lors de la suppression.','error');
+                }
+            });
         }
 
     });

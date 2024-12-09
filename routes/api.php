@@ -91,7 +91,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/refresh_num_lit', [ApisearchController::class, 'refresh_num_lit']);
 	Route::get('/list_chambre_select', [ApisearchController::class, 'list_chambre_select']);
 	Route::get('/select_specialite', [ApisearchController::class, 'select_specialite']);
-	Route::get('/select_typeacte/{id}', [ApisearchController::class, 'select_typeacte']);
+	Route::get('/select_typeacte/{codeassurance}', [ApisearchController::class, 'select_typeacte']);
 	Route::get('/name_patient_reception', [ApisearchController::class, 'name_patient_reception']);
 	Route::get('/name_patient_examen', [ApisearchController::class, 'name_patient_examen']);
 	Route::get('/name_patient', [ApisearchController::class, 'name_patient']);
@@ -165,7 +165,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/delete_rdv/{id}', [ApideleteController::class, 'delete_rdv']);
 	Route::get('/delete_specialite/{id}', [ApideleteController::class, 'delete_specialite']);
 	Route::get('/delete_depotfacture/{id}', [ApideleteController::class, 'delete_depotfacture']);
-	Route::get('/delete_Cons/{id}', [ApideleteController::class, 'delete_Cons']);
+	Route::get('/delete_Cons/{numfac}', [ApideleteController::class, 'delete_Cons']);
 	Route::get('/delete_user/{matricule}', [ApideleteController::class, 'delete_user']);
 	Route::get('/delete_assurance/{id}', [ApideleteController::class, 'delete_assurance']);
 	Route::get('/delete_assureur/{id}', [ApideleteController::class, 'delete_assureur']);

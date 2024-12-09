@@ -700,9 +700,7 @@
                 montantRestant = 0 ;
             }
             document.getElementById('input_montant_restant_Cons').value = `${formatPrice(montantRestant)}`;
-            
         });
-
         document.getElementById('input_montant_verser_Cons').addEventListener('keypress', function(event) 
         {
             // Permettre uniquement les chiffres et le point
