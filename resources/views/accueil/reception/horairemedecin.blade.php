@@ -25,9 +25,9 @@
             <div class="card bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Horaires des Médecins.</h5>
+                        <h6>HORAIRES MEDECINS & RENDEZ-VOUS</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Récéption / Horaires des Médecins.</p>
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                                     </div> --}}
                                     <div class="col-12">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover table-sm">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate">
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
@@ -231,7 +231,7 @@
                 <h5 class="modal-title" id="exampleModalLabel">Nouveau Rendez-Vous</h5>
             </div>
             <div class="modal-body">
-                <form id="updateForm">
+                <form id="updateForm mb-3 mt-3">
                     <input type="hidden" id="medecin_id_rdv">
                     <div class="mb-3">
                         <label class="form-label">Médecin</label>
@@ -244,6 +244,10 @@
                     <div class="mb-3">
                         <label class="form-label">Patient</label>
                         <select class="form-select select2" id="patient_id_rdv"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact</label>
+                        <input type="tel" class="form-control" id="tel_patient" maxlength="10" placeholder="Saisie Obligatoire">
                     </div>
                     <div class="mb-3" id="div_date_rdv" style="display: none;">
                         <label class="form-label">Date</label>
@@ -273,6 +277,8 @@
             <div class="modal-body">
                 <form id="updateForm">
                     <input type="hidden" id="id_rdvM">
+                    <input type="hidden" id="patientid_rdvM">
+                    <input type="hidden" id="medecinid_rdvM">
                     <div class="mb-3">
                         <label class="form-label">Médecin</label>
                         <input readonly type="text" class="form-control" id="medecin_rdvM">
@@ -284,6 +290,10 @@
                     <div class="mb-3">
                         <label class="form-label">Patient</label>
                         <input readonly type="text" class="form-control" id="patient_rdvM" placeholder="Saisie Obligatoire" autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact</label>
+                        <input type="text" class="form-control" id="tel_patientModif" placeholder="Saisie Obligatoire" maxlength="10">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date</label>
@@ -368,7 +378,7 @@
             $('#Table_day').DataTable().ajax.reload(null, false);
         });
 
-        ["rech_medecin", "rech_specialite", "rech_jour", "rech_periode"].forEach(id => document.getElementById(id).addEventListener("change", list));
+        ["#rech_medecin", "#rech_specialite", "#rech_jour", "#rech_periode"].forEach(id => $(id).on("change", list));
 
         $('#patient_id_rdv').on('change', function () { 
             const selectedValue = $(this).val(); // Récupère la valeur sélectionnée
@@ -380,6 +390,24 @@
             }
         });
 
+        var inputs = ['tel_patient','tel_patientModif']; // Array of element IDs
+        inputs.forEach(function(id) {
+            var inputElement = document.getElementById(id); // Get each element by its ID
+
+            // Allow only numeric input (and optionally some special keys like backspace or delete)
+            inputElement.addEventListener('keypress', function(event) {
+                const key = event.key;
+                // Allow numeric keys, backspace, and delete
+                if (!/[0-9]/.test(key) && key !== 'Backspace' && key !== 'Delete') {
+                    event.preventDefault();
+                }
+            });
+
+            // Alternatively, for more comprehensive input validation, use input event listener
+            inputElement.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
+            });
+        });
 
         function showAlert(title, message, type)
         {
@@ -430,7 +458,7 @@
                 .then(data => {
                     if (data && Array.isArray(data.name)) {
                         data.name.forEach(item => {
-                            const option = new Option(item.np, item.id);
+                            const option = new Option(item.nomprenomspatient, item.idenregistremetpatient);
                             selectElement.append(option);
                         });
                     } else {
@@ -446,7 +474,7 @@
             $selectElement.empty();
             const defaultOption = $('<option>', {
                 value: '',
-                text: 'Sélectionner un medecin'
+                text: 'Selectionner'
             });
             $selectElement.append(defaultOption);
 
@@ -458,8 +486,8 @@
                     const medecins = data.medecin;
                     medecins.forEach((item) => {
                         const option = $('<option>', {
-                            value: item.id, // Ensure 'id' is the correct key
-                            text: `Dr. ${item.name}` // Ensure 'name' is the correct key
+                            value: item.codemedecin, // Ensure 'id' is the correct key
+                            text: item.nomprenomsmed, // Ensure 'name' is the correct key
                         });
                         $selectElement.append(option);
                     });
@@ -514,12 +542,12 @@
                     const medecins = data.medecin;
                     medecins.forEach((item, index) => {
                         const option2 = document.createElement('option');
-                        option2.value = `${item.id}`; // Ensure 'id' is the correct key
-                        option2.textContent = `Dr. ${item.name}`; // Ensure 'nom' is the correct key
+                        option2.value =  `${item.codemedecin}`; // Ensure 'id' is the correct key
+                        option2.text = `${item.nomprenomsmed}`; // Ensure 'nom' is the correct key
                         selectElementRech.appendChild(option2);
                     });
                 })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
+                .catch(error => console.error('Erreur lors du chargement des medecin rech:', error));
         }
 
         function rech_specialite()
@@ -535,15 +563,15 @@
             fetch('/api/select_specialite')
                 .then(response => response.json())
                 .then(data => {
-                    const rechs = data.typeacte;
+                    const rechs = data.specialite;
                     rechs.forEach((item, index) => {
                         const option2 = document.createElement('option');
-                        option2.value = `${item.id}`; // Ensure 'id' is the correct key
-                        option2.textContent = `${item.nom}`; // Ensure 'nom' is the correct key
+                        option2.value = `${item.codespecialitemed}`; // Ensure 'id' is the correct key
+                        option2.textContent = `${item.nomspecialite}`; // Ensure 'nom' is the correct key
                         selectElementRech.appendChild(option2);
                     });
                 })
-                .catch(error => console.error('Erreur lors du chargement des societes:', error));
+                .catch(error => console.error('Erreur lors du chargement des specialite rech:', error));
         }
 
         function rech_jour()
@@ -711,7 +739,6 @@
 
         function eng()
         {
-
             try {
                 const isValid = Verification();
                 if (!isValid) {
@@ -746,7 +773,7 @@
                 });
             });
 
-            const medecin_id = document.getElementById('medecin_id').value;
+            const medecin_id = $('#medecin_id').val();
 
             if (medecin_id == '') {
                 showAlert("ALERT", 'Veuillez selectionner un médecin SVP.', "warning");
@@ -780,8 +807,8 @@
                         $('#medecin_id').val('').trigger('change');
                         document.getElementById('div_Horaire').style.display = "none";
 
-                        list(); 
-                        $('#Table_day').DataTable().ajax.reload(null, false);  
+                        // refresh(); 
+                        // $('#Table_day').DataTable().ajax.reload(null, false);  
 
                         // showAlert("ALERT", 'Enregistrement éffectué', "success");
 
@@ -826,9 +853,9 @@
 
         function refresh()
         {
-            document.getElementById('rech_medecin').value = "tout";
-            document.getElementById('rech_specialite').value = "tout";
-            document.getElementById('rech_jour').value = "tout";
+            $('#rech_medecin').val('tout').trigger('change');
+            $('#rech_specialite').val('tout').trigger('change');
+            $('#rech_jour').val('tout').trigger('change');
             document.getElementById('rech_periode').value = "tout";
 
             list();
@@ -841,10 +868,15 @@
             const loaderDiv = document.getElementById('loader');
 
             // Récupération des filtres
-            const medecin = document.getElementById('rech_medecin').value;
-            const specialite = document.getElementById('rech_specialite').value;
-            const jour = document.getElementById('rech_jour').value;
-            const periode = document.getElementById('rech_periode').value;
+            const medecin = $('#rech_medecin').val();
+            const specialite = $('#rech_specialite').val();
+            const jour = $('#rech_jour').val();
+            const periode = $('#rech_periode').val();
+
+            // console.log(medecin);
+            // console.log(specialite);
+            // console.log(jour);
+            // console.log(periode);
 
             const url = `/api/list_horaire/${medecin}/${specialite}/${jour}/${periode}`;
 
@@ -897,7 +929,7 @@
 
                             if (medecin.horaires.length > 0) {
                                 buttonRdv = `
-                                    <a class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#Rdv_modal" id="rdv-${medecin.id}">
+                                    <a class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#Rdv_modal" id="rdv-${medecin.codemedecin}">
                                         <i class="ri-calendar-schedule-line"></i>
                                         Prendre Rendez-Vous
                                     </a>
@@ -910,7 +942,7 @@
                                         <div class="text-center">
                                             <a class="d-flex align-items-center flex-column">
                                                 <img src="{{asset('assets/images/docteur.png')}}" class="img-7x rounded-circle mb-3">
-                                                <h6>Dr. ${medecin.name}</h6>
+                                                <h6>${medecin.nomprenomsmed}</h6>
                                                 <h6 class="text-primary">${medecin.specialité}</h6>
                                                 ${buttonRdv}
                                                 <ul class="list-group">
@@ -967,20 +999,20 @@
                                 });
                             });
 
-                            const rdvButton = document.getElementById(`rdv-${medecin.id}`);
+                            const rdvButton = document.getElementById(`rdv-${medecin.codemedecin}`);
                             if (rdvButton) {
                                 rdvButton.addEventListener('click', () => {
 
-                                    document.getElementById('medecin_id_rdv').value = `${medecin.id}`;
-                                    document.getElementById('medecin_rdv').value = `Dr. ${medecin.name}`;
+                                    document.getElementById('medecin_id_rdv').value = `${medecin.codemedecin}`;
+                                    document.getElementById('medecin_rdv').value = `Dr. ${medecin.nomprenomsmed}`;
                                     document.getElementById('specialite_rdv').value = `${medecin.specialité}`;
-
                                     document.getElementById('btn_eng_rdv').style.display = "none";
 
                                     $('#date_rdv').val('');
                                     $('#patient_id_rdv').val('').trigger('change');
                                     $('#patient_rdv').val('');
                                     $('#motif_rdv').val('');
+                                    $('#tel_patient').val('');
 
                                     {{-- const allowedDays = medecin.horaires.map(horaire => horaire.jour);
 
@@ -1082,15 +1114,23 @@
                 });
         }
 
+        const contacts = [];
+
         function eng_rdv() {
             const medecin_id = $('#medecin_id_rdv').val();
             const patient_id = $('#patient_id_rdv').val();
             const date_rdv = $('#date_rdv').val();
             const motif_rdv = $('#motif_rdv').val();
+            const tel = $('#tel_patient').val();
 
             // Vérifier que tous les champs sont remplis
-            if (!medecin_id.trim() || !patient_id.trim() || !date_rdv.trim() || !motif_rdv.trim()) {
+            if (!medecin_id.trim() || !patient_id.trim() || !date_rdv.trim() || !motif_rdv.trim() || !tel.trim()) {
                 showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
+                return false;
+            }
+
+            if (tel.length !== 10 ) {
+                showAlert("Alert", "Contact incomplet.", "warning");
                 return false;
             }
 
@@ -1115,17 +1155,29 @@
                     patient_id: patient_id,
                     date: date_rdv,
                     motif: motif_rdv,
+                    tel: tel,
                 },
                 success: function(response) {
-                    $('#preloader_ch').remove(); // Supprimer le préchargeur
 
                     if (response.success) {
                         $('#Table_day').DataTable().ajax.reload(null, false);
                         count_rdv_two_day();
-                        showAlert("ALERT", 'Enregistrement éffectué', "success");
+                        // showAlert("ALERT", 'Enregistrement éffectué', "success");
+
+                        contacts.push({
+                            tel: response.tel,
+                            date: formatDateHeure(response.date),
+                        });
+
+                        const message = 'Cher Patient, Vous avez un RDV au Centre Medico-Social la Pyramide le ${date}. Arrivez 15 min en avance. Merci';
+
+                        smsSenderMultipleAsync(contacts, message);
+
                     } else if (response.error) {
+                        $('#preloader_ch').remove();
                         showAlert("ERREUR", 'Une erreur est survenue', "error");
                     } else if (response.existe) {
+                        $('#preloader_ch').remove();
                         showAlert("Alert", 'Cet patient a déjà pris Rendez-Vous avec ce Médecin a la même Date. veuillez selectionner  une autre date SVP!!!', "info");
                     }
                 },
@@ -1140,6 +1192,7 @@
 
             processing: true,
             serverSide: false,
+            // deferLoading: true,
             ajax: {
                 url: `/api/list_rdv`,
                 type: 'GET',
@@ -1164,7 +1217,7 @@
                     searchable: true, 
                 },
                 {
-                    data: 'patient_tel',
+                    data: 'tel',
                     render: (data, type, row) => {
                         return data ? `+225 ${data}` : 'Néant';
                     },
@@ -1210,6 +1263,9 @@
                             ${row.statut == 'en attente' ? 
                             `<a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Modif_Rdv_modal" id="modif"
                                 data-id="${row.id}"
+                                data-tel="${row.tel}"
+                                data-patient_id="${row.patient_id}"
+                                data-medecin_id="${row.codemedecin}"
                                 data-date="${row.date}"
                                 data-patient="${row.patient}"
                                 data-motif="${row.motif}"
@@ -1243,8 +1299,13 @@
                 const motif = $(this).data('motif');
                 const medecin = $(this).data('medecin');
                 const specialite = $(this).data('specialite');
+                const patient_id = $(this).data('patient_id');
+                const medecin_id = $(this).data('medecin_id');
+                const tel = $(this).data('tel');
 
                 $('#id_rdvM').val(id);
+                $('#patientid_rdvM').val(patient_id);
+                $('#medecinid_rdvM').val(medecin_id);
 
                 const today = new Date();
                 const formattedToday = today.toISOString().split('T')[0];
@@ -1254,6 +1315,7 @@
                 $('#motif_rdvM').val(motif);
                 $('#medecin_rdvM').val(medecin);
                 $('#specialite_rdvM').val(specialite);
+                $('#tel_patientModif').val(tel);
 
                 const horairesData = $(this).data('horaires') || [];
                 const allowedDays = horairesData.map(horaire => horaire.jour);
@@ -1395,11 +1457,19 @@
         function update_rdv()
         {
             const id = document.getElementById('id_rdvM').value;
+            const patient_id = document.getElementById('patientid_rdvM').value;
+            const medecin_id = document.getElementById('medecinid_rdvM').value;
             const date_rdv = document.getElementById('date_rdvM');
             const motif_rdv = document.getElementById('motif_rdvM');
+            const tel = document.getElementById('tel_patientModif');
 
-            if (!date_rdv.value.trim() || !motif_rdv.value.trim()) {
+            if (!date_rdv.value.trim() || !motif_rdv.value.trim() || !tel.value.trim()) {
                 showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
+                return false;
+            }
+
+            if (tel.value.length !== 10 ) {
+                showAlert("Alert", "Contact incomplet.", "warning");
                 return false;
             }
 
@@ -1418,8 +1488,11 @@
                 url: '/api/update_rdv/' + id,
                 method: 'GET',
                 data:{
+                    patient_id: patient_id,
+                    medecin_id: medecin_id,
                     date: date_rdv.value,
                     motif: motif_rdv.value,
+                    tel: tel.value,
                 },
                 success: function(response) {
 
@@ -1432,7 +1505,16 @@
 
                         $('#Table_day').DataTable().ajax.reload(null, false);
                         count_rdv_two_day();
-                        showAlert("ALERT", 'Mise à jour éffectué', "success");
+                        // showAlert("ALERT", 'Mise à jour éffectué', "success");
+
+                        contacts.push({
+                            tel: response.tel,
+                            date: formatDateHeure(response.date),
+                        });
+
+                        const message = 'Cher Patient, Votre RDV au Centre Medico-Social la Pyramide a été réporter au ${date}. Merci';
+
+                        smsSenderMultipleAsync(contacts, message);
 
                     } else if (response.error) {
                         showAlert("ERREUR", 'Une erreur est survenue', "error");
@@ -1455,29 +1537,111 @@
         function count_rdv_two_day() 
         {
 
-                fetch('/api/count_rdv_two_day')
-                    .then(response => response.json())
-                    .then(data => {
-                        const nbre = data.nbre || 0;
+            fetch('/api/count_rdv_two_day')
+                .then(response => response.json())
+                .then(data => {
+                    const nbre = data.nbre || 0;
 
-                        document.getElementById('div_two_rdv').innerHTML = '';
+                    document.getElementById('div_two_rdv').innerHTML = '';
 
-                        if (nbre > 0) {
+                    if (nbre > 0) {
 
-                            const div = `
-                                <div class="sidebar-contact" style="background-color: red;">
-                                    <a class="text-white" href="{{route('rdv_two_day')}}">
-                                        <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
-                                        <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
-                                        <i class="ri-calendar-schedule-line"></i>
-                                    </a>
-                                </div>
-                            `;
+                        const div = `
+                            <div class="sidebar-contact" style="background-color: red;">
+                                <a class="text-white" href="{{route('rdv_two_day')}}">
+                                    <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
+                                    <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
+                                    <i class="ri-calendar-schedule-line"></i>
+                                </a>
+                            </div>
+                        `;
 
-                            document.getElementById('div_two_rdv').innerHTML = div;
+                        document.getElementById('div_two_rdv').innerHTML = div;
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function smsSenderMultipleAsync(contacts, message) {
+
+            const replacePlaceholders = (message, item) => {
+                return message
+                    .replace('${date}', item.date);
+            };
+
+            const params = {
+                username: '{{ env('API_SMS_USERNANME') }}',
+                password: '{{ env('API_SMS_PASSWORD') }}',
+                serviceid: '{{ env('API_SMS_SERVICEID') }}',
+                sender: '{{ env('API_SMS_SENDER') }}',
+            };
+
+            const requests = contacts.map((item) => {
+
+                const personalizedMessage = replacePlaceholders(message, item);
+
+                const queryString = new URLSearchParams({
+                    ...params,
+                    msisdn: `+225${item.tel}`,
+                    msg: personalizedMessage,
+                }).toString();
+
+                const url = `https://api-public-2.mtarget.fr/messages?${queryString}`;
+
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
                         }
+                        return response.json();
                     })
-                    .catch(error => console.error('Error fetching data:', error));
+                    .then((data) => ({ item, success: true, data }))
+                    .catch((error) => ({
+                        item,
+                        success: false,
+                        error,
+                    }));
+            });
+
+            Promise.all(requests).then((results) => {
+
+                contacts.length = 0;
+
+                var preloader = document.getElementById('preloader_ch');
+                if (preloader) {
+                    preloader.remove();
+                }
+
+                const successCount = results.filter((result) => result.success).length;
+                const failureCount = results.length - successCount;
+
+                if (successCount > 0) {
+                    showAlert('Succès', `Opération éffctuée. ${successCount}/${results.length} SMS envoyé avec succès`, 'success');
+                }
+
+                if (failureCount > 0) {
+                    showAlert('Echec', `Opération éffctuée. Mais l'sms de confirmation n'a pas été envoyé`, 'error');
+                }
+
+                if (results.length === 0 || failureCount === results.length) {
+                    // Aucun SMS envoyé, probablement pas de connexion
+                    showAlert('Echec', 'Opération éffctuée. Mais l\'sms de confirmation n\'a pas été envoyé.', 'error');
+                }
+
+            }).catch((error) => {
+                // Gérer les erreurs globales (par exemple, problème réseau avant même de démarrer)
+                var preloader = document.getElementById('preloader_ch');
+                if (preloader) {
+                    preloader.remove();
+                }
+
+                showAlert('Echec', 'Une erreur inattendue est survenue.', 'error');
+            });
         }
 
     });

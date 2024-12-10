@@ -796,7 +796,7 @@ class ApistatController extends Controller
     {
         $twoDaysLater = Carbon::today()->addDays(2);
 
-        $nbre = rdvpatient::whereDate('date', '=', $twoDaysLater)->count();
+        $nbre = DB::table('rdvpatients')->whereDate('date', '=', $twoDaysLater)->count();
 
         return response()->json([
             'nbre' => $nbre,

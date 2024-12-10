@@ -301,7 +301,7 @@ class ApisearchController extends Controller
 
     public function select_jour()
     {
-        $rech = joursemaine::select('id','jour')->get();
+        $rech = DB::table('joursemaines')->select('id','jour')->get();
 
         return response()->json(['rech' => $rech]); 
     }

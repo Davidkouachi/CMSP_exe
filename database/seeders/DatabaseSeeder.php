@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
 
         // caisse::create(['solde' => '0','statut' => 'fermer']);
 
-        porte_caisse::create(['montant' => '0','statut' => 'fermer']);
+        DB::table('porte_caisses')->insert(['montant' => '0','statut' => 'fermer']);
 
         // prelevement::create(['prix' => '1.500','code' => '1']);
 
@@ -270,9 +270,9 @@ class DatabaseSeeder extends Seeder
         //     }
         // }
 
-        // $jours = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
-        // foreach ($jours as $value) {
-        //     joursemaine::create(['jour' => $value]); 
-        // }
+        $jours = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
+        foreach ($jours as $value) {
+            DB::table('joursemaines')->insert(['jour' => $value]); 
+        }
     }
 }

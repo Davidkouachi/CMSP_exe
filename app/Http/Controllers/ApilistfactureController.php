@@ -104,7 +104,7 @@ class ApilistfactureController extends Controller
 
         $facture = DB::table('consultation')
             ->join('patient', 'consultation.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
-            ->join('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'consultation.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
             ->join('medecin', 'consultation.codemedecin', '=', 'medecin.codemedecin')
             ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
             ->join('garantie', 'consultation.codeacte', '=', 'garantie.codgaran')
@@ -127,9 +127,11 @@ class ApilistfactureController extends Controller
                 'factures.montant_pat as part_patient',
                 'factures.montantregle_pat as part_patient_regler',
             )
-            ->orderBy('consultation.date', 'desc')->get();
+            ->orderBy('consultation.date', 'desc')
+            ->get();
 
         foreach ($facture as $value) {
+
             if ($value->part_patient == $value->part_patient_regler) {
                 $value->statut_regle = 'Oui';
             } else {

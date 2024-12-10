@@ -25,14 +25,13 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body " style="background: rgba(0, 0, 0, 0.7);" >
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Rendez-Vous.</h5>
+                        <h6>RENDEZ-VOUS</h6>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Récéption / Rendez-Vous dans deux jour(s).</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row gx-3" id="stat"></div>
     </div>
     <div class="row gx-3" >
         <div class="col-sm-12">
@@ -63,7 +62,7 @@
                                 <div class="card-body">
                                     <div class="table-outer" id="div_Table_rdv" style="display: none;">
                                         <div class="table-responsive">
-                                            <table class="table m-0 align-middle" id="Table_rdv">
+                                            <table class="table align-middle table-hover m-0 truncate" id="Table_rdv">
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
@@ -109,69 +108,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="Modif_Rdv_modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateForm">
-                    <input type="hidden" id="medecin_id_rdvM">
-                    <div class="mb-3">
-                        <label class="form-label">Médecin</label>
-                        <input readonly type="text" class="form-control" id="medecin_rdvM">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Spécialité</label>
-                        <input readonly type="text" class="form-control" id="specialite_rdvM">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Patient</label>
-                        <input readonly type="text" class="form-control" id="patient_rdvM" placeholder="Saisie Obligatoire" autocomplete="off">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="datetime-local" class="form-control" id="date_rdvM" placeholder="Saisie Obligatoire" min="{{ date('Y-m-d\TH:i') }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Motif</label>
-                        <textarea class="form-control" id="motif_rdvM" rows="3" style="resize: none;"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-outline-danger" data-bs-dismiss="modal">Fermer</a>
-                <button type="button" class="btn btn-success" id="btn_update_rdv">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="Mdelete" tabindex="-1" aria-labelledby="delRowLabel" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="delRowLabel">
-                    Confirmation
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Voulez-vous vraiment Annulé ce Rendez-Vous
-                <input type="hidden" id="Iddelete">
-            </div>
-            <div class="modal-footer">
-                <div class="d-flex justify-content-end gap-2">
-                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Non</a>
-                    <button id="btn_delete_rdv" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Oui</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="Message" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content">
@@ -186,7 +122,7 @@
                     <div class="col-12">
                         <div class="mb-3">
                             <label class="form-label">Message</label>
-                            <textarea style="resize: none;" class="form-control" id="messageSms" rows="5">Cher Patient, Vous avez un RDV au Centre Medico-Social la Pyramide le ${date}. Arrivez 15 min en avance. Merci</textarea>
+                            <textarea style="resize: none;" class="form-control" id="messageSms" rows="5">RAPPEL! Cher Patient, Vous avez un RDV au Centre Medico-Social la Pyramide le ${date}. Arrivez 15 min en avance. Merci</textarea>
                         </div>
                     </div>
                 </div>
@@ -210,9 +146,7 @@
 
         list_rdv();
 
-        document.getElementById("btn_update_rdv").addEventListener("click", update_rdv);
         document.getElementById("btn_refresh_table_rdv").addEventListener("click", list_rdv);
-        document.getElementById("btn_delete_rdv").addEventListener("click", delete_rdv);
 
         function showAlert(title, message, type) 
         {
@@ -286,23 +220,10 @@
                             rdvs.forEach((item, index) => {
 
                                 contacts.push({
-                                    nom: item.patient, // Nom du patient
-                                    tel: item.patient_tel, // Numéro de téléphone
-                                    date: formatDateHeure(item.date),     // Date du rendez-vous
+                                    nom: item.patient,
+                                    tel: item.tel,
+                                    date: formatDateHeure(item.date),
                                 });
-
-                                let button = '';
-
-                                if (item.statut == 'en attente') {
-                                    button = `
-                                        <a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Modif_Rdv_modal" id="modif-${item.id}">
-                                            <i class="ri-edit-line"></i>
-                                        </a>
-                                        <a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete-${item.id}">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </a>
-                                    `;
-                                }
 
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
@@ -315,8 +236,8 @@
                                             ${item.patient}
                                         </div>
                                     </td>
-                                    <td>+225 ${item.patient_tel}</td>
-                                    <td>Dr. ${item.medecin}</td>
+                                    <td>+225 ${item.tel}</td>
+                                    <td>${item.medecin}</td>
                                     <td>${item.specialite}</td>
                                     <td>${formatDateHeure(item.date)}</td>
                                     <td>${formatDateHeure(item.created_at)}</td>
@@ -325,85 +246,10 @@
                                             <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail_motif" id="motif-${item.id}">
                                                 <i class="ri-eye-line"></i>
                                             </a>
-                                            ${button}
                                         </div>
                                     </td>
                                 `;
                                 tableBody.appendChild(row);
-
-                                const deleteButton = document.getElementById(`delete-${item.id}`);
-                                if (deleteButton) {
-                                    deleteButton.addEventListener('click', () => {
-                                        document.getElementById('Iddelete').value = item.id;
-                                    });
-                                }
-
-                                const modifButton = document.getElementById(`modif-${item.id}`);
-                                if (modifButton) {
-                                    modifButton.addEventListener('click', () => {
-
-                                        document.getElementById('medecin_id_rdvM').value = item.id;
-                                        document.getElementById('date_rdvM').value = item.date; 
-                                        document.getElementById('patient_rdvM').value = item.patient;
-                                        document.getElementById('motif_rdvM').value = item.motif;
-                                        document.getElementById('medecin_rdvM').value = item.medecin;
-                                        document.getElementById('specialite_rdvM').value = item.specialite;
-
-                                        const horairesData = item.horaires;
-                                        const allowedDays = horairesData.map(horaire => horaire.jour);
-                                        const heureDays = horairesData.reduce((map, horaire) => {
-                                            const dayMapping = {
-                                                'DIMANCHE': 0,
-                                                'LUNDI': 1,
-                                                'MARDI': 2,
-                                                'MERCREDI': 3,
-                                                'JEUDI': 4,
-                                                'VENDREDI': 5,
-                                                'SAMEDI': 6,
-                                            };
-                                            map[dayMapping[horaire.jour]] = horaire.heure_debut;
-                                            return map;
-                                        }, {});
-
-                                        const dateInput = document.getElementById('date_rdvM');
-                                        let previousDate = dateInput.value; // Track previous date
-
-                                        $('#date_rdvM').on('change', function (event) {
-                                            const selectedDate = new Date(event.target.value); // Date sélectionnée
-                                            const selectedDay = selectedDate.getDay(); // Jour de la semaine
-
-                                            const isValidDay = allowedDays.some(day => {
-                                                const dayMapping = {
-                                                    'DIMANCHE': 0,
-                                                    'LUNDI': 1,
-                                                    'MARDI': 2,
-                                                    'MERCREDI': 3,
-                                                    'JEUDI': 4,
-                                                    'VENDREDI': 5,
-                                                    'SAMEDI': 6
-                                                };
-                                                return dayMapping[day] === selectedDay;
-                                            });
-
-                                            if (!isValidDay) {
-                                                // Restaurer une date valide
-                                                $('#date_rdvM').val(date);
-
-                                                showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
-                                            } else {
-                                                const selectedHour = heureDays[selectedDay];
-                                                if (selectedHour) {
-                                                    const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-MM-dd
-                                                    const formattedTime = selectedHour.slice(0, 5); // HH:mm
-                                                    $('#date_rdvM').val(`${formattedDate}T${formattedTime}`); // yyyy-MM-ddTHH:mm
-                                                } else {
-                                                    showAlert("ALERT", "L'heure de début n'est pas définie pour ce jour.", "info");
-                                                }
-                                            }
-                                        });
-
-                                    });
-                                }
 
                                 document.getElementById(`motif-${item.id}`).addEventListener('click', () =>
                                 {
@@ -531,140 +377,6 @@
 
             // Append pagination controls to the DOM
             paginationDiv.appendChild(paginationWrapper);
-        }
-
-        function delete_rdv() 
-        {
-
-            const id = document.getElementById('Iddelete').value;
-
-            var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
-            modal.hide();
-
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-            $.ajax({
-                url: '/api/delete_rdv/'+id,
-                method: 'GET',
-                success: function(response) {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    if (response.success) {
-                        list_rdv();
-                        count_rdv_two_day();
-                        showAlert('Succès', 'Rendez-Vous annulé.','success');
-                    } else if (response.error) {
-                        showAlert("ERREUR", 'Une erreur est survenue', "error");
-                    }
-                
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Erreur', 'Erreur lors de la suppression.','error');
-                }
-            });
-        }
-
-        function update_rdv()
-        {
-            const id = document.getElementById('medecin_id_rdvM').value;
-            const date_rdv = document.getElementById('date_rdvM');
-            const motif_rdv = document.getElementById('motif_rdvM');
-
-            if (!date_rdv.value.trim() || !motif_rdv.value.trim()) {
-                showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
-                return false;
-            }
-
-            var modal = bootstrap.Modal.getInstance(document.getElementById('Modif_Rdv_modal'));
-            modal.hide();
-
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-            $.ajax({
-                url: '/api/update_rdv/' + id,
-                method: 'GET',
-                data:{
-                    date: date_rdv.value,
-                    motif: motif_rdv.value,
-                },
-                success: function(response) {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-                    
-                    if (response.success) {
-
-                        list_rdv();
-                        count_rdv_two_day();
-                        showAlert("ALERT", 'Mise à jour éffectué', "success");
-
-                    } else if (response.error) {
-                        showAlert("ERREUR", 'Une erreur est survenue', "error");
-                    } else if (response.existe) {
-                        showAlert("Alert", 'Cet patient a déjà un RDV programmé a cette date', "info");
-                    }
-
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert("ERREUR", 'Une erreur est survenue lors de l\'enregistrement', "error");
-                }
-            });
-        }
-
-        function count_rdv_two_day() 
-        {
-
-                fetch('/api/count_rdv_two_day')
-                    .then(response => response.json())
-                    .then(data => {
-                        const nbre = data.nbre || 0;
-
-                        document.getElementById('div_two_rdv').innerHTML = '';
-
-                        if (nbre > 0) {
-
-                            const div = `
-                                <div class="sidebar-contact" style="background-color: red;">
-                                    <a class="text-white" href="{{route('rdv_two_day')}}">
-                                        <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
-                                        <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
-                                        <i class="ri-calendar-schedule-line"></i>
-                                    </a>
-                                </div>
-                            `;
-
-                            document.getElementById('div_two_rdv').innerHTML = div;
-                        }
-                    })
-                    .catch(error => console.error('Error fetching data:', error));
         }
 
         function smsSenderMultipleAsync(contacts, message) {

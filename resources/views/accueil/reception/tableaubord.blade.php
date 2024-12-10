@@ -462,7 +462,7 @@
                                 <div class="card-body">
                                     <div class="">
                                         <div class="table-responsive">
-                                            <table id="Table_day" class="table table-hover table-sm Table_day_rdv">
+                                            <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_day_rdv">
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
@@ -473,7 +473,6 @@
                                                         <th>Rdv prévu</th>
                                                         <th>Statut</th>
                                                         <th>Date de création</th>
-                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -650,69 +649,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="Modif_Rdv_modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateForm">
-                    <input type="hidden" id="id_rdvM">
-                    <div class="mb-3">
-                        <label class="form-label">Médecin</label>
-                        <input readonly type="text" class="form-control" id="medecin_rdvM">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Spécialité</label>
-                        <input readonly type="text" class="form-control" id="specialite_rdvM">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Patient</label>
-                        <input readonly type="text" class="form-control" id="patient_rdvM" placeholder="Saisie Obligatoire" autocomplete="off">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-control" id="date_rdvM" placeholder="Saisie Obligatoire" min="{{ date('Y-m-d') }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Motif</label>
-                        <textarea class="form-control" id="motif_rdvM" rows="3" style="resize: none;"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-outline-danger" data-bs-dismiss="modal">Fermer</a>
-                <button type="button" class="btn btn-success" id="btn_update_rdv">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="Mdelete" tabindex="-1" aria-labelledby="delRowLabel" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="delRowLabel">
-                    Confirmation
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Voulez-vous vraiment Annulé ce Rendez-Vous
-                <input type="hidden" id="Iddelete">
-            </div>
-            <div class="modal-footer">
-                <div class="d-flex justify-content-end gap-2">
-                    <a class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Non</a>
-                    <button id="btn_delete_rdv" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Oui</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="MdeleteCons" tabindex="-1" aria-labelledby="delRowLabel" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
@@ -763,8 +699,6 @@
         $("#btn_eng_societe").on("click", eng_societe);
         $("#btn_eng_assurance").on("click", eng_assurance);
         $("#btn_eng_patient").on("click", eng_patient);
-        // $("#btn_update_rdv").on("click", update_rdv);
-        // $("#btn_delete_rdv").on("click", delete_rdv);
         $("#deleteBtnCons").on("click", delete_cons);
 
         $('#btn_affiche_stat').on('click', function() {
@@ -1964,7 +1898,7 @@
 
                                 $("#preloader_ch").remove();
 
-                                $('#id_patient').val(response.id).trigger('changer')
+                                $('#id_patient').val(response.id).trigger('change');
 
                             },
                             error: function() {
@@ -1972,7 +1906,7 @@
                             }
                         });
 
-                        showAlert("Succès", response.message, "success");
+                        // showAlert("Succès", response.message, "success");
                     } else if (response.error) {
                         showAlert("Alert", response.message, "error");
                     }
@@ -2997,333 +2931,77 @@
 
         // -----------------------------------------------------------------
 
-        // const table_rdv = $('.Table_day_rdv').DataTable({
+        const table_rdv = $('.Table_day_rdv').DataTable({
 
-        //     processing: true,
-        //     serverSide: false,
-        //     ajax: {
-        //         url: `/api/list_rdv_day`,
-        //         type: 'GET',
-        //         dataSrc: 'data',
-        //     },
-        //     columns: [
-        //         { 
-        //             data: null, 
-        //             render: (data, type, row, meta) => meta.row + 1,
-        //             searchable: false,
-        //             orderable: false,
-        //         },
-        //         { 
-        //             data: 'patient', 
-        //             render: (data, type, row) => `
-        //             <div class="d-flex align-items-center">
-        //                 <a class="d-flex align-items-center flex-column me-2">
-        //                     <img src="/assets/images/rdv1.png" class="img-2x rounded-circle border border-1">
-        //                 </a>
-        //                 ${data}
-        //             </div>`,
-        //             searchable: true, 
-        //         },
-        //         {
-        //             data: 'patient_tel',
-        //             render: (data, type, row) => {
-        //                 return data ? `+225 ${data}` : 'Néant';
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'medecin',
-        //             render: (data, type, row) => {
-        //                 return data ? `Dr. ${data}` : 'Néant';
-        //             },
-        //             searchable: true,
-        //         },
-        //         { 
-        //             data: 'specialite',
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'date',
-        //             render: formatDate,
-        //             searchable: true, 
-        //         },
-        //         {
-        //             data: 'statut',
-        //             render: (data, type, row) => `
-        //                 <span class="badge ${data === 'en attente' ? 'bg-danger' : 'bg-success'}">
-        //                     ${data === 'en attente' ? 'En Attente' : 'Terminer'}
-        //                 </span>
-        //             `,
-        //             searchable: true,
-        //         },
-        //         { 
-        //             data: 'created_at',
-        //             render: formatDateHeure,
-        //             searchable: true, 
-        //         },
-        //         {
-        //             data: null,
-        //             render: (data, type, row) => `
-        //                 <div class="d-inline-flex gap-1" style="font-size:10px;">
-        //                     <a class="btn btn-outline-warning btn-sm rounded-5 edit-btn" data-motif="${row.motif}" data-bs-toggle="modal" data-bs-target="#Detail_motif" id="motif">
-        //                         <i class="ri-eye-line"></i>
-        //                     </a>
-        //                     ${row.statut == 'en attente' ? 
-        //                     `<a class="btn btn-outline-info btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Modif_Rdv_modal" id="modif"
-        //                         data-id="${row.id}"
-        //                         data-date="${row.date}"
-        //                         data-patient="${row.patient}"
-        //                         data-motif="${row.motif}"
-        //                         data-medecin="${row.medecin}"
-        //                         data-specialite="${row.specialite}"
-        //                         data-horaires='${JSON.stringify(row.horaires)}'>
-        //                        <i class="ri-edit-line"></i>
-        //                     </a>
-        //                     <a class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete" data-id="${row.id}">
-        //                         <i class="ri-delete-bin-line"></i>
-        //                     </a>` :
-        //                     `` }
-        //                 </div>
-        //             `,
-        //             searchable: false,
-        //             orderable: false,
-        //         }
-        //     ],
-        //     ...dataTableConfig, 
-        //     initComplete: function(settings, json) {
-        //         initializeRowEventListenersRdv();
-        //     },
-        // });
+            processing: true,
+            serverSide: false,
+            ajax: {
+                url: `/api/list_rdv_day`,
+                type: 'GET',
+                dataSrc: 'data',
+            },
+            columns: [
+                { 
+                    data: null, 
+                    render: (data, type, row, meta) => meta.row + 1,
+                    searchable: false,
+                    orderable: false,
+                },
+                { 
+                    data: 'patient', 
+                    render: (data, type, row) => `
+                    <div class="d-flex align-items-center">
+                        <a class="d-flex align-items-center flex-column me-2">
+                            <img src="/assets/images/rdv1.png" class="img-2x rounded-circle border border-1">
+                        </a>
+                        ${data}
+                    </div>`,
+                    searchable: true, 
+                },
+                {
+                    data: 'patient_tel',
+                    render: (data, type, row) => {
+                        return data ? `+225 ${data}` : 'Néant';
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'medecin',
+                    render: (data, type, row) => {
+                        return data ? `Dr. ${data}` : 'Néant';
+                    },
+                    searchable: true,
+                },
+                { 
+                    data: 'specialite',
+                    searchable: true, 
+                },
+                { 
+                    data: 'date',
+                    render: formatDate,
+                    searchable: true, 
+                },
+                {
+                    data: 'statut',
+                    render: (data, type, row) => `
+                        <span class="badge ${data === 'en attente' ? 'bg-danger' : 'bg-success'}">
+                            ${data === 'en attente' ? 'En Attente' : 'Terminer'}
+                        </span>
+                    `,
+                    searchable: true,
+                },
+                { 
+                    data: 'created_at',
+                    render: formatDateHeure,
+                    searchable: true, 
+                }
+            ],
+            ...dataTableConfig,
+        });
 
-        // function initializeRowEventListenersRdv() {
-
-        //     $('.Table_day_rdv').on('click', '#modif', function() {
-        //         const id = $(this).data('id');
-        //         const date = $(this).data('date');
-        //         const patient = $(this).data('patient');
-        //         const motif = $(this).data('motif');
-        //         const medecin = $(this).data('medecin');
-        //         const specialite = $(this).data('specialite');
-
-        //         $('#id_rdvM').val(id);
-
-        //         const today = new Date();
-        //         const formattedToday = today.toISOString().split('T')[0];
-        //         $('#date_rdvM').val(date).attr('min', formattedToday);
-
-        //         $('#patient_rdvM').val(patient);
-        //         $('#motif_rdvM').val(motif);
-        //         $('#medecin_rdvM').val(medecin);
-        //         $('#specialite_rdvM').val(specialite);
-
-        //         const horairesData = $(this).data('horaires');
-        //         const allowedDays = horairesData ? horairesData.map(horaire => horaire.jour) : [];
-
-        //         $('#date_rdvM').on('change', function(event) {
-        //             const selectedDate = new Date(event.target.value);
-        //             const selectedDay = selectedDate.getDay();
-
-        //             const dayMapping = {
-        //                 'DIMANCHE': 0,
-        //                 'LUNDI': 1,
-        //                 'MARDI': 2,
-        //                 'MERCREDI': 3,
-        //                 'JEUDI': 4,
-        //                 'VENDREDI': 5,
-        //                 'SAMEDI': 6
-        //             };
-
-        //             const isValidDay = allowedDays.some(day => dayMapping[day] === selectedDay);
-
-        //             if (!isValidDay) {
-        //                 // Vérification si date_rdvM est une valeur valide
-        //                 let formattedDate = "";
-        //                 if (date_rdvM && !isNaN(new Date(date_rdvM).getTime())) {
-        //                     // Si date_rdvM est valide, formater la date
-        //                     formattedDate = new Date(date_rdvM).toISOString().split('T')[0];
-        //                 } else {
-        //                     // Si date_rdvM n'est pas valide, utilisez la date du jour comme fallback
-        //                     formattedDate = new Date().toISOString().split('T')[0];
-        //                 }
-
-        //                 // Remettre la date dans le champ de saisie
-        //                 $('#date_rdvM').val(formattedDate);
-                        
-        //                 // Afficher le message d'alerte
-        //                 showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
-        //             }
-        //         });
-        //     });
-
-        //     $('.Table_day_rdv').on('click', '#motif', function() {
-        //         const motif = $(this).data('motif');
-        //         // Handle the 'Delete' button click
-        //         const modal = document.getElementById('modal_Detail_motif');
-        //         modal.innerHTML = '';
-
-        //         const div = document.createElement('div');
-        //         div.innerHTML = `
-        //                <div class="row gx-3">
-        //                     <div class="col-12">
-        //                         <div class=" mb-3">
-        //                             <div class="card-body">
-        //                                 <ul class="list-group">
-        //                                     <li class="list-group-item active text-center" aria-current="true">
-        //                                         Motif
-        //                                     </li>
-        //                                     <li class="list-group-item">
-        //                                         ${motif} 
-        //                                     </li>
-        //                                 </ul>
-        //                             </div>
-        //                         </div>
-        //                     </div>
-        //                 </div>     
-        //         `;
-
-        //         modal.appendChild(div);
-        //     });
-
-        //     $('.Table_day_rdv').on('click', '#delete', function() {
-        //         const id = $(this).data('id');
-                
-        //         $('#Iddelete').val(id);
-        //     });
-        // }
-
-        // $('#btn_refresh_table_rdv').on('click', function () {
-        //     table_rdv.ajax.reload(null, false);
-        // });
-
-        // function delete_rdv() {
-
-        //     const id = document.getElementById('Iddelete').value;
-
-        //     var modal = bootstrap.Modal.getInstance(document.getElementById('Mdelete'));
-        //     modal.hide();
-
-        //     var preloader_ch = `
-        //         <div id="preloader_ch">
-        //             <div class="spinner_preloader_ch"></div>
-        //         </div>
-        //     `;
-        //     // Add the preloader to the body
-        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-        //     $.ajax({
-        //         url: '/api/delete_rdv/'+id,
-        //         method: 'GET',
-        //         success: function(response) {
-
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-
-        //             if (response.success) {
-        //                 $('.Table_day_rdv').DataTable().ajax.reload(null, false);
-        //                 count_rdv_two_day();
-        //                 showAlert('Succès', 'Rendez-Vous annulé.','success');
-        //             } else if (response.error) {
-        //                 showAlert("ERREUR", 'Une erreur est survenue', "error");
-        //             }
-                
-        //         },
-        //         error: function() {
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-
-        //             showAlert('Erreur', 'Erreur lors de la suppression.','error');
-        //         }
-        //     });
-        // }
-
-        // function update_rdv()
-        // {
-        //     const id = document.getElementById('id_rdvM').value;
-        //     const date_rdv = document.getElementById('date_rdvM');
-        //     const motif_rdv = document.getElementById('motif_rdvM');
-
-        //     if (!date_rdv.value.trim() || !motif_rdv.value.trim()) {
-        //         showAlert("ALERT", 'Veuillez remplir tous les champs.', "warning");
-        //         return false;
-        //     }
-
-        //     var modal = bootstrap.Modal.getInstance(document.getElementById('Modif_Rdv_modal'));
-        //     modal.hide();
-
-        //     var preloader_ch = `
-        //         <div id="preloader_ch">
-        //             <div class="spinner_preloader_ch"></div>
-        //         </div>
-        //     `;
-        //     // Add the preloader to the body
-        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-        //     $.ajax({
-        //         url: '/api/update_rdv/' + id,
-        //         method: 'GET',
-        //         data:{
-        //             date: date_rdv.value,
-        //             motif: motif_rdv.value,
-        //         },
-        //         success: function(response) {
-
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-                    
-        //             if (response.success) {
-
-        //                 $('.Table_day_rdv').DataTable().ajax.reload(null, false);
-        //                 count_rdv_two_day();
-        //                 showAlert("ALERT", 'Mise à jour éffectué', "success");
-
-        //             } else if (response.error) {
-        //                 showAlert("ERREUR", 'Une erreur est survenue', "error");
-        //             }
-
-        //         },
-        //         error: function() {
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-
-        //             showAlert("ERREUR", 'Une erreur est survenue lors de l\'enregistrement', "error");
-        //         }
-        //     });
-        // }
-
-        // function count_rdv_two_day() {
-
-        //         fetch('/api/count_rdv_two_day')
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 const nbre = data.nbre || 0;
-
-        //                 document.getElementById('div_two_rdv').innerHTML = '';
-
-        //                 if (nbre > 0) {
-
-        //                     const div = `
-        //                         <div class="sidebar-contact" style="background-color: red;">
-        //                             <a class="text-white" href="{{route('rdv_two_day')}}">
-        //                                 <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
-        //                                 <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
-        //                                 <i class="ri-calendar-schedule-line"></i>
-        //                             </a>
-        //                         </div>
-        //                     `;
-
-        //                     document.getElementById('div_two_rdv').innerHTML = div;
-        //                 }
-        //             })
-        //             .catch(error => console.error('Error fetching data:', error));
-        // }
+        $('#btn_refresh_table_rdv').on('click', function () {
+            table_rdv.ajax.reload(null, false);
+        });
 
     });
 </script>

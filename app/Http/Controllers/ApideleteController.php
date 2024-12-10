@@ -223,10 +223,13 @@ class ApideleteController extends Controller
 
     public function delete_rdv($id)
     {
-        $put = rdvpatient::find($id);
+        $put = DB::table('rdvpatients')->where('id', '=', $id)->first();
 
         if ($put) {
-            if ($put->delete()) {
+
+            $delete = DB::table('rdvpatients')->where('id', '=', $id)->delete();
+
+            if ($delete == 1) {
                 return response()->json(['success' => true]);
             }else{
                 return response()->json(['error' => true]);

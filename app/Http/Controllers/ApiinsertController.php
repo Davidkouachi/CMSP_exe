@@ -207,8 +207,7 @@ class ApiinsertController extends Controller
             } catch (Exception $e) {
                 DB::rollback();
                 return response()->json(['error' => true, 'message' => $e->getMessage()]);
-            }
-        
+            }  
     }
 
     public function assurance_new(Request $request)
@@ -1191,9 +1190,9 @@ class ApiinsertController extends Controller
             return response()->json(['json' => true]);
         }
 
-        $user = user::find($request->medecin_id);
+        $medecin = DB::table('medecin')->where('codemedecin', '=', $request->medecin_id)->first();
 
-        if (!$user) {
+        if (!$medecin) {
             return response()->json(['error' => true]);
         }
 
@@ -1203,17 +1202,20 @@ class ApiinsertController extends Controller
 
             foreach ($selections as $value) {
 
-                $adds = new programmemedecin();
-                $adds->periode = $value['periode'];
-                $adds->statut = 'oui';
-                $adds->heure_debut = $value['heure_debut'];
-                $adds->heure_fin = $value['heure_fin'];
-                $adds->jour_id = $value['jour_id'];
-                $adds->user_id = $user->id;
+                $horaireInserted = DB::table('programmemedecins')->insert([
+                    'periode' => $value['periode'],
+                    'statut' => 'oui',
+                    'heure_debut' => $value['heure_debut'],
+                    'heure_fin' => $value['heure_fin'],
+                    'jour_id' => $value['jour_id'],
+                    'codemedecin' => $medecin->codemedecin,
+                    'created_at' => now(),
+                ]);
 
-                if (!$adds->save()) {
-                    throw new \Exception('Erreur');
+                if ($horaireInserted === 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table programmemedecins');
                 }
+
             }
 
             DB::commit();
@@ -1228,18 +1230,18 @@ class ApiinsertController extends Controller
 
     public function new_rdv(Request $request)
     {
-        $user = user::find($request->medecin_id);
-        if (!$user) {
+        $medecin = DB::table('medecin')->where('codemedecin', '=', $request->medecin_id)->first();
+        if (!$medecin) {
             return response()->json(['error' => true]);
         }
 
-        $patient = patient::find($request->patient_id);
+        $patient = DB::table('patient')->where('idenregistremetpatient', '=', $request->patient_id)->first();
         if (!$patient) {
             return response()->json(['error' => true]);
         }
 
-        $verf = rdvpatient::where('patient_id', '=', $patient->id)
-                        ->where('user_id', '=', $user->id)
+        $verf = DB::table('rdvpatients')->where('patient_id', '=', $patient->idenregistremetpatient)
+                        ->where('codemedecin', '=', $medecin->codemedecin)
                         ->where('date','=', $request->date)
                         ->exists();
 
@@ -1247,15 +1249,22 @@ class ApiinsertController extends Controller
             return response()->json(['existe' => true]);
         }
 
-        $add = new rdvpatient();
-        $add->user_id = $user->id;
-        $add->patient_id = $patient->id;
-        $add->date = $request->date;
-        $add->motif = $request->motif;
-        $add->statut = 'en attente';
+        $rdvInserted = DB::table('rdvpatients')->insert([
+            'codemedecin' => $medecin->codemedecin,
+            'patient_id' => $patient->idenregistremetpatient,
+            'date' => $request->date,
+            'tel' => $request->tel,
+            'motif' => $request->motif,
+            'statut' => 'en attente',
+            'created_at' => now(),
+        ]);
 
-        if ($add->save()) {
-            return response()->json(['success' => true]);
+        if ($rdvInserted == 1) {
+            return response()->json([
+                'success' => true,
+                'tel' => $request->tel,
+                'date' => $request->date
+            ]);
         }
 
         return response()->json(['error' => true]);

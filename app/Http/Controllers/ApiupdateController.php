@@ -426,7 +426,15 @@ class ApiupdateController extends Controller
         $add = programmemedecin::find($id);
         $add->statut = 'non';
 
-        if ($add->save()) {
+        $updateData_programme =[
+            'statut' => 'non',
+        ];
+
+        $programmeUpdate = DB::table('programmemedecins')
+                            ->where('id', '=', $id)
+                            ->update($updateData_programme);
+
+        if ($programmeUpdate === 1) {
             return response()->json(['success' => true]);
         }
 
@@ -435,22 +443,34 @@ class ApiupdateController extends Controller
 
     public function update_rdv(Request $request, $id)
     {
-        $add = rdvpatient::find($id);
 
-        $verf = rdvpatient::where('date', '=', $request->date)
-                        ->where('patient_id', '=', $add->patient_id)
-                        ->where('user_id', '=', $add->user_id)
-                        ->exists();
+        $dateSansHeure = Carbon::parse($request->date)->toDateString();
+
+        $verf = DB::table('rdvpatients')
+            ->where('patient_id', '=', $request->patient_id)
+            ->where('codemedecin', '=', $request->medecin_id)
+            // ->where('date', '=', $request->date)
+            ->whereRaw('DATE(date) = ?', [$dateSansHeure])
+            ->where('id', '!=', $id)
+            ->exists();
 
         if ($verf) {
             return response()->json(['existe' => true]);
         }
-        
-        $add->date = $request->date;
-        $add->motif = $request->motif;
 
-        if ($add->save()) {
-            return response()->json(['success' => true]);
+        $updateData_rdv =[
+            'date' => $request->date,
+            'motif' => $request->motif,
+            'tel' => $request->tel,
+            'updated_at' => now(),
+        ];
+
+        $rdvUpdate = DB::table('rdvpatients')
+                            ->where('id', '=', $id)
+                            ->update($updateData_rdv);
+
+        if ($rdvUpdate == 1) {
+            return response()->json(['success' => true, 'tel' => $request->tel, 'date' => $request->date]);
         }
 
         return response()->json(['error' => true]);

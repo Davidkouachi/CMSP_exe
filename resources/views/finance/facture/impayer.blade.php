@@ -1524,12 +1524,24 @@
                 if (!numfac) {
                     return;
                 }
+
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+                // Add the preloader to the body
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
                 
                 $.ajax({
                     url: `/api/list_facture_inpayer/${numfac}`,
                     type: 'GET',
 
                     success: function(response) {
+                        var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
                         // Supprimez ou cachez les données de la DataTable en cas d'erreur
                         table_cons.clear().draw();
                         // Supprimer ou cacher les données de la DataTable au besoin
@@ -1549,6 +1561,10 @@
                         }
                     },
                     error: function(xhr, status, error) {
+                        var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
                         // Supprimez ou cachez les données de la DataTable en cas d'erreur
                         callback({ data: [] });
                         // Gestion des erreurs avec messages

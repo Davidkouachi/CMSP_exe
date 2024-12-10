@@ -613,26 +613,24 @@ class ApilistController extends Controller
 
     public function list_horaire($medecin, $specialite, $jour, $periode)
     {
-        $query = user::join('typemedecins', 'typemedecins.user_id', '=', 'users.id')
-                    ->join('typeactes', 'typeactes.id', '=', 'typemedecins.typeacte_id')
-                    ->where('users.role', '=', 'MEDECIN');
+        $query = DB::table('medecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed');
 
-        // Filtrage par médecin
         if ($medecin !== 'tout') {
-            $query->where('users.id', '=', $medecin);
+            $query->where('medecin.codemedecin', '=', $medecin);
         }
 
-        // Filtrage par spécialité
         if ($specialite !== 'tout') {
-            $query->where('typeactes.id', '=', $specialite);
+            $query->where('specialitemed.codespecialitemed', '=', $specialite);
         }
 
-        $medecins = $query->select('users.*', 'typeactes.nom as specialité')->get();
+        $medecins = $query->select('medecin.*', 'specialitemed.libellespecialite as specialité')->get();
 
         foreach ($medecins as $value) {
-            $horairesQuery = programmemedecin::join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
-                                             ->where('programmemedecins.user_id', '=', $value->id)
-                                             ->where('programmemedecins.statut', '=', 'oui');
+            $horairesQuery = DB::table('programmemedecins')
+                ->join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
+                ->where('programmemedecins.codemedecin', '=', $value->codemedecin)
+                ->where('programmemedecins.statut', '=', 'oui');
 
             // Filtrage par jour
             if ($jour !== 'tout') {
@@ -655,26 +653,27 @@ class ApilistController extends Controller
 
     public function list_rdv()
     {
-        $rdv = rdvpatient::Join('patients', 'patients.id', '=', 'rdvpatients.patient_id')
-                        ->Join('users', 'users.id', '=', 'rdvpatients.user_id')
-                        ->join('typemedecins', 'typemedecins.user_id', '=', 'users.id')
-                        ->join('typeactes', 'typeactes.id', '=', 'typemedecins.typeacte_id')
-                        ->select(
-                            'rdvpatients.*', 
-                            'patients.np as patient',
-                            'patients.tel as patient_tel',
-                            'users.name as medecin',
-                            'typeactes.nom as specialite'
-                        )
-                        ->orderBy('rdvpatients.created_at', 'desc')
-                        ->get();
+        $rdv = DB::table('rdvpatients')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'rdvpatients.patient_id')
+            ->Join('medecin', 'medecin.codemedecin', '=', 'rdvpatients.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->select(
+                'rdvpatients.*', 
+                'patient.nomprenomspatient as patient',
+                'patient.telpatient as patient_tel',
+                'medecin.nomprenomsmed as medecin',
+                'specialitemed.nomspecialite as specialite'
+            )
+            ->orderBy('rdvpatients.created_at', 'desc')
+            ->get();
 
         foreach ($rdv as $value) {
-            $horaires = programmemedecin::join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
-                                    ->where('programmemedecins.user_id', '=', $value->user_id)
-                                    ->where('programmemedecins.statut', '=', 'oui')
-                                    ->select('programmemedecins.*', 'joursemaines.jour as jour')
-                                    ->get();
+            $horaires = DB::table('programmemedecins')
+                ->join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
+                ->where('programmemedecins.codemedecin', '=', $value->codemedecin)
+                ->where('programmemedecins.statut', '=', 'oui')
+                ->select('programmemedecins.*', 'joursemaines.jour as jour')
+                ->get();
 
             $value->horaires = $horaires;
         }
@@ -688,27 +687,28 @@ class ApilistController extends Controller
     {
         $today = Carbon::today();
 
-        $rdv = rdvpatient::Join('patients', 'patients.id', '=', 'rdvpatients.patient_id')
-                        ->Join('users', 'users.id', '=', 'rdvpatients.user_id')
-                        ->join('typemedecins', 'typemedecins.user_id', '=', 'users.id')
-                        ->join('typeactes', 'typeactes.id', '=', 'typemedecins.typeacte_id')
-                        ->whereDate('rdvpatients.date', '=', $today)
-                        ->select(
-                            'rdvpatients.*', 
-                            'patients.np as patient',
-                            'patients.tel as patient_tel',
-                            'users.name as medecin',
-                            'typeactes.nom as specialite'
-                        )
-                        ->orderBy('rdvpatients.created_at', 'desc')
-                        ->get();
+        $rdv = DB::table('rdvpatients')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'rdvpatients.patient_id')
+            ->Join('medecin', 'medecin.codemedecin', '=', 'rdvpatients.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->whereDate('rdvpatients.date', '=', $today)
+            ->select(
+                'rdvpatients.*', 
+                'patient.nomprenomspatient as patient',
+                'patient.telpatient as patient_tel',
+                'medecin.nomprenomsmed as medecin',
+                'specialitemed.nomspecialite as specialite'
+            )
+            ->orderBy('rdvpatients.created_at', 'desc')
+            ->get();
 
         foreach ($rdv as $value) {
-            $horaires = programmemedecin::join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
-                                    ->where('programmemedecins.user_id', '=', $value->user_id)
-                                    ->where('programmemedecins.statut', '=', 'oui')
-                                    ->select('programmemedecins.*', 'joursemaines.jour as jour')
-                                    ->get();
+            $horaires = DB::table('programmemedecins')
+                ->join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
+                ->where('programmemedecins.codemedecin', '=', $value->codemedecin)
+                ->where('programmemedecins.statut', '=', 'oui')
+                ->select('programmemedecins.*', 'joursemaines.jour as jour')
+                ->get();
 
             $value->horaires = $horaires;
         }
@@ -716,6 +716,7 @@ class ApilistController extends Controller
         return response()->json([
             'data' => $rdv,
         ]);
+
     }
 
     public function list_specialite()
@@ -1076,32 +1077,20 @@ class ApilistController extends Controller
         // $today = Carbon::today();
         // $twoDaysLater = Carbon::today()->addDays(2);
 
-        $rdvQuery = rdvpatient::Join('patients', 'patients.id', '=', 'rdvpatients.patient_id')
-                        ->Join('users', 'users.id', '=', 'rdvpatients.user_id')
-                        ->join('typemedecins', 'typemedecins.user_id', '=', 'users.id')
-                        ->join('typeactes', 'typeactes.id', '=', 'typemedecins.typeacte_id')
-                        ->whereDate('rdvpatients.date', '=', $twoDaysLater)
-                        // ->whereBetween('rdvpatients.date', [$today, $twoDaysLater])
-                        ->select(
-                            'rdvpatients.*', 
-                            'patients.np as patient',
-                            'patients.tel as patient_tel', 
-                            'users.name as medecin',
-                            'typeactes.nom as specialite'
-                        )
-                        ->orderBy('rdvpatients.created_at', 'desc');
+        $rdvQuery = DB::table('rdvpatients')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'rdvpatients.patient_id')
+            ->Join('medecin', 'medecin.codemedecin', '=', 'rdvpatients.codemedecin')
+            ->join('specialitemed', 'medecin.codespecialitemed', '=', 'specialitemed.codespecialitemed')
+            ->whereDate('rdvpatients.date', '=', $twoDaysLater)
+            ->select(
+                'rdvpatients.*', 
+                'patient.nomprenomspatient as patient',
+                'medecin.nomprenomsmed as medecin',
+                'specialitemed.nomspecialite as specialite'
+            )
+            ->orderBy('rdvpatients.created_at', 'desc');
 
         $rdv = $rdvQuery->paginate(15);
-
-        foreach ($rdv->items() as $value) {
-            $horaires = programmemedecin::join('joursemaines', 'joursemaines.id', '=', 'programmemedecins.jour_id')
-                                    ->where('programmemedecins.user_id', '=', $value->user_id)
-                                    ->where('programmemedecins.statut', '=', 'oui')
-                                    ->select('programmemedecins.*', 'joursemaines.jour as jour')
-                                    ->get();
-
-            $value->horaires = $horaires;
-        }
 
         return response()->json([
             'rdv' => $rdv->items(),

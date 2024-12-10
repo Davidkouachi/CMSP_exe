@@ -583,6 +583,36 @@
 
             count_rdv_two_day();
 
+            function count_rdv_two_day() 
+            {
+
+                fetch('/api/count_rdv_two_day')
+                    .then(response => response.json())
+                    .then(data => {
+                        const nbre = data.nbre || 0;
+
+                        console.log(nbre);
+
+                        document.getElementById('div_two_rdv').innerHTML = '';
+
+                        if (nbre > 0) {
+
+                            const div = `
+                                <div class="sidebar-contact" style="background-color: red;">
+                                    <a class="text-white" href="{{route('rdv_two_day')}}">
+                                        <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
+                                        <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
+                                        <i class="ri-calendar-schedule-line"></i>
+                                    </a>
+                                </div>
+                            `;
+
+                            document.getElementById('div_two_rdv').innerHTML = div;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
             function showAlert(title, message, type) {
                 Swal.fire({
                     title: title,
@@ -861,250 +891,225 @@
                 }
             });
 
-            function update_info() {
+            // function update_info() 
+            // {
 
-                const id = {{Auth::user()->id}};
-                const nom = document.getElementById("nom_para");
-                const email = document.getElementById("email_para");
-                const tel = document.getElementById("tel_para");
-                const tel2 = document.getElementById("tel2_para");
-                const sexe = document.getElementById("sexe_para");
-                const adresse = document.getElementById("adresse_para");
-                const role_id = {{Auth::user()->role_id}};
+            //     const id = {{Auth::user()->id}};
+            //     const nom = document.getElementById("nom_para");
+            //     const email = document.getElementById("email_para");
+            //     const tel = document.getElementById("tel_para");
+            //     const tel2 = document.getElementById("tel2_para");
+            //     const sexe = document.getElementById("sexe_para");
+            //     const adresse = document.getElementById("adresse_para");
+            //     const role_id = {{Auth::user()->role_id}};
 
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            //     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                // Field validation
-                if (!nom.value.trim() || !email.value.trim() || !tel.value.trim() || !sexe.value.trim() || !adresse.value.trim()) {
-                    showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
-                    return false;
-                }
+            //     // Field validation
+            //     if (!nom.value.trim() || !email.value.trim() || !tel.value.trim() || !sexe.value.trim() || !adresse.value.trim()) {
+            //         showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
+            //         return false;
+            //     }
 
-                // Email validation
-                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email.value.trim())) {
-                    showAlert('Alert', 'Email incorrect.','warning');
-                    return false;
-                }
+            //     // Email validation
+            //     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            //     if (!emailRegex.test(email.value.trim())) {
+            //         showAlert('Alert', 'Email incorrect.','warning');
+            //         return false;
+            //     }
 
-                // Phone validation
-                if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
-                    showAlert('Alert', 'Contact incomplet.','warning');
-                    return false;
-                }
+            //     // Phone validation
+            //     if (tel.value.length !== 10 || (tel2.value !== '' && tel2.value.length !== 10)) {
+            //         showAlert('Alert', 'Contact incomplet.','warning');
+            //         return false;
+            //     }
 
-                var modal = bootstrap.Modal.getInstance(document.getElementById('Parametrage'));
-                modal.hide();
+            //     var modal = bootstrap.Modal.getInstance(document.getElementById('Parametrage'));
+            //     modal.hide();
 
-                var preloader_ch = `
-                    <div id="preloader_ch">
-                        <div class="spinner_preloader_ch"></div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            //     var preloader_ch = `
+            //         <div id="preloader_ch">
+            //             <div class="spinner_preloader_ch"></div>
+            //         </div>
+            //     `;
+            //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                $.ajax({
-                    url: '/refresh-csrf',
-                    method: 'GET',
-                    success: function(response_crsf) {
-                        // Met à jour la balise <meta> avec le nouveau token
-                        document.querySelector('meta[name="csrf-token"]').setAttribute('content', response_crsf.csrf_token);
+            //     $.ajax({
+            //         url: '/refresh-csrf',
+            //         method: 'GET',
+            //         success: function(response_crsf) {
+            //             // Met à jour la balise <meta> avec le nouveau token
+            //             document.querySelector('meta[name="csrf-token"]').setAttribute('content', response_crsf.csrf_token);
                         
-                        // console.log("Nouveau token CSRF:", response_crsf.csrf_token);
+            //             // console.log("Nouveau token CSRF:", response_crsf.csrf_token);
 
-                        $.ajax({
-                            url: '/api/update_user/' + id,
-                            method: 'PUT',
-                            headers: {
-                                'X-CSRF-TOKEN': response_crsf.csrf_token,
-                            },
-                            data: {
-                                nom: nom.value, 
-                                email: email.value, 
-                                tel: tel.value, 
-                                tel2: tel2.value || null, 
-                                adresse: adresse.value || null, 
-                                sexe: sexe.value, 
-                                role_id: role_id,
-                            },
-                            success: function(response) {
+            //             $.ajax({
+            //                 url: '/api/update_user/' + id,
+            //                 method: 'PUT',
+            //                 headers: {
+            //                     'X-CSRF-TOKEN': response_crsf.csrf_token,
+            //                 },
+            //                 data: {
+            //                     nom: nom.value, 
+            //                     email: email.value, 
+            //                     tel: tel.value, 
+            //                     tel2: tel2.value || null, 
+            //                     adresse: adresse.value || null, 
+            //                     sexe: sexe.value, 
+            //                     role_id: role_id,
+            //                 },
+            //                 success: function(response) {
 
-                                document.getElementById('preloader_ch').remove();
+            //                     document.getElementById('preloader_ch').remove();
 
-                                if (response.tel_existe) {
+            //                     if (response.tel_existe) {
 
-                                    showAlert('Alert', 'Veuillez saisir autre numéro de téléphone s\'il vous plaît','warning');
+            //                         showAlert('Alert', 'Veuillez saisir autre numéro de téléphone s\'il vous plaît','warning');
 
-                                }else if (response.email_existe) {
+            //                     }else if (response.email_existe) {
 
-                                    showAlert('Alert', 'Veuillez saisir autre email s\'il vous plaît','warning');
+            //                         showAlert('Alert', 'Veuillez saisir autre email s\'il vous plaît','warning');
 
-                                }else if (response.nom_existe) {
+            //                     }else if (response.nom_existe) {
 
-                                    showAlert('Alert', 'Cet Utilisateur existe déjà.','warning');
+            //                         showAlert('Alert', 'Cet Utilisateur existe déjà.','warning');
 
-                                } else if (response.success) {
+            //                     } else if (response.success) {
 
-                                    let timerInterval;
-                                    Swal.fire({
-                                        title: "Opération éffectuée, Veuillez patienter un instant s'il vous plaît",
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        didOpen: () => {
-                                            Swal.showLoading();
-                                            const timer = Swal.getPopup().querySelector("b");
-                                            timerInterval = setInterval(() => {
-                                                timer.textContent = `${Swal.getTimerLeft()}`;
-                                            }, 100);
-                                        },
-                                        willClose: () => {
-                                            clearInterval(timerInterval);
-                                        }
-                                    }).then((result) => {
-                                        if (result.dismiss === Swal.DismissReason.timer) {
-                                            location.reload(); // Rafraîchir la page après le timer
-                                        }
-                                    });
+            //                         let timerInterval;
+            //                         Swal.fire({
+            //                             title: "Opération éffectuée, Veuillez patienter un instant s'il vous plaît",
+            //                             timer: 2000,
+            //                             timerProgressBar: true,
+            //                             didOpen: () => {
+            //                                 Swal.showLoading();
+            //                                 const timer = Swal.getPopup().querySelector("b");
+            //                                 timerInterval = setInterval(() => {
+            //                                     timer.textContent = `${Swal.getTimerLeft()}`;
+            //                                 }, 100);
+            //                             },
+            //                             willClose: () => {
+            //                                 clearInterval(timerInterval);
+            //                             }
+            //                         }).then((result) => {
+            //                             if (result.dismiss === Swal.DismissReason.timer) {
+            //                                 location.reload(); // Rafraîchir la page après le timer
+            //                             }
+            //                         });
 
-                                } else if (response.error) {
+            //                     } else if (response.error) {
 
-                                    showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
+            //                         showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
 
-                                }
-                            },
-                            error: function() {
-                                document.getElementById('preloader_ch').remove();
-                                showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
-                            }
-                        });
+            //                     }
+            //                 },
+            //                 error: function() {
+            //                     document.getElementById('preloader_ch').remove();
+            //                     showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
+            //                 }
+            //             });
 
-                    },
-                    error: function() {
-                        console.log("Erreur lors du rafraîchissement du token CSRF");
-                        document.getElementById('preloader_ch').remove();
-                        showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
-                    }
-                });
-            }
+            //         },
+            //         error: function() {
+            //             console.log("Erreur lors du rafraîchissement du token CSRF");
+            //             document.getElementById('preloader_ch').remove();
+            //             showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
+            //         }
+            //     });
+            // }
 
-            function update_mdp() {
+            // function update_mdp() 
+            // {
 
-                const id = {{Auth::user()->id}};
-                const mdp1 = document.getElementById("password1_para");
-                const mdp2 = document.getElementById("password2_para");
+            //     const id = {{Auth::user()->id}};
+            //     const mdp1 = document.getElementById("password1_para");
+            //     const mdp2 = document.getElementById("password2_para");
 
-                // Field validation
-                if (!mdp1.value.trim() || !mdp2.value.trim()) {
-                    showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
-                    return false;
-                }
+            //     // Field validation
+            //     if (!mdp1.value.trim() || !mdp2.value.trim()) {
+            //         showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
+            //         return false;
+            //     }
 
-                // Phone validation
-                if (mdp1.value !== mdp2.value) {
-                    showAlert('Alert', 'Mot de passe incorrecte.','warning');
-                    return false;
-                }
+            //     // Phone validation
+            //     if (mdp1.value !== mdp2.value) {
+            //         showAlert('Alert', 'Mot de passe incorrecte.','warning');
+            //         return false;
+            //     }
 
-                var modal = bootstrap.Modal.getInstance(document.getElementById('Parametrage'));
-                modal.hide();
+            //     var modal = bootstrap.Modal.getInstance(document.getElementById('Parametrage'));
+            //     modal.hide();
 
-                var preloader_ch = `
-                    <div id="preloader_ch">
-                        <div class="spinner_preloader_ch"></div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            //     var preloader_ch = `
+            //         <div id="preloader_ch">
+            //             <div class="spinner_preloader_ch"></div>
+            //         </div>
+            //     `;
+            //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-                $.ajax({
-                    url: '/refresh-csrf',
-                    method: 'GET',
-                    success: function(response_crsf) {
-                        // Met à jour la balise <meta> avec le nouveau token
-                        document.querySelector('meta[name="csrf-token"]').setAttribute('content', response_crsf.csrf_token);
+            //     $.ajax({
+            //         url: '/refresh-csrf',
+            //         method: 'GET',
+            //         success: function(response_crsf) {
+            //             // Met à jour la balise <meta> avec le nouveau token
+            //             document.querySelector('meta[name="csrf-token"]').setAttribute('content', response_crsf.csrf_token);
 
-                        $.ajax({
-                            url: '/api/update_mdp/' + id,
-                            method: 'PUT',
-                            headers: {
-                                'X-CSRF-TOKEN': response_crsf.csrf_token,
-                            },
-                            data: {
-                                mdp1: mdp1.value,
-                            },
-                            success: function(response) {
+            //             $.ajax({
+            //                 url: '/api/update_mdp/' + id,
+            //                 method: 'PUT',
+            //                 headers: {
+            //                     'X-CSRF-TOKEN': response_crsf.csrf_token,
+            //                 },
+            //                 data: {
+            //                     mdp1: mdp1.value,
+            //                 },
+            //                 success: function(response) {
 
-                                document.getElementById('preloader_ch').remove();
+            //                     document.getElementById('preloader_ch').remove();
 
-                                if (response.success) {
+            //                     if (response.success) {
 
-                                    let timerInterval;
-                                    Swal.fire({
-                                        title: "Opération éffectuée, Veuillez patienter un instant s'il vous plaît",
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        didOpen: () => {
-                                            Swal.showLoading();
-                                            const timer = Swal.getPopup().querySelector("b");
-                                            timerInterval = setInterval(() => {
-                                                timer.textContent = `${Swal.getTimerLeft()}`;
-                                            }, 100);
-                                        },
-                                        willClose: () => {
-                                            clearInterval(timerInterval);
-                                        }
-                                    }).then((result) => {
-                                        if (result.dismiss === Swal.DismissReason.timer) {
-                                            location.reload(); // Rafraîchir la page après le timer
-                                        }
-                                    });
+            //                         let timerInterval;
+            //                         Swal.fire({
+            //                             title: "Opération éffectuée, Veuillez patienter un instant s'il vous plaît",
+            //                             timer: 2000,
+            //                             timerProgressBar: true,
+            //                             didOpen: () => {
+            //                                 Swal.showLoading();
+            //                                 const timer = Swal.getPopup().querySelector("b");
+            //                                 timerInterval = setInterval(() => {
+            //                                     timer.textContent = `${Swal.getTimerLeft()}`;
+            //                                 }, 100);
+            //                             },
+            //                             willClose: () => {
+            //                                 clearInterval(timerInterval);
+            //                             }
+            //                         }).then((result) => {
+            //                             if (result.dismiss === Swal.DismissReason.timer) {
+            //                                 location.reload(); // Rafraîchir la page après le timer
+            //                             }
+            //                         });
 
 
-                                } else if (response.error) {
+            //                     } else if (response.error) {
 
-                                    showAlert('Erreur', 'Echec de l\'opération.','error');
+            //                         showAlert('Erreur', 'Echec de l\'opération.','error');
 
-                                }
-                            },
-                            error: function() {
-                                document.getElementById('preloader_ch').remove();
-                                showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
-                            }
-                        });
-                    },
-                    error: function() {
-                        console.log("Erreur lors du rafraîchissement du token CSRF");
-                        document.getElementById('preloader_ch').remove();
-                        showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
-                    }
-                });
-            }
-
-            function count_rdv_two_day() {
-
-                fetch('/api/count_rdv_two_day')
-                    .then(response => response.json())
-                    .then(data => {
-                        const nbre = data.nbre || 0;
-
-                        document.getElementById('div_two_rdv').innerHTML = '';
-
-                        if (nbre > 0) {
-
-                            const div = `
-                                <div class="sidebar-contact" style="background-color: red;">
-                                    <a class="text-white" href="{{route('rdv_two_day')}}">
-                                        <p class="fw-light mb-1 text-nowrap text-truncate">Rendez-Vous dans 2 jours</p>
-                                        <h5 class="m-0 lh-1 text-nowrap text-truncate">${nbre}</h5>
-                                        <i class="ri-calendar-schedule-line"></i>
-                                    </a>
-                                </div>
-                            `;
-
-                            document.getElementById('div_two_rdv').innerHTML = div;
-                        }
-                    })
-                    .catch(error => console.error('Error fetching data:', error));
-            }
+            //                     }
+            //                 },
+            //                 error: function() {
+            //                     document.getElementById('preloader_ch').remove();
+            //                     showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
+            //                 }
+            //             });
+            //         },
+            //         error: function() {
+            //             console.log("Erreur lors du rafraîchissement du token CSRF");
+            //             document.getElementById('preloader_ch').remove();
+            //             showAlert('Erreur', 'Erreur lors de la mise à jour.','error');
+            //         }
+            //     });
+            // }
 
         });
     </script>
