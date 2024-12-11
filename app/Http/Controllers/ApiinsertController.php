@@ -154,6 +154,14 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueFactureSoinsAmbulatoire()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('soins_medicaux')->where('numfac_soins', '=', 'FCS'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -776,22 +784,26 @@ class ApiinsertController extends Controller
 
     public function new_produit(Request $request)
     {
-        $verf = produit::where('nom', '=', $request->nom)->exists();
+        $verf = DB::table('medicine')->where('name', '=', $request->nom)->exists();
 
         if ($verf) {
             return response()->json(['existe' => true]);
         }
 
-        $add = new produit();
-        $add->nom = $request->nom;
-        $add->prix = $request->prix;
-        $add->quantite = $request->quantite;
+        $produitInserted = DB::table('medicine')->insert([
+            'name' => $request->nom,
+            'medicine_category_id' => $request->categorieid,
+            'price' => str_replace('.', '', $request->prix),
+            'status' => $request->quantite,
+        ]);
 
-        if($add->save()){
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['error' => true]);
+        if ($produitInserted == 1) {
+            return response()->json([
+                'success' => true,
+            ]);
         }
+
+        return response()->json(['error' => true]);
     }
 
     public function add_soinshopital(Request $request, $id)
@@ -905,32 +917,43 @@ class ApiinsertController extends Controller
 
     public function new_typesoins(Request $request)
     {
-        $verf = typesoins::where('nom', '=', $request->nom)->exists();
+        $verf = DB::table('typesoinsinfirmiers')->where('libelle_typesoins', '=', $request->nom)->exists();
 
         if ($verf) {
             return response()->json(['existe' => true]);
         }
 
-        $add = new typesoins();
-        $add->nom = $request->nom;
+        $typesoinsInserted = DB::table('typesoinsinfirmiers')->insert([
+            'libelle_typesoins' => $request->nom,
+        ]);
 
-        if($add->save()){
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['error' => true]);
+        if ($typesoinsInserted == 1) {
+            return response()->json([
+                'success' => true,
+            ]);
         }
+
+        return response()->json(['error' => true]);
     }
 
     public function new_soinsIn(Request $request)
     {
-        $add = new soinsinfirmier();
+        $verf = DB::table('soins_infirmier')->where('libelle_soins', '=', $request->nom)->exists();
 
-        $add->nom = $request->nom_soins;
-        $add->prix = $request->prix;
-        $add->typesoins_id = $request->typesoins_id;
+        if ($verf) {
+            return response()->json(['existe' => true]);
+        }
 
-        if ($add->save()) {
-            return response()->json(['success' => true]);
+        $soinsInserted = DB::table('soins_infirmier')->insert([
+            'price' => str_replace('.', '', $request->prix),
+            'libelle_soins' => $request->nom,
+            'code_typesoins' => $request->typesoins,
+        ]);
+
+        if ($soinsInserted == 1) {
+            return response()->json([
+                'success' => true,
+            ]);
         }
 
         return response()->json(['error' => true]);
@@ -938,6 +961,7 @@ class ApiinsertController extends Controller
 
     public function new_soinsam(Request $request)
     {
+
         $selectionsSoins = $request->input('selectionsSoins');
         if (!is_array($selectionsSoins) || empty($selectionsSoins)) {
             return response()->json(['json' => true]);
@@ -948,109 +972,117 @@ class ApiinsertController extends Controller
             return response()->json(['json' => true]);
         }
 
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-        ->where('patients.id', '=', $request->patient_id)
-        ->select('patients.*', 'assurances.nom as assurance')
-        ->first();
-
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        if (!$patient) {
-            return response()->json(['error' => true]);
-        }
-
-        $typesoins = typesoins::find($request->typesoins_id);
-
-        if (!$typesoins) {
-            return response()->json(['error' => true]);
-        }
-
-        $code = $this->generateUniqueMatricule();
-
-        $codeFac = $this->generateUniqueFacture();
+        $numfac = $this->generateUniqueFactureSoinsAmbulatoire();
 
         DB::beginTransaction();
 
         try {
 
-            $fac = new facture();
-            $fac->code = $codeFac;
-            $fac->statut = 'impayer';
-            $fac->acte = 'SOINS AMBULATOIRE';
-            $fac->creer_id = $request->auth_id;
+            $taux = (str_replace('.', '', $request->montantAssurance) / str_replace('.', '', $request->montantTotal)) * 100;
+            $tauxEntier = intval($taux);
 
-            if (!$fac->save()) {
-                throw new \Exception('Erreur');
+            $soinsId = DB::table('soins_medicaux')->insertGetId([
+                'idenregistremetpatient' => $request->patient_id,
+                'taux_couverture' => $tauxEntier,
+                'date_soin' => now(),
+                'montant_total' => str_replace('.', '', $request->montantTotal),
+                'ticket_moderateur' => str_replace('.', '', $request->montantPatient),
+                'part_assurance' => str_replace('.', '', $request->montantAssurance),
+                'numfac_soins' => 'FCS'.$numfac,
+                'paid_status' => 0,
+            ]);
+
+            if (!$soinsId) {
+                throw new Exception('Erreur lors de l\'insertion dans la table tarifs');
             }
 
-            if ($request->numcode != null) {
-                $verf = soinspatient::where('num_bon', '=', $request->numcode)->exists();
+            $patient = DB::table('patient')
+                ->where('patient.idenregistremetpatient', '=', $request->patient_id)
+                ->select('patient.codeassurance as codeassurance')
+                ->first();
 
-                if ($verf) {
-                    return response()->json(['existe' => true]);
-                }
-            }
+            $facturesInserted = DB::table('factures')->insert([
+                'numfac' => 'FCS'.$numfac,
+                'idenregistremetpatient' => $request->patient_id,
+                'montanttotal' => str_replace('.', '', $request->montantTotal),
+                'remise' => 0,
+                'type_remise' => 0,
+                'calcul_applique' => 0,
+                'taux_applique' => $tauxEntier,
+                'montant_ass' => str_replace('.', '', $request->montantAssurance),
+                'montant_pat' => str_replace('.', '', $request->montantPatient),
+                'montantregle_ass' => 0,
+                'montantregle_pat' => 0,
+                'montantpat_verser' => 0,
+                'montantpat_remis' => 0,
+                'montantreste_ass' => str_replace('.', '', $request->montantAssurance),
+                'montantreste_pat' => str_replace('.', '', $request->montantPatient),
+                'solde_ass' => 0,
+                'solde_pat' => 0,
+                'codeassurance' => $patient->codeassurance,
+                'datefacture' => now(),
+                'type_facture' => 4,
+                'timbre_fiscal' => 0,
+                'a_encaisser' => 0,
+            ]);
 
-            $add = new soinspatient();
-            $add->code = $code;
-            $add->statut = 'en cours';
-            $add->num_bon = $request->numcode;
-            $add->part_patient = $request->montantPatient;
-            $add->part_assurance = $request->montantAssurance;
-            $add->remise = $request->montantRemise;
-            $add->montant = $request->montantTotal;
-            $add->libelle = '';
-            $add->facture_id = $fac->id;
-            $add->patient_id = $patient->id;
-            $add->typesoins_id = $typesoins->id;
-
-            if ($patient->assurer === 'non') {
-                $add->assurance_utiliser = 'non';
-            }else{
-                $add->assurance_utiliser = $request->assurance_utiliser;
-            }
-
-            if (!$add->save()) {
-                throw new \Exception('Erreur lors de la creation du soins patient');
+            if ($facturesInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table factures');
             }
 
             foreach ($selectionsSoins as $value) {
 
-                $adds = new sp_soins();
-                $adds->soinsinfirmier_id = $value['id'];
-                $adds->montant = number_format($value['montant'], 0, ',', '.');
-                $adds->soinspatient_id = $add->id;
+                $soins = DB::table('soins_infirmier')
+                    ->where('code_soins','=',$value['id'])
+                    ->select('soins_infirmier.*')
+                    ->first();
 
-                if (!$adds->save()) {
-                    throw new \Exception('Erreur');
+                $soinsInsert = DB::table('soins_medicaux_itemsoins')->insert([
+                    'id_soins' => $soinsId,
+                    'code_soins' => $value['id'],
+                    'qte' => 1,
+                    'libelle_soins' => $soins->libelle_soins,
+                    'price' => str_replace('.', '', $value['montant']),
+                ]);
+
+                if ($soinsInsert == 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table soins_medicaux_itemsoins');
                 }
+
             }
 
             foreach ($selectionsProduits as $value) {
 
-                $qu = produit::find($value['id']);
-                if ($qu && $qu->quantite >= $value['quantite']) {
-                    
-                    $qu->quantite -= $value['quantite'];
+                $produit = DB::table('medicine')
+                    ->where('medicine_id','=',$value['id'])
+                    ->select('medicine.*')
+                    ->first();
 
-                    if (!$qu->save()) {
-                        throw new \Exception('Erreur lors de la mise à jour de la quantité du produit');
-                    }
+                $produitInsert = DB::table('soins_medicaux_itemmedics')->insert([
+                    'id_soins' => $soinsId,
+                    'medicine_id' => $value['id'],
+                    'qte' => $value['quantite'],
+                    'name' => $produit->name,
+                    'price' => str_replace('.', '', $value['montant']),
+                ]);
 
-                }else{
-                    throw new \Exception('Quantité insuffisante pour le produit : ' . $qu->nom);
+                if ($produitInsert == 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table soins_medicaux_itemmedics');
                 }
 
-                $addp = new sp_produit();
-                $addp->produit_id = $value['id'];
-                $addp->quantite = $value['quantite'];
-                $addp->montant = number_format($value['montant'], 0, ',', '.');
-                $addp->soinspatient_id = $add->id;
+                $qte_new = (int) $produit->status - (int) $value['quantite'];
 
-                if (!$addp->save()) {
-                    throw new \Exception('Erreur');
+                $updateData_produit =[
+                    'status' => $qte_new,
+                    'updated_at' => now(),
+                ];
+
+                $produitUpdate = DB::table('medicine')
+                                    ->where('medicine_id', '=', $value['id'])
+                                    ->update($updateData_produit);
+
+                if ($produitUpdate == 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table medicine');
                 }
             }
 
@@ -1060,7 +1092,7 @@ class ApiinsertController extends Controller
         } catch (Exception $e) {
 
             DB::rollback();
-            return response()->json(['error' => true]);
+            return response()->json(['error' => true, 'message' => $e->getMessage()]);
         }
     }
 

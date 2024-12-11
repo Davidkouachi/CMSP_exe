@@ -277,57 +277,76 @@ class ApiupdateController extends Controller
 
     public function update_produit(Request $request, $id)
     {
-        $put = produit::find($id);
+        $verf = DB::table('medicine')
+            ->where('name', '=', $request->nom)
+            ->where('medicine_id', '!=', $id)
+            ->exists();
 
-        if ($put) {
-            $put->nom = $request->nom;
-            $put->prix = $request->prix;
-            $put->quantite = $request->quantite;
-
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
-
+        if ($verf) {
+            return response()->json(['existe' => true]);
         }
 
-        return response()->json(['success' => true]);
+        $updateData_produit =[
+            'name' => $request->nom,
+            'medicine_category_id' => $request->categorie_id,
+            'price' => str_replace('.', '', $request->prix),
+            'status' => $request->quantite,
+            'updated_at' => now(),
+        ];
+
+        $produitUpdate = DB::table('medicine')
+                            ->where('medicine_id', '=', $id)
+                            ->update($updateData_produit);
+
+        if ($produitUpdate == 1) {
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['error' => true]);
     }
 
     public function update_typesoins(Request $request, $id)
     {
-        $put = typesoins::find($id);
+        $updateData_typesoins =[
+            'libelle_typesoins' => $request->nom,
+            'updated_at' => now(),
+        ];
 
-        if ($put) {
-            $put->nom = $request->nom;
+        $typesoinsUpdate = DB::table('typesoinsinfirmiers')
+                            ->where('code_typesoins', '=', $id)
+                            ->update($updateData_typesoins);
 
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
-
+        if ($typesoinsUpdate == 1) {
+            return response()->json(['success' => true]);
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['error' => true]);
     }
 
     public function update_soinIn(Request $request, $id)
     {
-        $put = soinsinfirmier::find($id);
+        $verf = DB::table('soins_infirmier')
+            ->where('libelle_soins', '=', $request->nom)
+            ->where('code_soins', '!=', $id)
+            ->exists();
 
-        if ($put) {
-            $put->nom = $request->nomModif;
-            $put->prix = $request->prix;
-            $put->typesoins_id = $request->typesoins_id;
+        if ($verf) {
+            return response()->json(['existe' => true]);
+        }
 
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
+        $updateData_soins =[
+            'libelle_soins' => $request->nom,
+            'price' => str_replace('.', '', $request->prix),
+            'code_typesoins' => $request->typesoins,
+            'updated_at' => now(),
+        ];
 
+        $soinsUpdate = DB::table('soins_infirmier')
+                            ->where('code_soins', '=', $id)
+                            ->update($updateData_soins);
+
+        if ($soinsUpdate == 1) {
+            return response()->json(['success' => true]);
         }
 
         return response()->json(['error' => true]);

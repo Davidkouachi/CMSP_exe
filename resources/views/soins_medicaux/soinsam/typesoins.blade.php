@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Types de soins</h5>
+                        <h5>TYPE DE SOINS</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Configuration / Types de soins</p>
                     </div>
                 </div>
             </div>
@@ -230,32 +230,20 @@
                     if (response.existe) {
                         showAlert('Alert', 'Cet type existe déjà.','warning');
                     } else if (response.success) {
+                        nom.value = '';
+                        list();
                         showAlert('Succès', 'Type Soins Enregistrée.','success');
                     } else if (response.error) {
                         showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
                     }
 
-                    nom.value = '';
-
-                    list();
                 },
                 error: function(xhr, status, error) {
                     var preloader = document.getElementById('preloader_ch');
                     if (preloader) {
                         preloader.remove();
                     }
-
-                    // You can log the entire error object to inspect it if needed
                     console.log(xhr, status, error);
-
-                    // Display a more specific error message
-                    if (xhr.responseText) {
-                        showAlert('Erreur', `Erreur: ${xhr.responseText}`,'error');
-                    } else {
-                        showAlert('Erreur', `Erreur: ${status} - ${error}`,'error');
-                    }
-
-                    nom.value = '';
                 }
             });
         }
@@ -299,12 +287,12 @@
                                         <a class="d-flex align-items-center flex-column me-2">
                                             <img src="{{asset('assets/images/soinsam.webp')}}" class="img-2x rounded-circle border border-1">
                                         </a>
-                                        ${item.nom}
+                                        ${item.libelle_typesoins}
                                     </div>
                                 </td>
                                 <td>
                                     <div class="d-inline-flex gap-1">
-                                        <a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit-${item.id}">
+                                        <a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit-${item.code_typesoins}">
                                             <i class="ri-edit-box-line"></i>
                                         </a>
                                         
@@ -318,10 +306,10 @@
                             tableBody.appendChild(row);
 
                             // Add event listener to the edit button to open the modal with pre-filled data
-                            document.getElementById(`edit-${item.id}`).addEventListener('click', () => {
+                            document.getElementById(`edit-${item.code_typesoins}`).addEventListener('click', () => {
                                 // Set the values in the modal form
-                                document.getElementById('Id').value = item.id;
-                                document.getElementById('nomModif').value = item.nom;
+                                document.getElementById('Id').value = item.code_typesoins;
+                                document.getElementById('nomModif').value = item.libelle_typesoins;
                             });
 
                             // Add event listener to the edit button to open the modal with pre-filled data

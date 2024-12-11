@@ -177,8 +177,8 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
-                                                                    <th scope="col">Code</th>
                                                                     <th scope="col">Nom</th>
+                                                                    <th scope="col">Code</th>
                                                                     <th scope="col">Actions</th>
                                                                 </tr>
                                                             </thead>

@@ -64,7 +64,6 @@ class ApideleteController extends Controller
         }
 
         return response()->json(['error' => true]);
-
     }
 
     public function delete_lit($id)
@@ -80,7 +79,6 @@ class ApideleteController extends Controller
         }
 
         return response()->json(['error' => true]);
-
     }
 
     public function delete_acte($id)
@@ -169,10 +167,13 @@ class ApideleteController extends Controller
 
     public function delete_typesoins($id)
     {
-        $put = typesoins::find($id);
+        $put = DB::table('typesoinsinfirmiers')->where('code_typesoins', '=', $id)->first();
 
         if ($put) {
-            if ($put->delete()) {
+
+            $delete = DB::table('typesoinsinfirmiers')->where('code_typesoins', '=', $id)->delete();
+
+            if ($delete == 1) {
                 return response()->json(['success' => true]);
             }else{
                 return response()->json(['error' => true]);

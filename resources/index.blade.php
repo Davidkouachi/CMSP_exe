@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h5>SOINS AMBULATOIRES</h5>
-                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
-                        <p>Services / Soins amulatoires.</p>
+                        <h6>Bienvenue,</h6>
+                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
+                        <h5>Les statistiques d'aujourd'hui.</h5>
                         <div class="mt-4 d-flex gap-3">
                             <div class="d-flex align-items-center">
                                 <div class="icon-box lg bg-info rounded-5 me-3">
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="d-flex flex-column">
                                     <h2 class="m-0 lh-1" id="nbre_soinsam" ></h2>
-                                    <p class="m-0">Patients Traités aujourd'hui</p>
+                                    <p class="m-0">Patients Traités</p>
                                 </div>
                             </div>
                         </div>
@@ -279,9 +279,15 @@
                                                 <div class="w-100">
                                                     <div class="input-group">
                                                         <span class="input-group-text">Du</span>
-                                                        <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-1 months')) }}" max="{{ date('Y-m-d') }}">
+                                                        <input type="date" id="searchDate1" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d', strtotime('-2 months')) }}" max="{{ date('Y-m-d') }}">
                                                         <span class="input-group-text">au</span>
                                                         <input type="date" id="searchDate2" placeholder="Recherche" class="form-control me-1" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                                        <span class="input-group-text">Statut</span>
+                                                        <select class="form-select me-1" id="statut">
+                                                            <option selected value="tous">Tous</option>
+                                                            <option value="en cours">En cours</option>
+                                                            <option value="terminé">Terminé</option>
+                                                        </select>
                                                         <a id="btn_search_table" class="btn btn-outline-success ms-auto">
                                                             <i class="ri-search-2-line"></i>
                                                         </a>
@@ -291,18 +297,16 @@
                                             <div class="card-body">
                                                 <div class="">
                                                     <div class="table-responsive">
-                                                        <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_soinsam">
+                                                        <table id="Table_day" class="table table-hover table-sm Table_soinsam">
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
-                                                                    <th scope="col">N° Facture</th>
+                                                                    <th scope="col">Type de Soins</th>
                                                                     <th scope="col">Patient</th>
-                                                                    <th scope="col">Nbre Soins</th>
-                                                                    <th scope="col">Nbre Produits</th>
-                                                                    <th scope="col">Part Assurance</th>
-                                                                    <th scope="col">Part Patient</th>
-                                                                    <th scope="col">Taux de couverture</th>
+                                                                    <th scope="col">Nombre Soins</th>
+                                                                    <th scope="col">Nombre Produits</th>
                                                                     <th scope="col">Montant Total</th>
+                                                                    <th scope="col">Statut</th>
                                                                     <th scope="col">Date de création</th>
                                                                     <th scope="col"></th>
                                                                 </tr>
@@ -326,7 +330,7 @@
 </div>
 
 
-{{-- <div class="modal fade" id="Detail" tabindex="-1" aria-labelledby="exampleModalCenteredScrollableTitle" aria-modal="true" role="dialog">
+<div class="modal fade" id="Detail" tabindex="-1" aria-labelledby="exampleModalCenteredScrollableTitle" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -350,9 +354,9 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
-{{-- <div class="modal fade" id="Add" tabindex="-1" aria-modal="true" role="dialog">
+<div class="modal fade" id="Add" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -387,7 +391,7 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
 <div class="modal fade" id="Detail_produit" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -465,8 +469,6 @@
 <script>
     $(document).ready(function() {
 
-        let cachedProduits = {};
-
         Statistique();
         select_patient();
         select_typesoins();
@@ -509,9 +511,10 @@
             ajax: function(data, callback) {
                 const date1 = $('#searchDate1').val();
                 const date2 = $('#searchDate2').val();
+                const statut = $('#statut').val();
                 
                 $.ajax({
-                    url: `/api/list_soinsam_all/${date1}/${date2}`,
+                    url: `/api/list_soinsam_all/${date1}/${date2}/${statut}`,
                     type: 'GET',
                     success: function(response) {
                         callback({ data: response.data });
@@ -529,7 +532,7 @@
                     orderable: false,
                 },
                 { 
-                    data: 'numfac_soins', 
+                    data: 'type', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
@@ -552,28 +555,22 @@
                     searchable: true,
                 },
                 { 
-                    data: 'part_assurance', 
-                    render: (data) => `${formatPriceT(data)} Fcfa`,
+                    data: 'montant', 
+                    render: (data) => `${data} Fcfa`,
                     searchable: true, 
                 },
                 { 
-                    data: 'ticket_moderateur', 
-                    render: (data) => `${formatPriceT(data)} Fcfa`,
-                    searchable: true, 
+                    data: 'statut',
+                    render: function(data) {
+                        return data === 'en cours' 
+                            ? `<span class="badge bg-danger">${data}</span>` 
+                            : `<span class="badge bg-success">${data}</span>`;
+                    },
+                    searchable: true
                 },
                 { 
-                    data: 'taux_couverture', 
-                    render: (data) => `${data}%`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'montant_total', 
-                    render: (data) => `${formatPriceT(data)} Fcfa`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'date_soin', 
-                    render: (data) => `${formatDate(data)}`,
+                    data: 'created_at', 
+                    render: (data) => `${formatDateHeure(data)}`,
                     searchable: true, 
                 },
                 {
@@ -581,12 +578,17 @@
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
                             <a class="btn btn-outline-danger btn-sm" id="detail_produit" data-bs-toggle="modal" data-bs-target="#Detail_produit"
-                                data-id="${row.id_soins}"
+                                data-id="${row.id}"
                             >
                                 <i class="ri-archive-2-fill"></i>
                             </a>
+                            <a class="btn btn-outline-warning btn-sm" id="detail" data-bs-toggle="modal" data-bs-target="#Detail"
+                                data-id="${row.id}"
+                            >
+                                <i class="ri-eye-line"></i>
+                            </a>
                             <a class="btn btn-outline-info btn-sm" id="fiche"
-                                data-id="${row.id_soins}"
+                                data-id="${row.id}"
                             >
                                 <i class="ri-file-line"></i>
                             </a>
@@ -622,12 +624,9 @@
                 fetch(`/api/detail_soinam/${id}`) // API endpoint
                     .then(response => response.json())
                     .then(data => {
-                        const prototal = data.prototal;
-                        const stotal = data.stotal;
+                        const soinspatient = data.soinspatient;
                         const soins = data.soins;
-                        const produit = data.produit;
-
-                        let total = prototal + stotal;
+                        const produit = data.produit; // Assurez-vous que l'API renvoie une liste de produits
 
                         // Clear existing rows
                         tableBodyP.innerHTML = '';
@@ -645,10 +644,10 @@
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
                                     <td>
-                                        <h6>${item.libelle_soins}</h6>
+                                        <h6>${item.nom_si}</h6>
                                     </td>
                                     <td>
-                                        <h6>${formatPriceT(item.price)} Fcfa</h6>
+                                        <h6>${item.prix_si} Fcfa</h6>
                                     </td>
                                 `;
                                 tableBodyP.appendChild(row);
@@ -659,7 +658,7 @@
                                 <td >&nbsp;</td>
                                 <td >
                                     <h5 class="mt-4 text-success">
-                                        Total Soins : ${formatPriceT(stotal)} Fcfa
+                                        Total Soins : ${formatPriceT(soinspatient.stotal)} Fcfa
                                     </h5>
                                 </td>
                             `;
@@ -670,16 +669,16 @@
                                 const rowProd = document.createElement('tr');
                                 rowProd.innerHTML = `
                                     <td>
-                                        <h6>${item.name}</h6>
+                                        <h6>${item.nom_pro}</h6>
                                     </td>
                                     <td>
-                                        <h6>${formatPriceT(item.priceu)} Fcfa</h6>
+                                        <h6>${item.prix_pro} Fcfa</h6>
                                     </td>
                                     <td>
-                                        <h6>${item.qte}</h6>
+                                        <h6>${item.quantite}</h6>
                                     </td>
                                     <td>
-                                        <h6>${formatPriceT(item.price)} Fcfa</h6>
+                                        <h6>${item.montant} Fcfa</h6>
                                     </td>
                                 `;
                                 tableBodyProdP.appendChild(rowProd);
@@ -690,7 +689,7 @@
                                 <td colspan="2" >&nbsp;</td>
                                 <td colspan="2">
                                     <h5 class="mt-4 text-success">
-                                        Total Produits : ${formatPriceT(prototal)} Fcfa
+                                        Total Produits : ${formatPriceT(soinspatient.prototal)} Fcfa
                                     </h5>
                                 </td>
                             `;
@@ -699,9 +698,7 @@
                             const rowNote = document.createElement('tr');
                             rowNote.innerHTML = `
                                 <td colspan="4">
-                                    <h6 class="text-danger">
-                                        TOTAL : ${formatPriceT(total)} Fcfa
-                                    </h6>
+                                    <h6 class="text-danger">NOTE</h6>
                                     <p class="small m-0">
                                         Le Montant Total des produits utilisés
                                         seront ajoutés au montant total des soins.
@@ -727,6 +724,97 @@
                     });
             });
 
+            $('.Table_soinsam').on('click', '#detail', function() {
+                const id = $(this).data('id');
+
+                const message_detail =document.getElementById('message_detail');
+                const modal_detail = document.getElementById('modal_detail');
+                const div_detail_loader=document.getElementById('div_detail_loader');
+
+                message_detail.style.display = 'none';
+                modal_detail.style.display = 'none';
+                div_detail_loader.style.display = 'block';
+
+                fetch(`/api/detail_soinam/${id}`) // API endpoint
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Access the 'chambre' array from the API response
+                        const modal = document.getElementById('modal_detail');
+                        modal.innerHTML = '';
+
+                        const soinspatient = data.soinspatient;
+                        const facture = data.facture;
+                        const patient = data.patient;
+                        const typesoins = data.typesoins;
+                        const soins = data.soins;
+                        const produit = data.produit;
+
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="">
+                                        <div class="card-body">
+                                            <div class="row justify-content-between">
+                                                <div class="col-12 text-center mt-4">
+                                                    <h6 class="fw-semibold">Type de Soins :</h6>
+                                                    <p>${typesoins.nom}</p>
+                                                    <h6 class="fw-semibold">N° Dossier :</h6>
+                                                    <p>${patient.matricule}</p>
+                                                    <h6 class="fw-semibold">Nom du patient :</h6>
+                                                    <p>${patient.np}</p>
+                                                    <h6 class="fw-semibold">contact :</h6>
+                                                    <p>${patient.tel}</p>
+                                                    <h6 class="fw-semibold">Assurer :</h6>
+                                                    <p>${patient.assurer}</p>
+                                                    ${patient.assurer === 'oui' ? `
+                                                        <h6 class="fw-semibold">Taux :</h6>
+                                                        <p>${patient.taux}%</p>
+
+                                                        <h6 class="fw-semibold">Assurance :</h6>
+                                                        <p>${patient.assurance}</p> 
+
+                                                        <h6 class="fw-semibold">Matricule :</h6>
+                                                        <p>${patient.matricule_assurance}</p>
+                                                    ` : ''}
+                                                </div>
+                                                <div class="col-12 text-center mt-4">
+                                                    ${soinspatient.num_bon != null ? `
+                                                        <h6 class="fw-semibold">Numéro de prise en charge :</h6>
+                                                        <p>${soinspatient.num_bon}</p>
+                                                    ` : ''}
+                                                    <h6 class="fw-semibold">Part Patient :</h6>
+                                                    <p>${soinspatient.part_patient} Fcfa</p>
+                                                    <h6 class="fw-semibold">Part Assurance :</h6>
+                                                    <p>${soinspatient.part_assurance} Fcfa</p>
+                                                    <h6 class="fw-semibold">Remise :</h6>
+                                                    <p>${soinspatient.remise ? soinspatient.remise : '0'} Fcfa</p>
+                                                    <h6 class="fw-semibold">Montant Total :</h6>
+                                                    <p>${soinspatient.montant} Fcfa</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        modal.appendChild(div);
+
+                        message_detail.style.display = 'none';
+                        modal_detail.style.display = 'block';
+                        div_detail_loader.style.display = 'none';
+
+                    })
+                    .catch(error => {
+                        message_detail.style.display = 'block';
+                        modal_detail.style.display = 'none';
+                        div_detail_loader.style.display = 'none';
+                        console.error('Erreur lors du chargement des données:', error);
+                    });  
+            });
+
             $('.Table_soinsam').on('click', '#fiche', function() {
                 var preloader_ch = `
                     <div id="preloader_ch">
@@ -738,11 +826,14 @@
 
                 const id = $(this).data('id');
 
-                fetch(`/api/imp_fac_soinam/${id}`) // API endpoint
+                fetch(`/api/detail_soinam/${id}`) // API endpoint
                     .then(response => response.json())
                     .then(data => {
                         // Access the 'chambre' array from the API response
+                        const soinspatient = data.soinspatient;
+                        const facture = data.facture;
                         const patient = data.patient;
+                        const typesoins = data.typesoins;
                         const soins = data.soins;
                         const produit = data.produit;
 
@@ -751,7 +842,7 @@
                             preloader.remove();
                         }
 
-                        generatePDFInvoice(patient, soins, produit);
+                        generatePDFInvoice(soinspatient, facture, patient, typesoins, soins, produit);
 
                     })
                     .catch(error => {
@@ -774,7 +865,7 @@
                 value: '',
                 text: 'Selectionner',
                 'data-taux': 0,
-                'data-assurer': 0,
+                'data-assurer': 'non',
             });
             selectElement.append(defaultOption);
 
@@ -788,7 +879,7 @@
                             value: item.id,
                             text: item.np,
                             'data-taux': item.taux || 0,
-                            'data-assurer': item.assure,
+                            'data-assurer': item.assurer,
                         });
                         selectElement.append(option);
                     });
@@ -811,7 +902,7 @@
 
                 // Récupérer les données depuis les attributs de l'option sélectionnée
                 const taux = selectedOption.data('taux') || 0;
-                const assurer = selectedOption.data('assurer') || 0;
+                const assurer = selectedOption.data('assurer');
 
                 // Mettre à jour le champ patient_taux
                 $('#patient_taux').val(taux);
@@ -820,7 +911,7 @@
                 $('#numcode').val('');
 
                 // Afficher ou masquer div_numcode en fonction de l'assurance
-                if (assurer === 1) {
+                if (assurer === 'oui') {
                     $('#div_numcode').show();
                 } else {
                     $('#div_numcode').hide();
@@ -869,14 +960,14 @@
             selectElement.append(defaultOption);
 
             $.ajax({
-                url: '/api/select_typesoins',
+                url: '/api/list_typesoins',
                 method: 'GET',
                 success: function(response) {
                     const data = response.typesoins;
                     data.forEach(item => {
                         const option = $('<option>', {
-                            value: item.code_typesoins,
-                            text: item.libelle_typesoins
+                            value: item.id,
+                            text: item.nom
                         });
                         selectElement.append(option);
                     });
@@ -903,6 +994,66 @@
                     checkContenuSoins();
                 }
             });
+        }
+
+        function addSelectSoins(parentDiv, soinsins) {
+            const div = $('<div>', { class: 'mb-3' });
+
+            // Créer le groupe de contrôle contenant le select et le bouton supprimer
+            const inputGroup = $(`
+                <div class="input-group">
+                    <select class="form-select soins-select w-50">
+                        <option value="">Sélectionner</option>
+                        ${soinsins.map(item => `<option value="${item.id}" data-prix="${item.prix.replace(/\./g, '')}">${item.nom} / ${item.prix} Fcfa</option>`).join('')}
+                    </select>
+                    <button class="btn btn-outline-danger suppr-btn">Supprimer</button>
+                </div>
+            `);
+
+            div.append(inputGroup);
+            parentDiv.append(div);
+
+            checkContenuSoins();
+
+            // Ajouter un event listener pour le bouton supprimer
+            div.find('.suppr-btn').on('click', function() {
+                div.remove(); // Supprimer l'élément div parent
+                checkContenuSoins(); // Re-vérifier le contenu
+                updateMontantTotalSoins(); // Mettre à jour le montant total après la suppression
+            });
+
+            // Event listener pour le select
+            div.find('.soins-select').on('change', function() {
+                updateMontantTotalSoins();
+            });
+        }
+
+        function updateMontantTotalSoins() {
+            let montantTotal = 0;
+            $('.soins-select').each(function() {
+                const selectedOption = $(this).find('option:selected');
+                const prix = selectedOption.data('prix');
+
+                if (prix) {
+                    montantTotal += parseInt(prix); // Ajouter le prix à la somme totale
+                }
+            });
+
+            // Formater le montant total avec des points
+            const montantTotalFormatted = montantTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            $('#montant_total_soins').val(montantTotalFormatted);
+        }
+
+        function checkContenuSoins() {
+            const contenuDiv = $('#contenu_soins');
+            const divBtnPro = $('#div_btn_soins');
+
+            // Si la div #contenu a un contenu, on affiche le bouton, sinon on le cache
+            if (contenuDiv.html().trim() !== '') {
+                divBtnPro.show(); // Afficher le bouton
+            } else {
+                divBtnPro.hide(); // Cacher le bouton
+            }
         }
 
         $('#add_select_soins').on('click', function() {
@@ -960,66 +1111,6 @@
             addSelectSoins(contenuDiv, cachedSoins[id]);
         }
 
-        function addSelectSoins(parentDiv, soinsins) {
-            const div = $('<div>', { class: 'mb-3' });
-
-            // Créer le groupe de contrôle contenant le select et le bouton supprimer
-            const inputGroup = $(`
-                <div class="input-group">
-                    <select class="form-select soins-select w-50">
-                        <option value="">Sélectionner</option>
-                        ${soinsins.map(item => `<option value="${item.code_soins}" data-prix="${item.price}">${item.libelle_soins} / ${formatPriceT(item.price)} Fcfa</option>`).join('')}
-                    </select>
-                    <button class="btn btn-outline-danger suppr-btn">Supprimer</button>
-                </div>
-            `);
-
-            div.append(inputGroup);
-            parentDiv.append(div);
-
-            checkContenuSoins();
-
-            // Ajouter un event listener pour le bouton supprimer
-            div.find('.suppr-btn').on('click', function() {
-                div.remove(); // Supprimer l'élément div parent
-                checkContenuSoins(); // Re-vérifier le contenu
-                updateMontantTotalSoins(); // Mettre à jour le montant total après la suppression
-            });
-
-            // Event listener pour le select
-            div.find('.soins-select').on('change', function() {
-                updateMontantTotalSoins();
-            });
-        }
-
-        function updateMontantTotalSoins() {
-            let montantTotal = 0;
-            $('.soins-select').each(function() {
-                const selectedOption = $(this).find('option:selected');
-                const prix = selectedOption.data('prix');
-
-                if (prix) {
-                    montantTotal += parseInt(prix); // Ajouter le prix à la somme totale
-                }
-            });
-
-            // Formater le montant total avec des points
-            const montantTotalFormatted = montantTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            $('#montant_total_soins').val(montantTotalFormatted);
-        }
-
-        function checkContenuSoins() {
-            const contenuDiv = $('#contenu_soins');
-            const divBtnPro = $('#div_btn_soins');
-
-            // Si la div #contenu a un contenu, on affiche le bouton, sinon on le cache
-            if (contenuDiv.html().trim() !== '') {
-                divBtnPro.show(); // Afficher le bouton
-            } else {
-                divBtnPro.hide(); // Cacher le bouton
-            }
-        }
-
         // -------------------------------------------------------
 
         function addSelect(parentDiv, produits) {
@@ -1030,7 +1121,7 @@
                 <div class="input-group">
                     <select class="form-select produit-select w-50">
                         <option value="">Sélectionner</option>
-                        ${produits.map(produit => `<option value="${produit.medicine_id}" data-prix="${produit.price}" data-quantite="${produit.status}">${produit.name} / ${produit.status} / ${formatPriceT(produit.price)} Fcfa</option>`).join('')}
+                        ${produits.map(produit => `<option value="${produit.id}" data-prix="${produit.prix.replace(/\./g, '')}" data-quantite="${produit.quantite}">${produit.nom} / ${produit.quantite} / ${produit.prix} Fcfa</option>`).join('')}
                     </select>
                     <input type="tel" class="form-control quantite-demande" placeholder="Quantité" value="1" maxlength="2">
                     <button class="btn btn-outline-danger suppr-btn">Supprimer</button>
@@ -1061,37 +1152,19 @@
             });
 
             // Validation de la quantité saisie pour ne pas dépasser la quantité disponible
-            // produitSelect.on('change', function () {
-            //     const selectedOption = produitSelect.find(':selected');
-            //     const quantiteDisponible = parseInt(selectedOption.data('quantite'));
-
-            //     // Réinitialiser la quantité demandée à 1
-            //     quantiteInput.val(1);
-
-            //     if (quantiteDisponible < 1) {
-            //         quantiteInput.val(1); // S'assurer que la quantité ne soit pas négative
-            //     }
-
-            //     updateMontantTotal(); // Mettre à jour le montant total après changement de produit
-            // });
-
             produitSelect.on('change', function () {
                 const selectedOption = produitSelect.find(':selected');
                 const quantiteDisponible = parseInt(selectedOption.data('quantite'));
 
-                // Reset the requested quantity to 1
+                // Réinitialiser la quantité demandée à 1
                 quantiteInput.val(1);
 
                 if (quantiteDisponible < 1) {
-
-                    produitSelect.val(null).trigger('change');
-                    showAlert("Alert", 'Ce produit n\'est plus disponible en stock', "info");
-                    return;
+                    quantiteInput.val(1); // S'assurer que la quantité ne soit pas négative
                 }
 
-                updateMontantTotal(); // Update the total amount after product change
+                updateMontantTotal(); // Mettre à jour le montant total après changement de produit
             });
-
 
             // Vérification lors de la perte de focus
             quantiteInput.on('blur', function () {
@@ -1143,11 +1216,12 @@
             }
         }
 
+        let cachedProduits = {};
+
         function select_produit()
         {
-            cachedProduits = {}; 
-            $.ajax({
-                url: '/api/select_produit',
+           $.ajax({
+                url: '/api/list_produit_all',
                 method: 'GET',
                 success: function (data) {
                     cachedProduits = data.produit;
@@ -1489,25 +1563,25 @@
                 });
             });
 
-            const login = @json(Auth::user()->login);
-            const patient_id = $('#patient_id').val();
-            const typesoins_id = $('#typesoins_id').val();
+            const auth_id = {{ Auth::user()->id }};
+            const patient_id = document.getElementById('patient_id').value;
+            const typesoins_id = document.getElementById('typesoins_id').value;
 
-            if (patient_id.trim() == '') {
+            if (patient_id == '') {
                 showAlert("ALERT", 'Veuillez sélectionner un Patient.', "warning");
                 return false;
             }
 
-            if (typesoins_id.trim() == '') {
+            if (typesoins_id == '') {
                 showAlert("ALERT", 'Veuillez sélectionner un Type de Soins.', "warning");
                 return false;
             }
 
-            var montant_assurance = $('#montant_assurance').val();
-            var taux_remise = $('#taux_remise').val();
-            var montant_total = $('#montant_total').val();
-            var montant_patient = $('#montant_patient').val();
-            var assurance_utiliser = $('#assurance_utiliser').val();
+            var montant_assurance = document.getElementById('montant_assurance').value;
+            var taux_remise = document.getElementById('taux_remise').value;
+            var montant_total = document.getElementById('montant_total').value;
+            var montant_patient = document.getElementById('montant_patient').value;
+            var assurance_utiliser = document.getElementById('assurance_utiliser').value;
 
             // Validate monetary fields
             if (!montant_assurance || 
@@ -1533,7 +1607,7 @@
                 return false;
             }
 
-            var numcode = $('#numcode').val();
+            var numcode = document.getElementById('numcode').value;
 
             var preloader_ch = `
                 <div id="preloader_ch">
@@ -1557,7 +1631,7 @@
                     typesoins_id: typesoins_id,
                     numcode: numcode || null,
                     assurance_utiliser: assurance_utiliser,
-                    login: login,
+                    auth_id: auth_id,
                 },
                 success: function(response) {
                     var preloader = document.getElementById('preloader_ch');
@@ -1584,7 +1658,6 @@
 
                         table.ajax.reload(null, false);
                         Statistique();
-                        select_produit();
 
                         var newConsultationTab = new bootstrap.Tab(document.getElementById('tab-oneAAA'));
                         newConsultationTab.show();
@@ -1612,89 +1685,90 @@
         // -----------------------------------------------------
 
         // Assurez-vous que ce code soit exécuté après l'ajout du bouton "Enregistrer"
-        // document.getElementById('btn_eng_produit').addEventListener('click', () => {
-        //     const selections = [];
-        //     const selects = document.querySelectorAll('.produit-select');
+        document.getElementById('btn_eng_produit').addEventListener('click', () => {
+            const selections = [];
+            const selects = document.querySelectorAll('.produit-select');
 
-        //     selects.forEach(select => {
-        //         const selectedOption = select.options[select.selectedIndex];
-        //         const idProduit = selectedOption.value; // ID du produit sélectionné
-        //         const quantiteDemande = parseInt(select.parentElement.querySelector('#quantite_demande').value); // Quantité demandée
-        //         const prix = parseInt(selectedOption.dataset.prix); // Prix du produit
+            selects.forEach(select => {
+                const selectedOption = select.options[select.selectedIndex];
+                const idProduit = selectedOption.value; // ID du produit sélectionné
+                const quantiteDemande = parseInt(select.parentElement.querySelector('#quantite_demande').value); // Quantité demandée
+                const prix = parseInt(selectedOption.dataset.prix); // Prix du produit
 
-        //         // Validation du produit et de la quantité
-        //         if (!idProduit) {  // Si aucun produit n'est sélectionné
-        //             formIsValid = false;
-        //             showAlertQauntite('danger', 'Veuillez sélectionner un produit.');
-        //             return;  // Stopper l'exécution si une erreur est trouvée
-        //         }
-        //         if (isNaN(quantiteDemande) || quantiteDemande <= 0) { // Si la quantité n'est pas valide
-        //             formIsValid = false;
-        //             showAlertQauntite('danger', 'Veuillez entrer une quantité valide pour chaque produit.');
-        //             return;  // Stopper l'exécution si une erreur est trouvée
-        //         }
+                // Validation du produit et de la quantité
+                if (!idProduit) {  // Si aucun produit n'est sélectionné
+                    formIsValid = false;
+                    showAlertQauntite('danger', 'Veuillez sélectionner un produit.');
+                    return;  // Stopper l'exécution si une erreur est trouvée
+                }
+                if (isNaN(quantiteDemande) || quantiteDemande <= 0) { // Si la quantité n'est pas valide
+                    formIsValid = false;
+                    showAlertQauntite('danger', 'Veuillez entrer une quantité valide pour chaque produit.');
+                    return;  // Stopper l'exécution si une erreur est trouvée
+                }
 
-        //         // Si un produit est sélectionné, ajoutez-le au tableau
-        //         if (idProduit) {
-        //             selections.push({
-        //                 id: idProduit,
-        //                 quantite: quantiteDemande,
-        //                 montant: prix * quantiteDemande // Calculer le montant
-        //             });
-        //         }
-        //     });
+                // Si un produit est sélectionné, ajoutez-le au tableau
+                if (idProduit) {
+                    selections.push({
+                        id: idProduit,
+                        quantite: quantiteDemande,
+                        montant: prix * quantiteDemande // Calculer le montant
+                    });
+                }
+            });
 
-        //     const montantTotal = document.getElementById('montant_total_produit').value;
-        //     const id = document.getElementById('id_hos_produit').value;
+            const montantTotal = document.getElementById('montant_total_produit').value;
+            const id = document.getElementById('id_hos_produit').value;
 
-        //     var modal = bootstrap.Modal.getInstance(document.getElementById('Add'));
-        //     modal.hide();
+            var modal = bootstrap.Modal.getInstance(document.getElementById('Add'));
+            modal.hide();
 
-        //     var preloader_ch = `
-        //         <div id="preloader_ch">
-        //             <div class="spinner_preloader_ch"></div>
-        //         </div>
-        //     `;
-        //     // Add the preloader to the body
-        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
+            var preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            // Add the preloader to the body
+            document.body.insertAdjacentHTML('beforeend', preloader_ch);
 
-        //     $.ajax({
-        //         url: '/api/add_soinshopital/'+ id,
-        //         method: 'GET',
-        //         data:{
-        //             selections: selections,
-        //             montantTotal: montantTotal,
-        //         },
-        //         success: function(response) {
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
+            $.ajax({
+                url: '/api/add_soinshopital/'+ id,
+                method: 'GET',
+                data:{
+                    selections: selections,
+                    montantTotal: montantTotal,
+                },
+                success: function(response) {
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
                     
-        //             if (response.success) {
-        //                 showAlert('success', 'Produit Pharmacie ajouter.');
-        //             } else if (response.error) {
-        //                 showAlert('danger', 'Une erreur est survenue');
-        //             } else if (response.json) {
-        //                 showAlert('danger', 'Invalid selections format');
-        //             }
+                    if (response.success) {
+                        showAlert('success', 'Produit Pharmacie ajouter.');
+                    } else if (response.error) {
+                        showAlert('danger', 'Une erreur est survenue');
+                    } else if (response.json) {
+                        showAlert('danger', 'Invalid selections format');
+                    }
 
-        //             list_hos();
-        //         },
-        //         error: function() {
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
+                    list_hos();
+                },
+                error: function() {
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
 
-        //             showAlert('danger', 'Une erreur est survenue lors de l\'enregistrement');
-        //         }
-        //     });
-        // });
+                    showAlert('danger', 'Une erreur est survenue lors de l\'enregistrement');
+                }
+            });
+        });
 
-        // document.getElementById('close_modal_produit').addEventListener('click', () => {
-        //     document.getElementById('montant_total_produit').value = "";
-        // });
+        document.getElementById('close_modal_produit').addEventListener('click', () => {
+            document.getElementById('montant_total_produit').value = "";
+        });
+
 
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -1720,119 +1794,102 @@
             return `${day}/${month}/${year} à ${hours}:${minutes}:${seconds}`;
         }
 
-        function calculateAge(dateString) 
-        {
-            const birthDate = new Date(dateString);
-            const today = new Date();
+        function updatePaginationControls(pagination) {
+            const paginationDiv = document.getElementById('pagination-controls');
+            paginationDiv.innerHTML = '';
 
-            let age = today.getFullYear() - birthDate.getFullYear();
+            // Bootstrap pagination wrapper
+            const paginationWrapper = document.createElement('ul');
+            paginationWrapper.className = 'pagination justify-content-center';
 
-            // Vérifie si l'anniversaire n'est pas encore passé cette année
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            const dayDiff = today.getDate() - birthDate.getDate();
-            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-                age--;
+            // Previous button
+            if (pagination.current_page > 1) {
+                const prevButton = document.createElement('li');
+                prevButton.className = 'page-item';
+                prevButton.innerHTML = `<a class="page-link" href="#">Precédent</a>`;
+                prevButton.onclick = (event) => {
+                    event.preventDefault(); // Empêche le défilement en haut de la page
+                    list(pagination.current_page - 1);
+                };
+                paginationWrapper.appendChild(prevButton);
+            } else {
+                // Disable the previous button if on the first page
+                const prevButton = document.createElement('li');
+                prevButton.className = 'page-item disabled';
+                prevButton.innerHTML = `<a class="page-link" href="#">Precédent</a>`;
+                paginationWrapper.appendChild(prevButton);
             }
 
-            return age;
+            // Page number links (show a few around the current page)
+            const totalPages = pagination.last_page;
+            const currentPage = pagination.current_page;
+            const maxVisiblePages = 5; // Max number of page links to display
+
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust start page if end page exceeds the total pages
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Loop through pages and create page links
+            for (let i = startPage; i <= endPage; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageItem.onclick = (event) => {
+                    event.preventDefault(); // Empêche le défilement en haut de la page
+                    list(i);
+                };
+                paginationWrapper.appendChild(pageItem);
+            }
+
+            // Ellipsis (...) if not all pages are shown
+            if (endPage < totalPages) {
+                const ellipsis = document.createElement('li');
+                ellipsis.className = 'page-item disabled';
+                ellipsis.innerHTML = `<a class="page-link" href="#">...</a>`;
+                paginationWrapper.appendChild(ellipsis);
+
+                // Add the last page link
+                const lastPageItem = document.createElement('li');
+                lastPageItem.className = `page-item`;
+                lastPageItem.innerHTML = `<a class="page-link" href="#">${totalPages}</a>`;
+                lastPageItem.onclick = (event) => {
+                    event.preventDefault(); // Empêche le défilement en haut de la page
+                    list(totalPages);
+                };
+                paginationWrapper.appendChild(lastPageItem);
+            }
+
+            // Next button
+            if (pagination.current_page < pagination.last_page) {
+                const nextButton = document.createElement('li');
+                nextButton.className = 'page-item';
+                nextButton.innerHTML = `<a class="page-link" href="#">Suivant</a>`;
+                nextButton.onclick = (event) => {
+                    event.preventDefault(); // Empêche le défilement en haut de la page
+                    list(pagination.current_page + 1);
+                };
+                paginationWrapper.appendChild(nextButton);
+            } else {
+                // Disable the next button if on the last page
+                const nextButton = document.createElement('li');
+                nextButton.className = 'page-item disabled';
+                nextButton.innerHTML = `<a class="page-link" href="#">Suivant</a>`;
+                paginationWrapper.appendChild(nextButton);
+            }
+
+            // Append pagination controls to the DOM
+            paginationDiv.appendChild(paginationWrapper);
         }
 
-        // function updatePaginationControls(pagination) {
-        //     const paginationDiv = document.getElementById('pagination-controls');
-        //     paginationDiv.innerHTML = '';
-
-        //     // Bootstrap pagination wrapper
-        //     const paginationWrapper = document.createElement('ul');
-        //     paginationWrapper.className = 'pagination justify-content-center';
-
-        //     // Previous button
-        //     if (pagination.current_page > 1) {
-        //         const prevButton = document.createElement('li');
-        //         prevButton.className = 'page-item';
-        //         prevButton.innerHTML = `<a class="page-link" href="#">Precédent</a>`;
-        //         prevButton.onclick = (event) => {
-        //             event.preventDefault(); // Empêche le défilement en haut de la page
-        //             list(pagination.current_page - 1);
-        //         };
-        //         paginationWrapper.appendChild(prevButton);
-        //     } else {
-        //         // Disable the previous button if on the first page
-        //         const prevButton = document.createElement('li');
-        //         prevButton.className = 'page-item disabled';
-        //         prevButton.innerHTML = `<a class="page-link" href="#">Precédent</a>`;
-        //         paginationWrapper.appendChild(prevButton);
-        //     }
-
-        //     // Page number links (show a few around the current page)
-        //     const totalPages = pagination.last_page;
-        //     const currentPage = pagination.current_page;
-        //     const maxVisiblePages = 5; // Max number of page links to display
-
-        //     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        //     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        //     // Adjust start page if end page exceeds the total pages
-        //     if (endPage - startPage < maxVisiblePages - 1) {
-        //         startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        //     }
-
-        //     // Loop through pages and create page links
-        //     for (let i = startPage; i <= endPage; i++) {
-        //         const pageItem = document.createElement('li');
-        //         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        //         pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        //         pageItem.onclick = (event) => {
-        //             event.preventDefault(); // Empêche le défilement en haut de la page
-        //             list(i);
-        //         };
-        //         paginationWrapper.appendChild(pageItem);
-        //     }
-
-        //     // Ellipsis (...) if not all pages are shown
-        //     if (endPage < totalPages) {
-        //         const ellipsis = document.createElement('li');
-        //         ellipsis.className = 'page-item disabled';
-        //         ellipsis.innerHTML = `<a class="page-link" href="#">...</a>`;
-        //         paginationWrapper.appendChild(ellipsis);
-
-        //         // Add the last page link
-        //         const lastPageItem = document.createElement('li');
-        //         lastPageItem.className = `page-item`;
-        //         lastPageItem.innerHTML = `<a class="page-link" href="#">${totalPages}</a>`;
-        //         lastPageItem.onclick = (event) => {
-        //             event.preventDefault(); // Empêche le défilement en haut de la page
-        //             list(totalPages);
-        //         };
-        //         paginationWrapper.appendChild(lastPageItem);
-        //     }
-
-        //     // Next button
-        //     if (pagination.current_page < pagination.last_page) {
-        //         const nextButton = document.createElement('li');
-        //         nextButton.className = 'page-item';
-        //         nextButton.innerHTML = `<a class="page-link" href="#">Suivant</a>`;
-        //         nextButton.onclick = (event) => {
-        //             event.preventDefault(); // Empêche le défilement en haut de la page
-        //             list(pagination.current_page + 1);
-        //         };
-        //         paginationWrapper.appendChild(nextButton);
-        //     } else {
-        //         // Disable the next button if on the last page
-        //         const nextButton = document.createElement('li');
-        //         nextButton.className = 'page-item disabled';
-        //         nextButton.innerHTML = `<a class="page-link" href="#">Suivant</a>`;
-        //         paginationWrapper.appendChild(nextButton);
-        //     }
-
-        //     // Append pagination controls to the DOM
-        //     paginationDiv.appendChild(paginationWrapper);
-        // }
-
-        function generatePDFInvoice(patient, soins, produit) {
+        function generatePDFInvoice(soinspatient, facture, patient, typesoins, soins, produit) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
-            const pdfFilename = "SOINS AMBULATOIRE Facture N°" + patient.numfac_soins + " du " + formatDate(patient.date_soin);
+            const pdfFilename = "SOINS AMBULATOIRE Facture N°" + facture.code + " du " + formatDateHeure(facture.created_at);
             doc.setProperties({
                 title: pdfFilename,
             });
@@ -1877,12 +1934,12 @@
                 doc.text(phone, phoneX, (yPos + 10));
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "normal");
-                const spatientDate = new Date(patient.date_soin);
+                const spatientDate = new Date(soinspatient.created_at);
                 // Formatter la date et l'heure séparément
-                const formattedDate = spatientDate.toLocaleDateString();
-                // const formattedTime = spatientDate.toLocaleTimeString();
-                doc.text("Date: " + formattedDate, 15, (yPos + 28));
-                // doc.text("Heure: " + formattedTime, 15, (yPos + 30));
+                const formattedDate = spatientDate.toLocaleDateString(); // Formater la date
+                const formattedTime = spatientDate.toLocaleTimeString();
+                doc.text("Date: " + formattedDate, 15, (yPos + 25));
+                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
 
                 //Ligne de séparation
                 doc.setFontSize(15);
@@ -1909,34 +1966,30 @@
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(255, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+patient.numfac_soins;
+                const titleN = "N° "+facture.code;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
 
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : "+ patient.numdossier;
+                const numDossier = "N° Dossier : P-"+ patient.matricule;
                 const numDossierWidth = doc.getTextWidth(numDossier);
                 doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
 
                 yPoss = (yPos + 40);
 
                 const patientInfo = [
-                    { 
-                        label: "Nom et Prénoms", 
-                        value: patient.nom_patient.length > 25 
-                            ? patient.nom_patient.substring(0, 25) + '...' 
-                            : patient.nom_patient 
-                    },
-                    { label: "Assurer", value: patient.assure === 1 ? "Oui" : "Non"  },
-                    { label: "Age", value: calculateAge(patient.datenais) + " Ans" },
-                    { label: "Contact", value: patient.telpatient }
+                    { label: "Nom et Prénoms", value: patient.np },
+                    { label: "Assurer", value: patient.assurer },
+                    { label: "Age", value: patient.age+" an(s)" },
+                    { label: "Domicile", value: patient.adresse },
+                    { label: "Contact", value: "+225 "+patient.tel }
                 ];
 
-                if (patient.assure == 1) {
+                if (patient.assurer == 'oui') {
                     patientInfo.push(
                         { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matriculeassure },
+                        { label: "Matricule", value: patient.matricule_assurance },
                     );
                 }
 
@@ -1953,9 +2006,14 @@
 
                 const typeInfo = [];
 
+                if (soinspatient.num_bon && soinspatient.num_bon !== "") {
+                    typeInfo.push({ label: "N° prise en charge", value: soinspatient.num_bon });
+                }
+
                 typeInfo.push(
-                    { label: "Nbre Soins Infirmiers", value: patient.nbre_soins },
-                    { label: "Nbre Produits Utilisés", value: patient.nbre_produit },
+                    { label: "Type de Soins", value: typesoins.nom },
+                    { label: "Soins Infirmiers", value: soins.length },
+                    { label: "Produits Utilisés", value: produit.length },
                 );
 
                 typeInfo.forEach(info => {
@@ -1967,14 +2025,14 @@
                     yPoss += 7;
                 });
 
-                if (patient.assure == 1) {
+                if (patient.assurer == 'oui') {
                     yPoss += 15;
                 }
 
                 const donneeTables = soins;
                 let yPossT = yPoss + 15; 
 
-                // const totalsi = donneeTables.reduce((sum, item) => sum + parseInt(item.price.replace(/[^0-9]/g, '') || 0), 0);
+                const totalsi = donneeTables.reduce((sum, item) => sum + parseInt(item.prix_si.replace(/[^0-9]/g, '') || 0), 0);
 
                 // Tableau dynamique pour les détails des soins infirmiers
                 doc.autoTable({
@@ -1982,13 +2040,13 @@
                     head: [['N°', 'Nom du Soins Infirmiers', 'Prix Unitaire']],
                     body: donneeTables.map((item, index) => [
                         index + 1,
-                        item.libelle_soins,
-                        formatPriceT(item.price) + " Fcfa",
+                        item.nom_si,
+                        item.prix_si + " Fcfa",
                     ]),
                     theme: 'striped',
                     foot: [[
                         { content: 'Totals', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-                        { content: formatPriceT(patient.stotal) + " Fcfa", styles: { fontStyle: 'bold' } },
+                        { content: formatPriceT(totalsi) + " Fcfa", styles: { fontStyle: 'bold' } },
                     ]]
                 });
 
@@ -1999,22 +2057,22 @@
                 const donneeTable = produit;
                 yPossT = yPoss + 5; // Ajuster la position Y pour le tableau des produits
 
-                // const totalsoins = donneeTable.reduce((sum, item) => sum + parseInt(item.price.replace(/[^0-9]/g, '') || 0), 0);
+                const totalsoins = donneeTable.reduce((sum, item) => sum + parseInt(item.montant.replace(/[^0-9]/g, '') || 0), 0);
 
                 doc.autoTable({
                     startY: yPossT,
                     head: [['N°', 'Nom du produit utilisé', 'Quantité', 'Prix Unitaire', 'Montant']],
                     body: donneeTable.map((item, index) => [
                         index + 1,
-                        item.name,
-                        item.qte,
-                        formatPriceT(item.priceu) + " Fcfa",
-                        formatPriceT(item.price) + " Fcfa",
+                        item.nom_pro,
+                        item.quantite,
+                        item.prix_pro + " Fcfa",
+                        item.montant + " Fcfa",
                     ]),
                     theme: 'striped',
                     foot: [[
                         { content: 'Totals', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold' } },
-                        { content: formatPriceT(patient.prototal) + " Fcfa", styles: { fontStyle: 'bold' } },
+                        { content: formatPriceT(totalsoins) + " Fcfa", styles: { fontStyle: 'bold' } },
                     ]]
                 });
 
@@ -2023,14 +2081,15 @@
                 yPoss = yPoss + 10;
 
                 const compteInfo = [
-                    { label: "Total", value: formatPriceT(patient.montant_total) + " Fcfa" },
-                    ...(patient.assure == 1 ? 
-                        [{ label: "Part assurance", value: formatPriceT(patient.part_assurance) + " Fcfa" }] 
+                    { label: "Total", value: soinspatient.montant ? soinspatient.montant + " Fcfa" : "0 Fcfa" },
+                    ...(soinspatient.part_assurance.replace(/[^0-9]/g, '') > 0 ? 
+                        [{ label: "Part assurance", value: soinspatient.part_assurance + " Fcfa" }] 
                         : []),
+                    { label: "Remise", value: soinspatient.remise ? soinspatient.remise + " Fcfa" : "0 Fcfa" }
                 ];
 
 
-                if (patient.assure == 1) {
+                if (patient.taux !== null) {
                     compteInfo.push({ label: "Taux", value: patient.taux + "%" });
                 }
 
@@ -2046,7 +2105,7 @@
                 doc.setFont("Helvetica", "bold");
                 doc.text('Montant à payer', leftMargin + 110, yPoss);
                 doc.setFont("Helvetica", "bold");
-                doc.text(": "+formatPriceT(patient.ticket_moderateur)+" Fcfa", leftMargin + 150, yPoss);
+                doc.text(": "+soinspatient.part_patient+" Fcfa", leftMargin + 150, yPoss);
 
             }
 

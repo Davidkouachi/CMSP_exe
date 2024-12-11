@@ -1374,4 +1374,67 @@ class ApipdfController extends Controller
 
     }
 
+    // -------------------------------------------------------------------------
+
+    public function imp_fac_soinam($id)
+    {
+
+        $produittotal = DB::table('soins_medicaux_itemmedics')
+            ->where('id_soins', '=', $id)
+            ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+            ->first();
+
+        // Total des soins
+        $soinstotal = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $id)
+            ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+            ->first();
+
+        $soins = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $id)
+            ->select('soins_medicaux_itemsoins.*')
+            ->get();
+
+        $produit = DB::table('soins_medicaux_itemmedics')
+            ->join('medicine', 'medicine.medicine_id', '=', 'soins_medicaux_itemmedics.medicine_id')
+            ->where('id_soins', '=', $id)
+            ->select('soins_medicaux_itemmedics.*','medicine.price as priceu')
+            ->get();
+
+        $patient = DB::table('soins_medicaux')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'dossierpatient.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->where('soins_medicaux.id_soins', '=', $id)
+            ->select(
+                'soins_medicaux.*',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'patient.assure as assure',
+                'patient.datenaispatient as datenais',
+                'patient.telpatient as telpatient',
+                'patient.matriculeassure as matriculeassure',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+            )
+            ->first();
+
+        $patient->nbre_soins = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+        $patient->nbre_produit = DB::table('soins_medicaux_itemmedics')
+            ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+        $patient->prototal = $produittotal->total ?? 0;
+        $patient->stotal = $soinstotal->total ?? 0;
+
+        return response()->json([
+            'patient' =>$patient,
+            'soins' => $soins,
+            'produit' => $produit,
+        ]);
+    }
+
 }

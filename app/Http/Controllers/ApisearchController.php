@@ -241,13 +241,14 @@ class ApisearchController extends Controller
 
     public function name_patient_examen()
     {
-       $name = Patient::leftJoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-                        ->select(
-                            'patients.id as id',
-                            'patients.np as np',
-                            'patients.assurer as assurer',
-                            'tauxes.taux as taux',
-                        )->get();
+       $name = DB::table('patient')
+        ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+        ->select(
+            'patient.idenregistremetpatient as id',
+            'patient.nomprenomspatient as np',
+            'patient.assure as assure',
+            'tauxcouvertureassure.valeurtaux as taux',
+        )->get();
                        
         return response()->json(['name' => $name]); 
     }
@@ -273,7 +274,7 @@ class ApisearchController extends Controller
 
     public function select_soinsIn($id)
     {
-        $soinsin = soinsinfirmier::where('typesoins_id', '=', $id)->get();
+        $soinsin = DB::table('soins_infirmier')->where('code_typesoins', '=', $id)->select('soins_infirmier.*')->get();
 
         return response()->json(['soinsin' => $soinsin]); 
     }

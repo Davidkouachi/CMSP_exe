@@ -294,7 +294,25 @@ class ApilistController extends Controller
 
     public function list_produit()
     {
-        $produits = Produit::orderBy('created_at', 'desc')->get();
+        // $add = DB::table('medicine')->select('medicine.*')->get();
+
+        // foreach ($add as $value) {
+        //     if ($value->status == null || $value->status == '' ) {
+        //         $updateData_soins =[
+        //             'status' => 0,
+        //             'updated_at' => now(),
+        //         ];
+
+        //         $soinsUpdate = DB::table('medicine')
+        //                             ->where('medicine_id', '=', $value->medicine_id)
+        //                             ->update($updateData_soins);
+        //     }
+        // }
+
+        $produits = DB::table('medicine')
+            ->Join('medicine_category', 'medicine_category.medicine_category_id', '=', 'medicine.medicine_category_id')
+            ->select('medicine.*', 'medicine_category.name as categorie')
+            ->get();
 
         return response()->json([
             'data' => $produits,
@@ -369,47 +387,44 @@ class ApilistController extends Controller
 
     public function list_typesoins()
     {
-        $typesoins = typesoins::orderBy('created_at', 'desc')->get();
+        $typesoins = DB::table('typesoinsinfirmiers')->select('typesoinsinfirmiers.*')->get();
 
         return response()->json(['typesoins' => $typesoins]);
     }
 
     public function list_soinsIn()
     {
-        $soinsinQuery = soinsinfirmier::Join('typesoins', 'typesoins.id', '=', 'soinsinfirmiers.typesoins_id')
-                        ->orderBy('soinsinfirmiers.created_at', 'desc')
-                        ->select('soinsinfirmiers.*', 'typesoins.nom as nom_typesoins')
-                        ->orderBy('created_at', 'desc')
-                        ->get();
+        $soinsinQuery = DB::table('soins_infirmier')
+            ->Join('typesoinsinfirmiers', 'typesoinsinfirmiers.code_typesoins', '=', 'soins_infirmier.code_typesoins')
+            ->select('soins_infirmier.*', 'typesoinsinfirmiers.libelle_typesoins as typesoins')
+            ->get();
 
         return response()->json([
             'data' => $soinsinQuery,
         ]);
     }
 
-    public function list_soinsam_all($date1, $date2,$statut)
+    public function list_soinsam_all($date1, $date2)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $spatientQuery = soinspatient::Join('patients', 'patients.id', '=', 'soinspatients.patient_id')
-                       ->Join('typesoins', 'typesoins.id', '=', 'soinspatients.typesoins_id')
-                       ->whereBetween('soinspatients.created_at', [$date1, $date2])
-                       ->select(
-                            'soinspatients.*', 
-                            'patients.np as patient', 
-                            'typesoins.nom as type')
-                       ->orderBy('created_at', 'desc');
-
-        if ($statut !== 'tous') {
-            $spatientQuery->where('soinspatients.statut', '=', $statut);
-        }
-
-        $spatient = $spatientQuery->get();
+        $spatient = DB::table('soins_medicaux')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+            ->whereBetween('soins_medicaux.date_soin', [$date1, $date2])
+            ->select(
+                'soins_medicaux.*', 
+                'patient.nomprenomspatient as patient'
+            )
+            ->orderBy('soins_medicaux.date_soin', 'desc')
+            ->get();
 
         foreach ($spatient as $value) {
-            $value->nbre_soins = sp_soins::where('soinspatient_id', '=', $value->id)->count() ?: 0;
-            $value->nbre_produit = sp_produit::where('soinspatient_id', '=', $value->id)->count() ?: 0;
+            $value->nbre_soins = DB::table('soins_medicaux_itemsoins')
+                ->where('id_soins', '=', $value->id_soins)->count() ?: 0;
+
+            $value->nbre_produit = DB::table('soins_medicaux_itemmedics')
+                ->where('id_soins', '=', $value->id_soins)->count() ?: 0;
         }
 
         return response()->json([
@@ -419,69 +434,39 @@ class ApilistController extends Controller
 
     public function detail_soinam($id)
     {
-        $soinspatient = soinspatient::find($id);
 
-        if ($soinspatient) { 
-            $produittotal = sp_produit::where('soinspatient_id', '=', $soinspatient->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
-                ->first();
+        $produittotal = DB::table('soins_medicaux_itemmedics')
+            ->where('id_soins', '=', $id)
+            ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+            ->first();
 
-            $soinspatient->prototal = $produittotal->total ?? 0;
+        $prototal = $produittotal->total ?? 0;
 
-            // Total des soins
-            $soinstotal = sp_soins::where('soinspatient_id', '=', $soinspatient->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
-                ->first();
+        // Total des soins
+        $soinstotal = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $id)
+            ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+            ->first();
 
-            $soinspatient->stotal = $soinstotal->total ?? 0;
-        } 
+        $stotal = $soinstotal->total ?? 0;
 
-        $facture = facture::find($soinspatient->facture_id);
 
-        $total_amount = intval(str_replace('.', '', $facture->montant_verser));
-        $paid_amount = intval(str_replace('.', '', $soinspatient->part_patient));
-        $remis_amount = intval(str_replace('.', '', $facture->montant_remis));
-
-        $remaining_amount = $total_amount - ($paid_amount + $remis_amount);
-
-        function formatWithPeriods($number) {
-        return number_format($number, 0, '', '.');
-        }
-
-        $facture->montant_restant = formatWithPeriods($remaining_amount);
-
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-        ->leftjoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-        ->where('patients.id', '=', $soinspatient->patient_id)
-        ->select('patients.*', 'assurances.nom as assurance', 'tauxes.taux as taux')
-        ->first();
-
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        $typesoins = typesoins::find($soinspatient->typesoins_id);
-
-        $soins = sp_soins::join('soinsinfirmiers', 'soinsinfirmiers.id', '=', 'sp_soins.soinsinfirmier_id')
-            ->where('sp_soins.soinspatient_id', '=', $soinspatient->id)
-            ->select('sp_soins.*', 'soinsinfirmiers.nom as nom_si', 'soinsinfirmiers.prix as prix_si')
+        $soins = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $id)
+            ->select('soins_medicaux_itemsoins.*')
             ->get();
 
-
-        // Récupération des produits avec les informations associées
-        $produit = sp_produit::join('produits', 'produits.id', '=', 'sp_produits.produit_id')
-            ->where('sp_produits.soinspatient_id', '=', $soinspatient->id)
-            ->select('sp_produits.*', 'produits.nom as nom_pro', 'produits.prix as prix_pro', 'sp_produits.quantite as quantite_pro')
+        $produit = DB::table('soins_medicaux_itemmedics')
+            ->join('medicine', 'medicine.medicine_id', '=', 'soins_medicaux_itemmedics.medicine_id')
+            ->where('id_soins', '=', $id)
+            ->select('soins_medicaux_itemmedics.*','medicine.price as priceu')
             ->get();
 
-        
         return response()->json([
-            'soinspatient' => $soinspatient,
-            'facture' => $facture,
-            'patient' => $patient,
+            'prototal' => $prototal,
+            'stotal' => $stotal,
             'soins' => $soins,
             'produit' => $produit,
-            'typesoins' => $typesoins,
         ]);
     }
 

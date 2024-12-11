@@ -36,7 +36,6 @@ class ApiController extends Controller
         $societe = DB::table('societeassure')->select('codesocieteassure','nomsocieteassure')->get();
 
         return response()->json(['societe' => $societe]); 
-
     }
 
     public function assurance_select_patient_new()
@@ -81,5 +80,26 @@ class ApiController extends Controller
         $garantie = DB::table('garantie')->select('codgaran','libgaran')->get();
 
         return response()->json(['garantie' => $garantie]); 
+    }
+
+    public function select_typesoins()
+    {
+        $typesoins = DB::table('typesoinsinfirmiers')->select('typesoinsinfirmiers.*')->get();
+
+        return response()->json(['typesoins' => $typesoins]);
+    }
+
+    public function select_category_medicine()
+    {
+        $categorie = DB::table('medicine_category')->select('medicine_category_id','name')->get();
+
+        return response()->json(['categorie' => $categorie]);
+    }
+
+    public function select_produit()
+    {
+        $produit = DB::table('medicine')->select('medicine_id','name','price','status')->get();
+
+        return response()->json(['produit' => $produit]);
     }
 }

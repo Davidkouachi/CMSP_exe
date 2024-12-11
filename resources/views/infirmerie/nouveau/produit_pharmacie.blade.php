@@ -11,7 +11,7 @@
             <a href="{{route('index_accueil')}}">Espace Santé</a>
         </li>
         <li class="breadcrumb-item text-primary" aria-current="page">
-            Nouveau Produit Pharmacie
+            Produit Pharmacie
         </li>
     </ol>
 </div>
@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Produits Pharmacies</h5>
+                        <h5>PRODUITS PHARMACIE</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Configuration / Produits Pharmacie</p>
                     </div>
                 </div>
             </div>
@@ -66,6 +66,12 @@
                                 </div>
                                 <div class="card-body" >
                                     <div class="row gx-3 align-items-center justify-content-center">
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Categorie</label>
+                                                <select class="form-select select2" id="categorieid"></select>
+                                            </div>
+                                        </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">
@@ -118,6 +124,7 @@
                                                     <tr>
                                                         <th scope="col">N°</th>
                                                         <th scope="col" colspan="2">Nom du medicament</th>
+                                                        <th scope="col">Catégories</th>
                                                         <th scope="col">Prix</th>
                                                         <th scope="col">Qté Restante</th>
                                                         <th scope="col">Actions</th>
@@ -161,7 +168,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="Mmodif" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="Mmodif" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -171,6 +178,10 @@
             <div class="modal-body">
                 <form id="updateChambreForm">
                     <input type="hidden" id="Id">
+                    <div class="mb-3">
+                        <label class="form-label">Categorie</label>
+                        <select class="form-select select2" id="categorieidModif"></select>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Nom du Produit</label>
                         <div class="input-group">
@@ -198,8 +209,28 @@
     </div>
 </div>
 
+@include('select2')
+
+<script>
+    $('#Mmodif').on('shown.bs.modal', function () {
+        $('#categorieidModif').select2({
+            theme: 'bootstrap',
+            placeholder: 'Selectionner',
+            language: {
+                noResults: function() {
+                    return "Aucun résultat trouvé";
+                }
+            },
+            width: '100%',
+            dropdownParent: $('#Mmodif'),
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function() {
+
+        select();
 
         $('#btn_eng').on('click', eng);
         $('#updateBtn').on('click', updatee);
@@ -245,11 +276,48 @@
             $('#Table_day').DataTable().ajax.reload(null, false);
         });
 
+        function select() {
+            const $selectElement = $('#categorieid');
+            $selectElement.empty();
+            $selectElement.append('<option value="">Selectionner</option>');
+
+             const $selectElement2 = $('#categorieidModif');
+
+            $.ajax({
+                url: '/api/select_category_medicine',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.categorie;
+                    data.forEach(item => {
+                        // Add each item as an option
+                        $selectElement.append(`<option value="${item.medicine_category_id}">${item.name}</option>`);
+                        $selectElement2.append(`<option value="${item.medicine_category_id}">${item.name}</option>`);
+                    });
+                },
+                error: function() {
+                    // Optionally handle the error
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+        }
+
         function formatPrice(input) {
             // Supprimer tous les points existants
             input = input.replace(/\./g, '');
             // Formater le prix avec des points
             return input.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function formatPriceT(price) 
+        {
+            // Convert to float and round to the nearest whole number
+            let number = Math.round(parseInt(price));
+            if (isNaN(number)) {
+                return '';
+            }
+
+            // Format the number with dot as thousands separator
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
         function showAlert(title, message, type) {
@@ -264,8 +332,9 @@
             const nom = $("#nom");
             const prix = $("#prix");
             const quantite = $("#quantite");
+            const categorieid = $("#categorieid");
 
-            if (!nom.val().trim() || !prix.val().trim() || !quantite.val().trim()) {
+            if (!nom.val().trim() || !prix.val().trim() || !quantite.val().trim() || !categorieid.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.', 'warning');
                 return false;
             }
@@ -285,6 +354,7 @@
                     nom: nom.val(),
                     prix: prix.val(),
                     quantite: quantite.val(),
+                    categorieid: categorieid.val(),
                 },
                 success: function(response) {
                     $('#preloader_ch').remove(); // Retirer le préchargeur
@@ -296,6 +366,7 @@
                         nom.val('');
                         prix.val('');
                         quantite.val('');
+                        categorieid.val('').trigger('change');
 
                         $('#Table_day').DataTable().ajax.reload(null, false);
 
@@ -321,6 +392,7 @@
         }
 
         const table = $('#Table_day').DataTable({
+
             processing: true,
             serverSide: false,
             ajax: {
@@ -336,7 +408,7 @@
                     orderable: false,
                 },
                 {
-                    data: 'nom',
+                    data: 'name',
                     render: function(data, type, row) {
                         return `
                             <div class="d-flex align-items-center">
@@ -349,24 +421,39 @@
                     searchable: false,
                 },
                 {
-                    data: 'nom',
+                    data: 'name',
+                    searchable: true,
+                },
+                {
+                    data: 'categorie',
                     searchable: true,
                 },
                 {   
-                    data: 'prix', 
-                    render: function(data) { return `${data} Fcfa`; },
+                    data: 'price', 
+                    render: function(data) { return `${formatPriceT(data)} Fcfa`; },
                     searchable: true,
                 },
-                { 
-                    data: 'quantite', 
-                    searchable: true, 
+                {
+                    data: 'status',
+                    render: (data, type, row) => {
+                        const value = data == null || data == '' ? '0' : data;
+                        const color = 'text-primary';
+                        return `<span class="${color}">${value}</span>`;
+                    },
+                    searchable: true,
                 },
                 {
-                    data: 'id',
+                    data: null,
                     render: function(data, type, row) {
                         return `
                             <div class="d-inline-flex gap-1">
-                                <a class="btn btn-outline-info btn-xs" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit" data-id="${row.id}" data-nom="${row.nom}" data-prix="${row.prix}" data-quantite="${row.quantite}">
+                                <a class="btn btn-outline-info btn-xs" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit" 
+                                    data-medicine_id="${row.medicine_id}"
+                                    data-medicine_category_id="${row.medicine_category_id}" 
+                                    data-name="${row.name}" 
+                                    data-price="${row.price}" 
+                                    data-status="${row.status}"
+                                >
                                     <i class="ri-edit-box-line"></i>
                                 </a>
                             </div>
@@ -384,15 +471,17 @@
 
         function initializeRowEventListeners() {
             $('#Table_day').on('click', '#edit', function() {
-                const id = $(this).data('id');
-                const nom = $(this).data('nom');
-                const prix = $(this).data('prix');
-                const quantite = $(this).data('quantite');
+                const id = $(this).data('medicine_id');
+                const categorie_id = $(this).data('medicine_category_id');
+                const nom = $(this).data('name');
+                const prix = formatPriceT($(this).data('price'));
+                const quantite = $(this).data('status');
                 
                 $('#Id').val(id);
                 $('#nomModif').val(nom);
                 $('#prixModif').val(prix);
                 $('#quantiteModif').val(quantite);
+                $('#categorieidModif').val(categorie_id).trigger('change');
             });
         }
 
@@ -403,8 +492,9 @@
             const nom = $('#nomModif').val();
             const prix = $('#prixModif').val();
             const quantite = $('#quantiteModif').val();
+            const categorie_id = $('#categorieidModif').val();
 
-            if(!nom.trim() || !prix.trim() || !quantite.trim()) {
+            if(!nom.trim() || !prix.trim() || !quantite.trim() || !categorie_id.trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
                 return false;
             }
@@ -427,11 +517,14 @@
                     nom: nom,
                     prix: prix,
                     quantite: quantite,
+                    categorie_id: categorie_id,
                 },
                 success: function(response) {
                     $('#preloader_ch').remove();
 
-                    if (response.success) {
+                    if (response.existe) {
+                        showAlert('Alert', 'Cet produit existe déjà.','info');
+                    } else if (response.success) {
                         showAlert('Succès', 'Produit mis à jour avec succès.','success');
                     } else if (response.error) {
                         showAlert('Erreur', 'Erreur lors de la mise à jour du produit.','error');

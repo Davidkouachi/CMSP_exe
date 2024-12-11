@@ -218,7 +218,7 @@ class ApistatController extends Controller
     {
         $today = Carbon::today();
         // Combine the queries into a single query to improve performance
-        $stat_soinsam_day = soinspatient::whereDate('created_at', '=', $today)->count();
+        $stat_soinsam_day = DB::table('soins_medicaux')->whereDate('date_soin', '=', $today)->count();
 
         // Return the results as JSON
         return response()->json([

@@ -47,6 +47,9 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/select_assureur', [ApiController::class, 'select_assureur']);
 	Route::get('/select_typegarantie', [ApiController::class, 'select_typegarantie']);
 	Route::get('/select_garantie', [ApiController::class, 'select_garantie']);
+	Route::get('/select_typesoins', [ApiController::class, 'select_typesoins']);
+	Route::get('/select_category_medicine', [ApiController::class, 'select_category_medicine']);
+	Route::get('/select_produit', [ApiController::class, 'select_produit']);
 	// recherche fin
 
 	// insert debut
@@ -189,7 +192,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/list_cons_all/{date1}/{date2}', [ApilistController::class, 'list_cons_all']);
 	Route::get('/list_typesoins', [ApilistController::class, 'list_typesoins']);
 	Route::get('/list_soinsIn', [ApilistController::class, 'list_soinsIn']);
-	Route::get('/list_soinsam_all/{date1}/{date2}/{statut}', [ApilistController::class, 'list_soinsam_all']);
+	Route::get('/list_soinsam_all/{date1}/{date2}', [ApilistController::class, 'list_soinsam_all']);
 	Route::get('/detail_soinam/{id}', [ApilistController::class, 'detail_soinam']);
 	Route::get('/list_societe_all', [ApilistController::class, 'list_societe_all']);
 	Route::get('/list_examen_all', [ApilistController::class, 'list_examen_all']);
@@ -261,6 +264,8 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	// PDF debut
 	Route::get('/fiche_consultation/{code}', [ApipdfController::class, 'fiche_consultation']);
 	Route::get('/facture_inpayer_cons/{id}', [ApipdfController::class, 'facture_inpayer_cons']);
+
+	Route::get('/imp_fac_soinam/{id}', [ApipdfController::class, 'imp_fac_soinam']);
 	// PDF fin
 
 	// Etat debut

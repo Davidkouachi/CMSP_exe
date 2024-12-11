@@ -11,7 +11,7 @@
             <a href="{{route('index_accueil')}}">Espace Santé</a>
         </li>
         <li class="breadcrumb-item text-primary" aria-current="page">
-            Nouveau Soins Infirmier
+            Soins Infirmier
         </li>
     </ol>
 </div>
@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Soins Infirmier</h5>
+                        <h5>SOINS INFIRMIERS</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <h5>Configuration / Soins Infirmiers</h5>
                     </div>
                 </div>
             </div>
@@ -226,7 +226,6 @@
     $(document).ready(function() {
 
         select();
-        select_modif();
 
         $("#btn_eng").on("click", eng);
         $("#updateBtn").on("click", updatee);
@@ -239,7 +238,6 @@
         $("#prix").on("input", function() {
             $(this).val(formatPrice($(this).val()));
         });
-
         $("#prix").on("keypress", function(event) {
             const key = event.key;
             if (isNaN(key)) {
@@ -250,7 +248,6 @@
         $("#prixModif").on("input", function() {
             $(this).val(formatPrice($(this).val()));
         });
-
         $("#prixModif").on("keypress", function(event) {
             const key = event.key;
             if (isNaN(key)) {
@@ -265,46 +262,34 @@
             return input.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        function select() {
-            const $selectElement = $('#typesoins_id');
+        function formatPriceT(price) 
+        {
+            // Convert to float and round to the nearest whole number
+            let number = Math.round(parseInt(price));
+            if (isNaN(number)) {
+                return '';
+            }
 
-            // Clear existing options
-            $selectElement.empty();
-
-            // Add default option
-            $selectElement.append('<option value="">Selectionner</option>');
-
-            $.ajax({
-                url: '/api/list_typesoins',
-                method: 'GET',
-                success: function(response) {
-                    const data = response.typesoins;
-                    data.forEach(item => {
-                        // Add each item as an option
-                        $selectElement.append(`<option value="${item.id}">${item.nom}</option>`);
-                    });
-                },
-                error: function() {
-                    // Optionally handle the error
-                    // showAlert('danger', 'Impossible de generer le code automatiquement');
-                }
-            });
+            // Format the number with dot as thousands separator
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        function select_modif() {
-            const $selectElement = $('#typesoins_id_modif');
-
-            // Clear existing options
+        function select() {
+            const $selectElement = $('#typesoins_id');
             $selectElement.empty();
+            $selectElement.append('<option value="">Selectionner</option>');
+
+             const $selectElement2 = $('#typesoins_id_modif');
 
             $.ajax({
-                url: '/api/list_typesoins',
+                url: '/api/select_typesoins',
                 method: 'GET',
                 success: function(response) {
                     const data = response.typesoins;
                     data.forEach(item => {
                         // Add each item as an option
-                        $selectElement.append(`<option value="${item.id}">${item.nom}</option>`);
+                        $selectElement.append(`<option value="${item.code_typesoins}">${item.libelle_typesoins}</option>`);
+                        $selectElement2.append(`<option value="${item.code_typesoins}">${item.libelle_typesoins}</option>`);
                     });
                 },
                 error: function() {
@@ -344,27 +329,25 @@
                 url: '/api/new_soinsIn',
                 method: 'GET',  // Changed to 'POST' for data creation
                 data: {
-                    typesoins_id: $typesoins_id.val(),
-                    nom_soins: $nom_soins.val(),
+                    typesoins: $typesoins_id.val(),
+                    nom: $nom_soins.val(),
                     prix: $prix.val()
                 },
                 success: function(response) {
                     $("#preloader_ch").remove();
 
-                    if (response.success) {
+                    if (response.existe) {
+                        showAlert('Erreur', 'Ce soins existe déjà.', 'error');
+                    } else if (response.success) {
+                        $typesoins_id.val('').trigger('change');
+                        $nom_soins.val('');
+                        $prix.val('');
+                        $('#Table_day').DataTable().ajax.reload();
                         showAlert('Succès', 'Opération éffectuée.', 'success');
                     } else if (response.error) {
                         showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
                     }
 
-                    // Clear input fields
-                    $typesoins_id.val('').trigger('change');
-                    $nom_soins.val('');
-                    $prix.val('');
-
-                    select_modif();
-                    select();
-                    $('#Table_day').DataTable().ajax.reload();
                 },
                 error: function() {
                     $("#preloader_ch").remove();
@@ -390,7 +373,7 @@
                     orderable: false,
                 },
                 { 
-                    data: 'nom', 
+                    data: 'libelle_soins', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
@@ -401,19 +384,19 @@
                     searchable: true, 
                 },
                 { 
-                    data: 'nom_typesoins',
+                    data: 'typesoins',
                     searchable: true,
                 },
                 { 
-                    data: 'prix',
-                    render: (data) => `${data} Fcfa`,
+                    data: 'price',
+                    render: (data) => `${formatPriceT(data)} Fcfa`,
                     searchable: true, 
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm edit-btn" data-id="${row.id}" data-nom="${row.nom}" data-prix="${row.prix}" data-typesoins_id="${row.typesoins_id}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
+                            <a class="btn btn-outline-info btn-sm edit-btn" data-code_soins="${row.code_soins}" data-libelle_soins="${row.libelle_soins}" data-price="${row.price}" data-code_typesoins="${row.code_typesoins}" data-bs-toggle="modal" data-bs-target="#Mmodif" id="modif">
                                 <i class="ri-edit-box-line"></i>
                             </a>
                         </div>
@@ -431,10 +414,10 @@
         function initializeRowEventListeners() {
 
             $('#Table_day').on('click', '#modif', function() {
-                const id = $(this).data('id');
-                const nom = $(this).data('nom');
-                const prix = $(this).data('prix');
-                const typesoins_id = $(this).data('typesoins_id');
+                const id = $(this).data('code_soins');
+                const nom = $(this).data('libelle_soins');
+                const prix = $(this).data('price');
+                const typesoins_id = $(this).data('code_typesoins');
 
                 $('#Id').val(id);
                 $('#nomModif').val(nom);
@@ -472,8 +455,8 @@
                 url: '/api/update_soinIn/'+id,
                 method: 'GET',
                 data: { 
-                    nomModif: nomModif, 
-                    typesoins_id: typesoins_id_modif, 
+                    nom: nomModif, 
+                    typesoins: typesoins_id_modif, 
                     prix: prixModif,
                 },
                 success: function(response) {
@@ -481,12 +464,16 @@
                     if (preloader) {
                         preloader.remove();
                     }
+                
 
-                    showAlert('Succès', 'Opération éffectuée.','success');
-            
-                    $('#Table_day').DataTable().ajax.reload();
-                    select();
-                    select_modif();
+                    if (response.existe) {
+                        showAlert('Erreur', 'Ce soins existe déjà.', 'error');
+                    } else if (response.success) {
+                        $('#Table_day').DataTable().ajax.reload();
+                        showAlert('Succès', 'Opération éffectuée.', 'success');
+                    } else if (response.error) {
+                        showAlert('Erreur', 'Une erreur est survenue lors de la mise à jour.', 'error');
+                    }
                 },
                 error: function() {
                     var preloader = document.getElementById('preloader_ch');

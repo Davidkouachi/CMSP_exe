@@ -355,7 +355,12 @@
                                         <b>Garanties & Tarifs</b>
                                     </a>
                                 </li>
-                                <li @if(request()->routeIs('chambre_new','lit_new','typeadmission_new','natureadmission_new','produit_new')) class="active" @endif >
+                                <li>
+                                    <a @if(request()->routeIs('produit_new')) class="text-primary" @endif href="{{route('produit_new')}}">
+                                        <b>Produit Pharmacie</b>
+                                    </a>
+                                </li>
+                                <li @if(request()->routeIs('chambre_new','lit_new','typeadmission_new','natureadmission_new')) class="active" @endif >
                                     <a href="#!">
                                         <b>Hospitalisations</b>
                                         <i class="ri-arrow-right-s-line"></i>
@@ -372,9 +377,6 @@
                                         </li>
                                         <li>
                                             <a @if(request()->routeIs('natureadmission_new')) class="text-primary" @endif href="{{route('natureadmission_new')}}">Nature admission</a>
-                                        </li>
-                                        <li>
-                                            <a @if(request()->routeIs('produit_new')) class="text-primary" @endif href="{{route('produit_new')}}">Produit Pharmacie</a>
                                         </li>
                                     </ul>
                                 </li>
