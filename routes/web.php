@@ -27,7 +27,7 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 });
 
-Route::middleware(['auth','statutchambre','dateRdv'])->group(function () {
+Route::middleware(['auth','statutchambre'])->group(function () {
 
 	Route::get('/', [AccueilController::class, 'index_accueil'])->name('index_accueil');
 
@@ -105,9 +105,6 @@ Route::middleware(['auth','statutchambre','dateRdv'])->group(function () {
 	// Route::get('/Examens Caisse', [Controller::class, 'encaissement_examen'])->name('encaissement_examen');
 	// Route::get('/Examens Liste Caisse', [Controller::class, 'liste_caisse_examen'])->name('liste_caisse_examen');
 
-	Route::get('/Horaires Médecin', [Controller::class, 'horaire_medecin'])->name('horaire_medecin');
-	Route::get('/Rendez-Vous', [Controller::class, 'rdv_two_day'])->name('rdv_two_day');
-
 	Route::get('/Caisse', [Controller::class, 'caisse'])->name('caisse');
 	Route::get('/Opération de Caisse', [Controller::class, 'operation_caisse'])->name('operation_caisse');
 	Route::get('/Tableau de Bord Comptabilité', [Controller::class, 'comptable'])->name('comptable');
@@ -119,13 +116,12 @@ Route::middleware(['auth','statutchambre','dateRdv'])->group(function () {
 	Route::get('/Etats Factures', [Controller::class, 'etat_facture'])->name('etat_facture');
 	Route::get('/Etats Caisses', [Controller::class, 'etat_caisse'])->name('etat_caisse');
 
-// Route::middleware(['role:ADMINISTRATEUR'])->group(function () {
-
-// });
-
-// Route::middleware(['auth'])->group(function () {
-
-// });
-
 });
+
+Route::middleware(['auth','dateRdv'])->group(function () {
+
+	Route::get('/Horaires Médecin', [Controller::class, 'horaire_medecin'])->name('horaire_medecin');
+	Route::get('/Rendez-Vous', [Controller::class, 'rdv_two_day'])->name('rdv_two_day');
+});
+
 

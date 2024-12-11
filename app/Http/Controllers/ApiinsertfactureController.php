@@ -365,137 +365,181 @@ class ApiinsertfactureController extends Controller
         }
     }
 
-    public function facture_payer_soinsam(Request $request,$code_fac)
+    public function facture_payer_soinsam(Request $request,$numfac)
     {
 
-        $caisse_verf = caisse::find(1);
+        $verf = DB::table('porte_caisses')->select('statut')->where('id', '=', 1)->first();
 
-        if ($caisse_verf->statut === 'fermer') {
+        if ($verf->statut === 'fermer') {
             return response()->json(['caisse_fermer' => true]);
         }
 
         DB::beginTransaction();
 
-        $fac = facture::where('code', '=', $code_fac)->first();
-
         try {
 
-            if ($fac) {
+            
+            // table consultation
+            $updateData_soinsmedicaux =[
+                'paid_status' => 1,
+                'updated_at' => now(),
+            ];
 
-               $fac->montant_verser = $request->montant_verser;
-               $fac->montant_remis = $request->montant_remis;
-               $fac->statut = 'payer';
-               $fac->date_payer = Carbon::now();
-               $fac->encaisser_id = $request->auth_id;
+            $soinsmedicauxUpdate = DB::table('soins_medicaux')
+                                ->where('numfac_soins', '=', $numfac)
+                                ->update($updateData_soinsmedicaux);
 
-                if (!$fac->save()) {
-                    throw new \Exception('Erreur');
-                }
-
-                $spatient = soinspatient::where('facture_id', '=', $fac->id)->first();
-                $spatient->statut = 'terminé';
-
-                if (!$spatient->save()) {
-                    throw new \Exception('Erreur');
-                }
-
-                // ------------------------------------------------------------
-
-                $soinspatient = soinspatient::find($spatient->id);
-
-                if ($soinspatient) { // Vérifiez que le patient a bien été trouvé
-                    // Total des produits
-                    $produittotal = sp_produit::where('soinspatient_id', '=', $soinspatient->id)
-                        ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
-                        ->first();
-
-                    $soinspatient->prototal = $produittotal->total ?? 0;
-
-                    // Total des soins
-                    $soinstotal = sp_soins::where('soinspatient_id', '=', $soinspatient->id)
-                        ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
-                        ->first();
-
-                    $soinspatient->stotal = $soinstotal->total ?? 0;
-                } 
-
-                $facture = facture::find($soinspatient->facture_id);
-
-                $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-                ->leftjoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-                ->where('patients.id', '=', $soinspatient->patient_id)
-                ->select('patients.*', 'assurances.nom as assurance', 'tauxes.taux as taux')
-                ->first();
-
-                if ($patient) {
-                    $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-                }
-
-                $typesoins = typesoins::find($soinspatient->typesoins_id);
-
-                $soins = sp_soins::join('soinsinfirmiers', 'soinsinfirmiers.id', '=', 'sp_soins.soinsinfirmier_id')
-                    ->where('sp_soins.soinspatient_id', '=', $soinspatient->id)
-                    ->select('sp_soins.*', 'soinsinfirmiers.nom as nom_si', 'soinsinfirmiers.prix as prix_si')
-                    ->get();
+            if ($soinsmedicauxUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table soins_medicaux');
+            }
 
 
-                // Récupération des produits avec les informations associées
-                $produit = sp_produit::join('produits', 'produits.id', '=', 'sp_produits.produit_id')
-                    ->where('sp_produits.soinspatient_id', '=', $soinspatient->id)
-                    ->select('sp_produits.*', 'produits.nom as nom_pro', 'produits.prix as prix_pro', 'produits.quantite as quantite_pro')
-                    ->get();
+            $montant_recu = str_replace('.', '', $request->montant_verser) - str_replace('.', '', $request->montant_remis);
 
-                //-----------------------------------------------
+            
+            // table caisse
+            $caisseInserted = DB::table('caisse')->insert([
+                'nopiece' => $numfac,
+                'type' => 'entree',
+                'libelle' => 'Encaissement facture soins infirmier',
+                'montant' => $montant_recu,
+                'dateop' => now(),
+                'datecreat' => now(),
+                'login' => $request->login,
+                'annule' => 0,
+                'mail' => 0,
+            ]);
 
-                $solde_caisse = caisse::find('1');
+            if ($caisseInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table caisse');
+            }
 
-                $solde_caisse_sans_point = str_replace('.', '', $solde_caisse->solde);
-                $part_patient_sans_point = str_replace('.', '', $soinspatient->part_patient);
-                $solde_apres = (int)$solde_caisse_sans_point + (int)$part_patient_sans_point;
+            
+            // table journal
+            $recu = $this->generateUniqueMatriculeNumRecu();
+            $journalInserted = DB::table('journal')->insert([
+                'idenregistremetpatient' => $request->matricule,
+                'date' => now(),
+                'numrecu' => 'REC'.$recu,
+                'montant_recu' => $montant_recu,
+                'numjournal' => $recu,
+                'numfac' => $numfac,
+                'type_action' => 0,
+            ]);
 
-                $add_caisse = new historiquecaisse();
-                $add_caisse->motif = 'ENCAISSEMENT SOINS AMBULATOIRE';
-                $add_caisse->montant = $soinspatient->part_patient;
-                $add_caisse->libelle = 'Encaissment SOINS AMBULATOIRE Facture N°'.$fac->code;
-                $add_caisse->solde_avant = $solde_caisse->solde;
-                $add_caisse->solde_apres = number_format($solde_apres, 0, '', '.');
-                $add_caisse->typemvt = 'Entrer de Caisse';
-                $add_caisse->creer_id = $request->auth_id;
-                $today = Carbon::today();
-                $add_caisse->date_ope = $today;
+            if ($journalInserted === 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table journal');
+            }
+
+
+            // table factures
+            $fac = DB::table('factures')->select('montant_pat','montantregle_pat')->where('numfac', '=', $numfac)->first();
+
+            $regle = str_replace('.', '', $montant_recu) + str_replace('.', '', $fac->montantregle_pat);
+
+            $reste = str_replace('.', '', $fac->montant_pat) - $regle;
+
+            $updateData_factures =[
+                'montantregle_pat' => $montant_recu,
+                'montantpat_verser' => str_replace('.', '', $request->montant_verser),
+                'montantpat_remis' => str_replace('.', '', $request->montant_remis),
+                'montantreste_pat' => $reste,
+                'montantregle_pat' => $regle,
+                'datereglt_pat' => now(),
+                'numrecu' => 'REC'.$recu,
+                'updated_at' => now(),
+            ];
+
+            $facturesUpdate = DB::table('factures')
+                                ->where('numfac', '=', $numfac)
+                                ->update($updateData_factures);
+
+            if ($facturesUpdate === 0) {
+                throw new Exception('Erreur lors de la mise à jour dans la table factures');
+            }
+            
+
+            // table imprime recu
+            $search = DB::table('soins_medicaux')->where('numfac_soins', '=', $numfac)->select('id_soins')->first();
+            $id = $search->id_soins;
+
+            if ($id) {
                 
-                if (!$add_caisse->save()) {
-                    throw new \Exception('Erreur');
-                }
+                $produittotal = DB::table('soins_medicaux_itemmedics')
+                    ->where('id_soins', '=', $id)
+                    ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+                    ->first();
 
-                $solde_caisse->solde = number_format($solde_apres, 0, '', '.');
+                // Total des soins
+                $soinstotal = DB::table('soins_medicaux_itemsoins')
+                    ->where('id_soins', '=', $id)
+                    ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
+                    ->first();
 
-                if (!$solde_caisse->save()) {
-                    throw new \Exception('Erreur');
-                }
+                $soins = DB::table('soins_medicaux_itemsoins')
+                    ->where('id_soins', '=', $id)
+                    ->select('soins_medicaux_itemsoins.*')
+                    ->get();
 
-                //-----------------------------------------------
+                $produit = DB::table('soins_medicaux_itemmedics')
+                    ->join('medicine', 'medicine.medicine_id', '=', 'soins_medicaux_itemmedics.medicine_id')
+                    ->where('id_soins', '=', $id)
+                    ->select('soins_medicaux_itemmedics.*','medicine.price as priceu')
+                    ->get();
+
+                $patient = DB::table('soins_medicaux')
+                    ->Join('factures', 'factures.numfac', '=', 'soins_medicaux.numfac_soins')
+                    ->Join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+                    ->leftjoin('dossierpatient', 'dossierpatient.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+                    ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+                    ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+                    ->where('soins_medicaux.id_soins', '=', $id)
+                    ->select(
+                        'soins_medicaux.*',
+                        'dossierpatient.numdossier as numdossier',
+                        'patient.nomprenomspatient as nom_patient',
+                        'patient.telpatient as tel_patient',
+                        'patient.assure as assure',
+                        'patient.datenaispatient as datenais',
+                        'patient.telpatient as telpatient',
+                        'patient.matriculeassure as matriculeassure',
+                        'assurance.libelleassurance as assurance',
+                        'tauxcouvertureassure.valeurtaux as taux',
+                        'factures.montant_ass as part_assurance',
+                        'factures.montant_pat as part_patient',
+                        'factures.montantregle_pat as part_patient_regler',
+                        'factures.numrecu as numrecu',
+                        'factures.datereglt_pat as datereglt_pat',
+                        'factures.montantpat_verser as montant_verser',
+                        'factures.montantpat_remis as montant_remis',
+                        'factures.montantreste_pat as montant_restant',
+                    )
+                    ->first();
+
+                $patient->nbre_soins = DB::table('soins_medicaux_itemsoins')
+                    ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+                $patient->nbre_produit = DB::table('soins_medicaux_itemmedics')
+                    ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+                $patient->prototal = $produittotal->total ?? 0;
+                $patient->stotal = $soinstotal->total ?? 0;
 
                 DB::commit();
                 return response()->json([
                     'success' => true,
-                    'soinspatient' => $soinspatient,
-                    'facture' => $facture,
-                    'patient' => $patient,
+                    'patient' =>$patient,
                     'soins' => $soins,
                     'produit' => $produit,
-                    'typesoins' => $typesoins,
                 ]);
 
-            }else{
-
-                throw new \Exception('Erreur');
-                
+            } else {
+                throw new Exception('Impossible de retrouver la facture');
             }
-            
+
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['error' => true]);
+            return response()->json(['error' => true,'message' => $e->getMessage()]);
         }
     }
 

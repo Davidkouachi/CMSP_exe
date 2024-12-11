@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 // use App\Models\rdvpatient;
 
@@ -19,23 +20,27 @@ class DateRdvMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // // Récupérer tous les lits
-        // $rdvs = rdvpatient::all(); 
 
-        // foreach ($rdvs as $value) {
+        $rdvs = DB::table('rdvpatients')->select('rdvpatients.*')->get(); 
 
-        //     // Comparer la date du rendez-vous avec la date actuelle en utilisant Carbon
-        //     $today = Carbon::today(); // Obtenir la date actuelle avec Carbon
-        //     $rdvDate = Carbon::parse($value->date); // Convertit la date du rendez-vous en objet Carbon
+        foreach ($rdvs as $value) {
 
-        //     // Si la date du rendez-vous est inférieure à la date du jour
-        //     if ($rdvDate->lessThan($today)) {
-        //         // Changer le statut
-        //         $value->statut = 'terminer'; // Met à jour le statut (par exemple 'Expiré')
-        //         $value->save(); // Sauvegarde les changements dans la base de données
-        //     }
+            $today = Carbon::today();
+            $rdvDate = Carbon::parse($value->date);
+
+            if ($rdvDate->lessThan($today)) {
+
+                $updateData =[
+                    'statut' => 'terminer',
+                    'updated_at' => now(),
+                ];
+
+                $Update = DB::table('rdvpatients')
+                    ->where('id', '=', $value->id)
+                    ->update($updateData);
+            }
             
-        // }
+        }
 
         return $next($request);
     }

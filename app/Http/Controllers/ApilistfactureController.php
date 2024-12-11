@@ -93,9 +93,7 @@ class ApilistfactureController extends Controller
                 'message' => 'Facture introuvable.'
             ], 404);
         }
-
     }
-
 
     public function list_facture($date1, $date2)
     {
@@ -185,34 +183,66 @@ class ApilistfactureController extends Controller
         ]);
     }
 
-    public function list_facture_soinsam()
+    public function list_facture_soinsam($numfac)
     {
-        $soinspatient = soinspatient::join('factures', 'factures.id','=','soinspatients.facture_id')
-                                ->where('factures.statut', '=', 'impayer')
-                                ->select(
-                                    'soinspatients.*',
-                                    'factures.code as code_fac',
-                                    'factures.statut as statut_fac',
-                                )->orderBy('soinspatients.created_at', 'desc')
-                                ->get();
 
-        foreach ($soinspatient as $value) {
-            $produittotal = sp_produit::where('soinspatient_id', '=', $value->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
+        $facture = DB::table('soins_medicaux')
+            ->join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+            ->join('dossierpatient', 'soins_medicaux.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('factures', 'soins_medicaux.numfac_soins', '=', 'factures.numfac')
+            ->where('soins_medicaux.numfac_soins', '=', $numfac)
+            ->select(
+                'soins_medicaux.id_soins as id_soins',
+                'soins_medicaux.montant_total as montant',
+                'soins_medicaux.date_soin as date',
+                'soins_medicaux.numfac_soins as numfac',
+                'dossierpatient.numdossier as numdossier',
+                'dossierpatient.idenregistremetpatient as matricule_patient',
+                'factures.remise as remise',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler'
+            )
+            ->first();
+
+        if ($facture) {
+            $facture->part_patient_regler = $facture->part_patient_regler ?? 0;
+
+            $facture->part_patient_reste = max(0, $facture->part_patient - $facture->part_patient_regler);
+
+            if ($facture->part_patient_reste === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'La facture est déjà totalement réglée.'
+                ], 200); // 200 car ce n'est pas une erreur technique
+            }
+
+            $produittotal = DB::table('soins_medicaux_itemmedics')
+                ->where('id_soins', '=', $facture->id_soins)
+                ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
                 ->first();
 
-            $value->prototal = $produittotal->total ?? 0;
+            $facture->prototal = $produittotal->total ?? 0;
 
-            $soinstotal = sp_soins::where('soinspatient_id', '=', $value->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
+            $soinstotal = DB::table('soins_medicaux_itemsoins')
+                ->where('id_soins', '=', $facture->id_soins)
+                ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
                 ->first();
 
-            $value->stotal = $soinstotal->total ?? 0;
+            $facture->stotal = $soinstotal->total ?? 0;
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $facture
+            ], 200);
+
+        } else {
+            // Aucun résultat trouvé
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Facture introuvable.'
+            ], 404);
         }
-
-        return response()->json([
-            'data' => $soinspatient,
-        ]);
     }
 
     public function list_facture_soinsam_all($date1, $date2,$statut)

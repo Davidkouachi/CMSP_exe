@@ -1003,6 +1003,7 @@
                             if (rdvButton) {
                                 rdvButton.addEventListener('click', () => {
 
+                                    // Mettre à jour les champs avec les informations du médecin sélectionné
                                     document.getElementById('medecin_id_rdv').value = `${medecin.codemedecin}`;
                                     document.getElementById('medecin_rdv').value = `Dr. ${medecin.nomprenomsmed}`;
                                     document.getElementById('specialite_rdv').value = `${medecin.specialité}`;
@@ -1014,39 +1015,10 @@
                                     $('#motif_rdv').val('');
                                     $('#tel_patient').val('');
 
-                                    {{-- const allowedDays = medecin.horaires.map(horaire => horaire.jour);
-
-                                    const dateInput = document.getElementById('date_rdv');
-                                    let previousDate = dateInput.value; // Track previous date
-
-                                    dateInput.addEventListener('change', function(event) {
-
-                                        const selectedDate = new Date(event.target.value);
-                                        const selectedDay = selectedDate.getDay();
-
-                                        const dayMapping = {
-                                            'DIMANCHE': 0,
-                                            'LUNDI': 1,
-                                            'MARDI': 2,
-                                            'MERCREDI': 3,
-                                            'JEUDI': 4,
-                                            'VENDREDI': 5,
-                                            'SAMEDI': 6
-                                        };
-
-                                        const isValidDay = allowedDays.some(day => dayMapping[day] === selectedDay);
-
-                                        if (!isValidDay) {
-                                            dateInput.value = previousDate;
-                                            showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
-                                        } else {
-                                            previousDate = dateInput.value;
-                                        }
-                                    }); --}}
-
-                                    const allowedDays = medecin.horaires.map(horaire => horaire.jour);
-                                    const heureDays = medecin.horaires.reduce((map, horaire) => {
-                                        const dayMapping = {
+                                    // Configurer les jours et heures autorisés pour le médecin sélectionné
+                                    let allowedDays = medecin.horaires.map(horaire => horaire.jour);
+                                    let heureDays = medecin.horaires.reduce((map, horaire) => {
+                                        let dayMapping = {
                                             'DIMANCHE': 0,
                                             'LUNDI': 1,
                                             'MARDI': 2,
@@ -1059,16 +1031,19 @@
                                         return map;
                                     }, {});
 
-                                    const dateInput = document.getElementById('date_rdv');
-                                    let previousDate = dateInput.value; // Track previous date
+                                    let dateInput = document.getElementById('date_rdv');
 
-                                    dateInput.addEventListener('change', function(event) {
-                                        const selectedDate = new Date(event.target.value);
-                                        const selectedDay = selectedDate.getDay(); // Numeric day of the week
+                                    // Supprimer l'écouteur précédent
+                                    let newDateInput = dateInput.cloneNode(true);
+                                    dateInput.parentNode.replaceChild(newDateInput, dateInput);
 
-                                        // Check if the selected day is valid
-                                        const isValidDay = allowedDays.some(day => {
-                                            const dayMapping = {
+                                    newDateInput.addEventListener('change', function (event) {
+                                        let selectedDate = new Date(event.target.value);
+                                        let selectedDay = selectedDate.getDay(); // Jour numérique de la semaine
+
+                                        // Vérifier si le jour sélectionné est valide
+                                        let isValidDay = allowedDays.some(day => {
+                                            let dayMapping = {
                                                 'DIMANCHE': 0,
                                                 'LUNDI': 1,
                                                 'MARDI': 2,
@@ -1081,22 +1056,21 @@
                                         });
 
                                         if (!isValidDay) {
-                                            dateInput.value = "";
+                                            newDateInput.value = "";
                                             showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
                                             document.getElementById('btn_eng_rdv').style.display = "none";
                                         } else {
-                                            // Add the hour to the selected date if valid
-                                            const selectedHour = heureDays[selectedDay];
-                                            const dateString = selectedDate.toISOString().split('T')[0];
-                                            dateInput.value = `${dateString} ${selectedHour}`;
-                                            previousDate = dateInput.value; // Update previous date
+                                            // Ajouter l'heure au jour sélectionné si valide
+                                            let selectedHour = heureDays[selectedDay];
+                                            let dateString = selectedDate.toISOString().split('T')[0];
+                                            newDateInput.value = `${dateString} ${selectedHour}`;
 
                                             document.getElementById('btn_eng_rdv').style.display = "block";
                                         }
                                     });
-
                                 });
                             }
+
 
                         });
 
@@ -1292,23 +1266,102 @@
 
         function initializeRowEventListeners() {
 
+            // $('#Table_day').on('click', '#modif', function() {
+            //     let id = $(this).data('id');
+            //     let date = $(this).data('date');
+            //     let patient = $(this).data('patient');
+            //     let motif = $(this).data('motif');
+            //     let medecin = $(this).data('medecin');
+            //     let specialite = $(this).data('specialite');
+            //     let patient_id = $(this).data('patient_id');
+            //     let medecin_id = $(this).data('medecin_id');
+            //     let tel = $(this).data('tel');
+
+            //     $('#id_rdvM').val(id);
+            //     $('#patientid_rdvM').val(patient_id);
+            //     $('#medecinid_rdvM').val(medecin_id);
+
+            //     let today = new Date();
+            //     let formattedToday = today.toISOString().split('T')[0];
+            //     $('#date_rdvM').val(date).attr('min', formattedToday);
+
+            //     $('#patient_rdvM').val(patient);
+            //     $('#motif_rdvM').val(motif);
+            //     $('#medecin_rdvM').val(medecin);
+            //     $('#specialite_rdvM').val(specialite);
+            //     $('#tel_patientModif').val(tel);
+
+            //     let horairesData = $(this).data('horaires') || [];
+            //     let allowedDays = horairesData.map(horaire => horaire.jour);
+            //     let heureDays = horairesData.reduce((map, horaire) => {
+            //         let dayMapping = {
+            //             'DIMANCHE': 0,
+            //             'LUNDI': 1,
+            //             'MARDI': 2,
+            //             'MERCREDI': 3,
+            //             'JEUDI': 4,
+            //             'VENDREDI': 5,
+            //             'SAMEDI': 6,
+            //         };
+            //         map[dayMapping[horaire.jour]] = horaire.heure_debut;
+            //         return map;
+            //     }, {});
+
+            //     let dateInput = document.getElementById('date_rdvM');
+            //     let previousDate = dateInput.value; // Track previous date
+
+            //     $('#date_rdvM').on('change', function (event) {
+            //         let selectedDate = new Date(event.target.value); // Date sélectionnée
+            //         let selectedDay = selectedDate.getDay(); // Jour de la semaine
+
+            //         let isValidDay = allowedDays.some(day => {
+            //             let dayMapping = {
+            //                 'DIMANCHE': 0,
+            //                 'LUNDI': 1,
+            //                 'MARDI': 2,
+            //                 'MERCREDI': 3,
+            //                 'JEUDI': 4,
+            //                 'VENDREDI': 5,
+            //                 'SAMEDI': 6
+            //             };
+            //             return dayMapping[day] === selectedDay;
+            //         });
+
+            //         if (!isValidDay) {
+            //             // Restaurer une date valide
+            //             $('#date_rdvM').val(date);
+
+            //             showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
+            //         } else {
+            //             let selectedHour = heureDays[selectedDay];
+            //             if (selectedHour) {
+            //                 let formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-MM-dd
+            //                 let formattedTime = selectedHour.slice(0, 5); // HH:mm
+            //                 $('#date_rdvM').val(`${formattedDate}T${formattedTime}`); // yyyy-MM-ddTHH:mm
+            //             } else {
+            //                 showAlert("ALERT", "L'heure de début n'est pas définie pour ce jour.", "info");
+            //             }
+            //         }
+            //     });
+            // });
+
             $('#Table_day').on('click', '#modif', function() {
-                const id = $(this).data('id');
-                const date = $(this).data('date');
-                const patient = $(this).data('patient');
-                const motif = $(this).data('motif');
-                const medecin = $(this).data('medecin');
-                const specialite = $(this).data('specialite');
-                const patient_id = $(this).data('patient_id');
-                const medecin_id = $(this).data('medecin_id');
-                const tel = $(this).data('tel');
+                let id = $(this).data('id');
+                let date = $(this).data('date');
+                let patient = $(this).data('patient');
+                let motif = $(this).data('motif');
+                let medecin = $(this).data('medecin');
+                let specialite = $(this).data('specialite');
+                let patient_id = $(this).data('patient_id');
+                let medecin_id = $(this).data('medecin_id');
+                let tel = $(this).data('tel');
 
                 $('#id_rdvM').val(id);
                 $('#patientid_rdvM').val(patient_id);
                 $('#medecinid_rdvM').val(medecin_id);
 
-                const today = new Date();
-                const formattedToday = today.toISOString().split('T')[0];
+                let today = new Date();
+                let formattedToday = today.toISOString().split('T')[0];
                 $('#date_rdvM').val(date).attr('min', formattedToday);
 
                 $('#patient_rdvM').val(patient);
@@ -1317,10 +1370,10 @@
                 $('#specialite_rdvM').val(specialite);
                 $('#tel_patientModif').val(tel);
 
-                const horairesData = $(this).data('horaires') || [];
-                const allowedDays = horairesData.map(horaire => horaire.jour);
-                const heureDays = horairesData.reduce((map, horaire) => {
-                    const dayMapping = {
+                let horairesData = $(this).data('horaires') || [];
+                let allowedDays = horairesData.map(horaire => horaire.jour);
+                let heureDays = horairesData.reduce((map, horaire) => {
+                    let dayMapping = {
                         'DIMANCHE': 0,
                         'LUNDI': 1,
                         'MARDI': 2,
@@ -1333,15 +1386,18 @@
                     return map;
                 }, {});
 
-                const dateInput = document.getElementById('date_rdvM');
-                let previousDate = dateInput.value; // Track previous date
+                let dateInput = document.getElementById('date_rdvM');
 
-                $('#date_rdvM').on('change', function (event) {
-                    const selectedDate = new Date(event.target.value); // Date sélectionnée
-                    const selectedDay = selectedDate.getDay(); // Jour de la semaine
+                // Supprimer tout ancien écouteur attaché à #date_rdvM
+                let newDateInput = dateInput.cloneNode(true);
+                dateInput.parentNode.replaceChild(newDateInput, dateInput);
 
-                    const isValidDay = allowedDays.some(day => {
-                        const dayMapping = {
+                $(newDateInput).on('change', function(event) {
+                    let selectedDate = new Date(event.target.value); // Date sélectionnée
+                    let selectedDay = selectedDate.getDay(); // Jour de la semaine
+
+                    let isValidDay = allowedDays.some(day => {
+                        let dayMapping = {
                             'DIMANCHE': 0,
                             'LUNDI': 1,
                             'MARDI': 2,
@@ -1355,21 +1411,19 @@
 
                     if (!isValidDay) {
                         // Restaurer une date valide
-                        $('#date_rdvM').val(date);
-
+                        $(newDateInput).val(date);
                         showAlert("ALERT", 'Veuillez sélectionner un jour valide selon les horaires du médecin.', "info");
                     } else {
-                        const selectedHour = heureDays[selectedDay];
+                        let selectedHour = heureDays[selectedDay];
                         if (selectedHour) {
-                            const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-MM-dd
-                            const formattedTime = selectedHour.slice(0, 5); // HH:mm
-                            $('#date_rdvM').val(`${formattedDate}T${formattedTime}`); // yyyy-MM-ddTHH:mm
+                            let formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-MM-dd
+                            let formattedTime = selectedHour.slice(0, 5); // HH:mm
+                            $(newDateInput).val(`${formattedDate}T${formattedTime}`); // yyyy-MM-ddTHH:mm
                         } else {
                             showAlert("ALERT", "L'heure de début n'est pas définie pour ce jour.", "info");
                         }
                     }
                 });
-
             });
 
             $('#Table_day').on('click', '#motif', function() {

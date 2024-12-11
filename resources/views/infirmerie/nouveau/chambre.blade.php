@@ -11,7 +11,7 @@
             <a href="{{route('index_accueil')}}">Espace Santé</a>
         </li>
         <li class="breadcrumb-item text-primary" aria-current="page">
-            Nouvelle Chambre
+            Chambre
         </li>
     </ol>
 </div>
@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Chambres</h5>
+                        <h5>CHAMBRES</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Configurations / Hospitalisation / Chambres</p>
                     </div>
                 </div>
             </div>
@@ -398,7 +398,7 @@
                                     </div>
                                 </td>
                                 <td>${item.nbre_lit}</td>
-                                <td>${item.prix} Fcfa</td>
+                                <td>${formatPrice(item.prix)} Fcfa</td>
                                 <td>
                                     ${item.statut === 'indisponible' ? 
                                         `<span class="badge bg-danger">${item.statut}</span>` : 
@@ -409,13 +409,15 @@
                                         <a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit-${item.id}">
                                             <i class="ri-edit-box-line"></i>
                                         </a>
-                                        ${item.statut === 'disponible' ?  
-                                        `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete-${item.id}">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </a>` : ``}
                                     </div>
                                 </td>
                             `;
+
+                            // ${item.statut === 'disponible' ?  
+                            //             `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete-${item.id}">
+                            //                 <i class="ri-delete-bin-line"></i>
+                            //             </a>` : ``}
+
                             // Append the row to the table body
                             tableBody.appendChild(row);
 

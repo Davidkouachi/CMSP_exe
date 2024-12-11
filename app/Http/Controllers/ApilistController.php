@@ -80,17 +80,18 @@ class ApilistController extends Controller
 
     public function list_chambre()
     {
-        $chambre = chambre::orderBy('created_at', 'desc')->get();
+        $chambre = DB::table('chambres')->select('chambres.*')->orderBy('chambres.created_at', 'desc')->get();
 
         return response()->json(['chambre' => $chambre]);
     }
 
     public function list_lit()
     {
-        $lit = lit::Join('chambres', 'chambres.id', '=', 'lits.chambre_id')
-                        ->orderBy('lits.created_at', 'desc')
-                        ->select('lits.*', 'chambres.prix as prix', 'chambres.code as code_ch')
-                        ->get();
+        $lit = DB::table('lits')
+            ->Join('chambres', 'chambres.id', '=', 'lits.chambre_id')
+            ->orderBy('lits.created_at', 'desc')
+            ->select('lits.*', 'chambres.prix as prix', 'chambres.code as code_ch')
+            ->get();
 
         return response()->json(['data' => $lit]);
     }

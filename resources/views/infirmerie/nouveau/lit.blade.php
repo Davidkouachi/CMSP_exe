@@ -25,9 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
-                        <h5>Lits</h5>
+                        <h5>LITS</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Configurations / Hospitalisation / Chambres</p>
                     </div>
                 </div>
             </div>
@@ -300,6 +300,13 @@
             });
         }
 
+        function formatPrice(input) {
+            // Supprimer tous les points existants
+            input = input.replace(/\./g, '');
+            // Formater le prix avec des points
+            return input.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         function eng_lit() {
 
             const num_lit = $('#num_lit').val().trim();
@@ -392,20 +399,21 @@
                                     </td>
                                     <td>CH-${item.code_ch}</td>
                                     <td>${item.type}</td>
-                                    <td>${item.prix} Fcfa</td>
+                                    <td>${formatPrice(item.prix)} Fcfa</td>
                                     <td>
                                         <div class="d-inline-flex gap-1">
                                             <a class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#Mmodif" id="edit-${item.id}">
                                                 <i class="ri-edit-box-line"></i>
                                             </a>
-                                            ${item.statut === 'disponible' ? 
-                                                `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete-${item.id}">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </a>` : ''}
                                         </div>
                                     </td>
                                 </tr>
                             `);
+
+                            // ${item.statut === 'disponible' ? 
+                            //                     `<a class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Mdelete" id="delete-${item.id}">
+                            //                         <i class="ri-delete-bin-line"></i>
+                            //                     </a>` : ''}
 
                             tableBody.append(row);
 

@@ -405,59 +405,69 @@ class ApiinsertController extends Controller
 
     public function chambre_new(Request $request)
     {
-        $verf = chambre::where('code', '=', $request->num_chambre)->exists();
+        $verf = DB::table('chambres')->where('code', '=', $request->num_chambre)->exists();
 
         if ($verf) {
             return response()->json(['existe' => true]);
         }
 
-        $add = new chambre();
-        $add->code = $request->num_chambre;
-        $add->nbre_lit = $request->nbre_lit;
-        $add->prix = $request->prix;
-        $add->statut = 'indisponible';
+        $chambreInsert = DB::table('chambres')->insert([
+            'code' => $request->num_chambre,
+            'nbre_lit' => $request->nbre_lit,
+            'prix' => str_replace('.', '', $request->prix),
+            'statut' => 'indisponible',
+            'created_at' => now(),
+        ]);
 
-        if($add->save()){
+        if ($chambreInsert == 1) {
             return response()->json(['success' => true]);
-        } else {
-            return response()->json(['error' => true]);
         }
+
+        return response()->json(['error' => true]);
     }
 
     public function lit_new(Request $request)
     {
-        $verf = lit::where('code', '=', $request->num_lit)->exists();
+        $verf = DB::table('lits')->where('code', '=', $request->num_lit)->exists();
 
         if ($verf) {
             return response()->json(['existe' => true]);
         }
 
-        $nbre = chambre::find($request->chambre_id);
-        $count = lit::where('chambre_id', '=', $request->chambre_id)->count();
+        $nbre = DB::table('chambres')->where('id', '=', $request->chambre_id)->first();
+        $count = DB::table('lits')->where('chambre_id', '=', $request->chambre_id)->count();
 
         if ($nbre->nbre_lit <= $count) {
             return response()->json(['nbre' => true]);
         }
-        
-        $add = new lit();
-        $add->code = $request->num_lit;
-        $add->type = $request->type;
-        $add->chambre_id = $request->chambre_id;
-        $add->statut = 'disponible';
 
         DB::beginTransaction();
 
         try {
 
-            if (!$add->save()) {
-                return response()->json(['error' => true]);
+            $litInsert = DB::table('lits')->insert([
+                'code' => $request->num_lit,
+                'type' => $request->type,
+                'chambre_id' => $request->chambre_id,
+                'statut' => 'disponible',
+                'created_at' => now(),
+            ]);
+
+            if ($litInsert == 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table lits');
             }
 
-            $add2 = chambre::find($request->chambre_id);
-            $add2->statut = 'disponible';
+            $updateData_chambre =[
+                'statut' => 'disponible',
+                'updated_at' => now(),
+            ];
 
-            if (!$add2->save()) {
-                return response()->json(['error' => true]);
+            $chambreUpdate = DB::table('chambres')
+                                ->where('id', '=', $request->chambre_id)
+                                ->update($updateData_chambre);
+
+            if ($chambreUpdate == 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table chambres');
             }
 
             DB::commit();

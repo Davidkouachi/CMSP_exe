@@ -102,39 +102,41 @@ class ApiupdateController extends Controller
 
     public function update_chambre(Request $request, $id)
     {
-        $put = chambre::find($id);
 
-        if ($put) {
-            $put->nbre_lit = $request->nbre_lit;
-            $put->prix = $request->prix;
+        $updateData_chambre =[
+            'nbre_lit' => $request->nbre_lit,
+            'prix' => str_replace('.', '', $request->prix),
+            'updated_at' => now(),
+        ];
 
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
+        $chambreUpdate = DB::table('chambres')
+                            ->where('id', '=', $id)
+                            ->update($updateData_chambre);
 
+        if ($chambreUpdate == 1) {
+            return response()->json(['success' => true]);
         }
 
-        return response()->json(['error' => true]);
+        return response()->json(['error' => true]); 
     }
 
     public function update_lit(Request $request, $id)
     {
-        $put = lit::find($id);
 
-        if ($put) {
-            $put->type = $request->typeLit;
+        $updateData_lit =[
+            'type' => $request->typeLit,
+            'updated_at' => now(),
+        ];
 
-            if ($put->save()) {
-                return response()->json(['success' => true]);
-            }else{
-                return response()->json(['error' => true]);
-            }
+        $litUpdate = DB::table('lits')
+                            ->where('id', '=', $id)
+                            ->update($updateData_lit);
 
+        if ($litUpdate == 1) {
+            return response()->json(['success' => true]);
         }
 
-        return response()->json(['error' => true]);
+        return response()->json(['error' => true]); 
     }
 
     public function update_acte(Request $request, $id)
