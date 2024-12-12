@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\assurance;
 use App\Models\taux;
@@ -243,11 +244,13 @@ class ApisearchController extends Controller
     {
        $name = DB::table('patient')
         ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+        ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
         ->select(
             'patient.idenregistremetpatient as id',
             'patient.nomprenomspatient as np',
             'patient.assure as assure',
             'tauxcouvertureassure.valeurtaux as taux',
+            'assurance.codeassurance as codeassurance',
         )->get();
                        
         return response()->json(['name' => $name]); 
@@ -288,16 +291,147 @@ class ApisearchController extends Controller
 
     public function montant_prelevement()
     {
-        $prelevement = prelevement::where('code', '=', '1')->first();
+        $prelevement = DB::table('prelevements')->where('code', '=', '1')->select('prelevements.*')->first();
 
         return response()->json(['prelevement' => $prelevement]); 
     }
 
-    public function select_examen($id)
+    public function select_examen($id, $codeassurance, $periode)
     {
-        $examen = Typeacte::where('acte_id', '=', $id)->get();
+        $examens = DB::table('examen')
+            ->where('codfamexam', '=', $id)
+            ->select(
+                'examen.numexam as numexam',
+                'examen.cot as cot',
+                'examen.denomination as denomination',
+                'examen.codfamexam as codfamexam',
+                'examen.codgaran as codgaran',
+            )
+            ->get();
 
-        return response()->json(['examen' => $examen]); 
+        if ($examens->isEmpty()) {
+            return response()->json(['existep' => true]);
+        }
+
+        foreach ($examens as $examen) {
+
+            if ($id == 'Y') {
+                
+                if ($examen->codgaran != null || $examen->codgaran != '') {
+                        
+                    $prix = DB::table('tarifs')
+                        ->where('tarifs.codgaran', '=', $examen->codgaran)
+                        ->where('tarifs.codeassurance', '=', $codeassurance)
+                        ->select('tarifs.*')
+                        ->first();
+
+                    if ($periode == 0) {
+                        $examen->tarif = $prix->montjour ?? 0;
+                    } else if ($periode == 1) {
+                        $examen->tarif = $prix->montnuit ?? 0;
+                    } else if ($periode == 2) {
+                        $examen->tarif = $prix->montferie ?? 0;
+                    }
+
+
+                    $prix_non_as = DB::table('tarifs')
+                        ->where('tarifs.codgaran', '=', $examen->codgaran)
+                        ->where('tarifs.codeassurance', '=', 'NONAS')
+                        ->select('tarifs.*')
+                        ->first();
+
+                    if ($periode == 0) {
+                        $examen->tarif_non_as = $prix_non_as->montjour ?? 0;
+                    } else if ($periode == 1) {
+                        $examen->tarif_non_as = $prix_non_as->montnuit ?? 0;
+                    } else if ($periode == 2) {
+                        $examen->tarif_non_as = $prix_non_as->montferie ?? 0;
+                    }
+
+                    $examen->valeur = 0;
+                    $examen->valeur_non_as = 0;
+
+                } else {
+
+                    $examen->tarif = 0;
+                    $examen->valeur = 0;
+
+                    $examen->tarif_non_as = 0;
+                    $examen->valeur_non_as = 0;
+                }
+
+                $examen->valeur = 0;
+
+            } else if ($id == 'Z' || $id == 'B') {
+
+                if ($examen->cot != null || $examen->cot != '' || $examen->cot != 0) {
+                        
+                    $prix = DB::table('tarifs')
+                        ->where('tarifs.codgaran', '=', $examen->codfamexam)
+                        ->where('tarifs.codeassurance', '=', $codeassurance)
+                        ->select('tarifs.*')
+                        ->first();
+
+                    $prix->montj = $examen->cot * $prix->montjour ?? 0;
+                    $prix->montn = $examen->cot * $prix->montnuit ?? 0;
+                    $prix->montf = $examen->cot * $prix->montferie ?? 0;
+
+                    if ($periode == 0) {
+                        $examen->tarif = $prix->montj;
+                        $examen->valeur = $prix->montjour;
+                    } else if ($periode == 1) {
+                        $examen->tarif = $prix->montn;
+                        $examen->valeur = $prix->montnuit;
+                    } else if ($periode == 2) {
+                        $examen->tarif = $prix->montf;
+                        $examen->valeur = $prix->montferie;
+                    }
+
+
+                    $prix_non_as = DB::table('tarifs')
+                        ->where('tarifs.codgaran', '=', $examen->codfamexam)
+                        ->where('tarifs.codeassurance', '=', 'NONAS')
+                        ->select('tarifs.*')
+                        ->first();
+
+                    $prix_non_as->montj = $examen->cot * $prix_non_as->montjour ?? 0;
+                    $prix_non_as->montn = $examen->cot * $prix_non_as->montnuit ?? 0;
+                    $prix_non_as->montf = $examen->cot * $prix_non_as->montferie ?? 0;
+
+                    if ($periode == 0) {
+                        $examen->tarif_non_as = $prix_non_as->montj;
+                        $examen->valeur_non_as = $prix_non_as->montjour;
+                    } else if ($periode == 1) {
+                        $examen->tarif_non_as = $prix_non_as->montn;
+                        $examen->valeur_non_as = $prix_non_as->montnuit;
+                    } else if ($periode == 2) {
+                        $examen->tarif_non_as = $prix_non_as->montf;
+                        $examen->valeur_non_as = $prix_non_as->montferie;
+                    }
+
+                } else {
+
+                    $examen->tarif = 0;
+                    $examen->valeur = 0;
+
+                    $examen->tarif_non_as = 0;
+                    $examen->valeur_non_as = 0;
+                }
+
+            } else {
+                
+                $examen->tarif = 0;
+                $examen->valeur = 0;
+                $examen->tarif_non_as = 0;
+                $examen->valeur_non_as = 0;
+            }
+
+        }
+
+        Log::info((array) $examens);
+
+        return response()->json(['success' => true, 'examens' => $examens]);
+
     }
 
     public function select_jour()

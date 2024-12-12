@@ -66,12 +66,6 @@
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link text-white" id="tab-twoAAA" data-bs-toggle="tab" href="#twoAAA" role="tab" aria-controls="twoAAA" aria-selected="false" tabindex="-1">
-                                    <i class="ri-hand-sanitizer-line me-2"></i>
-                                    Nouvel Examen
-                                </a>
-                            </li>
-                            <li class="nav-item" role="presentation">
                                 <a class="nav-link text-white" id="tab-oneAAAD" data-bs-toggle="tab" href="#oneAAAD" role="tab" aria-controls="oneAAAD" aria-selected="false" tabindex="-1">
                                     <i class="ri-health-book-line me-2"></i>
                                     Liste des demandes d'examens
@@ -104,11 +98,24 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="row gx-3 justify-content-center align-items-center mb-5">
+                                <div class="row gx-3 justify-content-center align-items-center">
                                     <div class="col-xxl-4 col-lg-4 col-sm-6">
                                         <div class="mb-3 text-center">
                                             <label class="form-label">Patient</label>
                                             <select class="form-select select2" id="patient_id"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="select_periode_div" style="display: none;" class="row gx-3 justify-content-center align-items-center mb-5">
+                                    <div class="col-xxl-4 col-lg-4 col-sm-6">
+                                        <div class="mb-3 text-center">
+                                            <label class="form-label">Période</label>
+                                            <select class="form-select select2" id="periode">
+                                                <option value=""></option>
+                                                <option value="0">Jour</option>
+                                                <option value="1">Nuit</option>
+                                                <option value="2">Férier</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +124,7 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Type d'examen</label>
-                                                <select class="form-select" id="typeacte_id_exd"></select>
+                                                <select class="form-select select2" id="typeacte_id_exd"></select>
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
@@ -154,7 +161,7 @@
                                                     <div class="col-12" id="contenu_examen">
 
                                                     </div>
-                                                    <div class="row gx-3" id="div_btn_examen" style="display: none;">
+                                                    <div class="row gx-3" id="div_btn_examen">
                                                         <div class="col-xxl-5 col-lg-6 col-sm-6">
                                                             <div class="input-group mb-3">
                                                                 <span class="input-group-text w-25">
@@ -208,82 +215,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="twoAAA" role="tabpanel" aria-labelledby="tab-twoAAA">
-                                <div class="card-header">
-                                    <h5 class="card-title text-center">
-                                        Nouvel Examen
-                                    </h5>
-                                </div>
-                                <div class="card-header">
-                                    <div class="text-center">
-                                        <a class="d-flex align-items-center flex-column">
-                                            <img src="{{asset('assets/images/examen.jpg')}}" class="img-7x rounded-circle border border-1">
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="row gx-3 justify-content-center align-items-center">
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Type d'examen
-                                            </label>
-                                            <select class="form-select" id="acte_id_ex">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Nom
-                                            </label>
-                                            <input type="text" class="form-control" id="nom_ex" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Cotation
-                                            </label>
-                                            <input type="text" class="form-control" id="cotation_ex" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="1">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Valeur
-                                            </label>
-                                            <input type="text" class="form-control" id="valeur_ex" placeholder="Saisie Obligatoire">
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Prix</label>
-                                            <div class="input-group">
-                                                <input type="tel" class="form-control" id="prix_ex" placeholder="Saisie Obligatoire">
-                                                <span class="input-group-text">Fcfa</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Total</label>
-                                            <div class="input-group">
-                                                <input readonly type="tel" class="form-control" id="montant_ex" placeholder="Montant Total">
-                                                <span class="input-group-text">Fcfa</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <div class="d-flex gap-2 justify-content-center">
-                                                <button id="btn_eng_ex" class="btn btn-success">
-                                                    Enregistrer
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -362,12 +293,11 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
-                                                                    <th scope="col">Type</th>
                                                                     <th scope="col">Examen</th>
-                                                                    <th scope="col">Cotation & Valeur</th>
-                                                                    <th scope="col">Prix</th>
-                                                                    <th scope="col">Montant Total</th>
-                                                                    <th scope="col">Date de création</th>
+                                                                    <th scope="col">Type</th>
+                                                                    <th scope="col">Code</th>
+                                                                    <th scope="col">Valeur</th>
+                                                                    <th scope="col">Cotation</th>
                                                                     <th scope="col"></th>
                                                                 </tr>
                                                             </thead>
@@ -416,78 +346,26 @@
     </div>
 </div>
 
-<div class="modal fade" id="MmodifE" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="PRIXexamen" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Mise à jour</h5>
+                <h5 class="modal-title">
+                    Détail Prix
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="updateForm">
-                    <input type="hidden" id="Id_exM"> <!-- Hidden field for the room's ID -->
-                    <div class="row gx-3 justify-content-center align-items-center">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Type d'examen
-                                </label>
-                                <select class="form-select" id="acte_id_exM">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Nom
-                                </label>
-                                <input type="text" class="form-control" id="nom_exM" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Cotation
-                                </label>
-                                <input type="text" class="form-control" id="cotation_exM" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="1">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Valeur
-                                </label>
-                                <input type="text" class="form-control" id="valeur_exM" placeholder="Saisie Obligatoire">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">Prix</label>
-                                <div class="input-group">
-                                    <input type="tel" class="form-control" id="prix_exM" placeholder="Saisie Obligatoire">
-                                    <span class="input-group-text">Fcfa</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">Total</label>
-                                <div class="input-group">
-                                    <input readonly type="tel" class="form-control" id="montant_exM" placeholder="Montant Total">
-                                    <span class="input-group-text">Fcfa</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div class="modal-body mb-3 mt-3" id="modal_Prix" style="display: none;" ></div>
+            <div id="message_loader" style="display: none;" class="mb-3 mt-3">
+                <p class="text-center" >
+                    Aucune donnée n'a été trouvé
+                </p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Fermer
-                </button>
-                <button type="button" class="btn btn-primary" id="updateBtnE">
-                    Mettre à jour
-                </button>
+            <div id="div_loader" style="display: none;" class="mb-3 mt-3">
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
+                    <strong>Chargement des données...</strong>
+                </div>
             </div>
         </div>
     </div>
@@ -556,12 +434,9 @@
 
         Statistique();
         select_patient();
-        select_acte();
         montant_prelevement();
-        Statistique();
+        select_type_examen();
 
-        $("#btn_eng_ex").on("click", eng_ex);
-        $("#updateBtnE").on("click", eng_exM);
         $("#btn_eng_pre").on("click", eng_pre);
         $("#add_select_examen").on("click", add_select);
         $("#btn_eng_exd").on("click", eng_exd);
@@ -603,35 +478,9 @@
             this.value = formatPrice(this.value);
         }
 
-        ['cotation_ex', 'cotation_exM'].forEach(id => {
-            document.getElementById(id).addEventListener('keypress', allowOnlyLetters);
-        });
-
-        ['prix_ex', 'prix_exM','prix_preleve'].forEach(id => {
+        ['prix_preleve'].forEach(id => {
             document.getElementById(id).addEventListener('input', formatPriceInput);
             document.getElementById(id).addEventListener('keypress', allowOnlyNumbers);
-        });
-
-        ['valeur_ex', 'valeur_exM'].forEach(id => {
-            document.getElementById(id).addEventListener('keypress', allowOnlyNumbers);
-        });
-
-        var inputs = ['prix_ex','valeur_ex'];
-        inputs.forEach(function(id) {
-            var inputElement = document.getElementById(id);
-
-            inputElement.addEventListener('input', function() {
-                calcul_montant_ex();
-            });
-        });
-
-        var inputs = ['prix_exM','valeur_exM'];
-        inputs.forEach(function(id) {
-            var inputElement = document.getElementById(id);
-
-            inputElement.addEventListener('input', function() {
-                calcul_montant_exM();
-            });
         });
 
         const table_examen = $('.Table_examen').DataTable({
@@ -659,7 +508,7 @@
                     orderable: false,
                 },
                 { 
-                    data: 'acte', 
+                    data: 'denomination', 
                     render: (data, type, row) => `
                     <div class="d-flex align-items-center">
                         <a class="d-flex align-items-center flex-column me-2">
@@ -667,46 +516,35 @@
                         </a>
                         ${data}
                     </div>`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'nom',
                     searchable: true,
                 },
                 { 
-                    data: null, 
-                    render: (data, type, row) => `${row.cotation} ${row.valeur}`,
-                    searchable: true, 
+                    data: 'type',
+                    render: (data) => `${data == null ? `Néant` : `${data}` }`,
+                    searchable: true,
                 },
                 { 
-                    data: 'prix', 
-                    render: (data) => `${data} Fcfa`,
-                    searchable: true, 
+                    data: 'numexam',
+                    searchable: true,
                 },
                 { 
-                    data: 'montant', 
-                    render: (data) => `${data} Fcfa`,
-                    searchable: true, 
+                    data: 'codfamexam',
+                    render: (data) => `${data == null || data == '' ? `Néant` : `${data}` }`,
+                    searchable: true,
                 },
                 { 
-                    data: 'created_at', 
-                    render: (data) => `${formatDateHeure(data)}`,
-                    searchable: true, 
+                    data: 'cot',
+                    render: (data) => `${data == null || data == '' ? 0 : `${data}` }`,
+                    searchable: true,
                 },
                 {
                     data: null,
                     render: (data, type, row) => `
                         <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-info btn-sm rounded-5" data-bs-toggle="modal" data-bs-target="#MmodifE" id="modif"
-                                data-id = ${row.id}
-                                data-nom = ${row.nom}
-                                data-cotation = ${row.cotation}
-                                data-valeur = ${row.valeur}
-                                data-prix = ${row.prix}
-                                data-montant = ${row.montant}
-                                data-acte_id = ${row.acte_id}
+                            <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#PRIXexamen" id="detail"
+                                data-numexam = ${row.numexam}
                             >
-                                <i class="ri-edit-line"></i>
+                                <i class="ri-eye-line"></i>
                             </a>
                         </div>
                     `,
@@ -722,31 +560,100 @@
 
         function initializeRowEventListeners() {
 
-            $('.Table_examen').on('click', '#modif', function() {
-                const id = $(this).data('id');
-                const nom = $(this).data('nom');
-                const cotation = $(this).data('cotation');
-                const valeur = $(this).data('valeur');
-                const prix = $(this).data('prix');
-                const montant = $(this).data('montant');
-                const acte_id = $(this).data('acte_id');
+            $('.Table_examen').on('click', '#detail', function() {
+                const id = $(this).data('numexam');
 
-                document.getElementById('Id_exM').value = id;
-                document.getElementById("nom_exM").value = nom;
-                document.getElementById("cotation_exM").value = cotation;
-                document.getElementById("valeur_exM").value = valeur;
-                document.getElementById("prix_exM").value = prix;
-                document.getElementById("montant_exM").value = montant;
+                const modal_Prix = document.getElementById('modal_Prix'); // Pour les produits
+                const message_Prix = document.getElementById('message_loader');
+                const loader_Prix = document.getElementById('div_loader');
 
-                const modifActeSelect = document.getElementById("acte_id_exM");
-                const typeeOptions = modifActeSelect.options;
+                modal_Prix.style.display = 'none';
+                message_Prix.style.display = 'none'; // Cacher au départ
+                loader_Prix.style.display = 'block';
 
-                for (let i = 0; i < typeeOptions.length; i++) {
-                    if (String(typeeOptions[i].value) === String(acte_id)) {
-                        typeeOptions[i].selected = true; 
-                        break;
-                    }
-                }
+                fetch(`/api/prix_examen/${id}`) // API endpoint
+                    .then(response => response.json())
+                    .then(data => {
+
+                        if (data.success) {
+
+                            const prix = data.prix;
+
+                            if (prix.length > 0) {
+                                const modal = document.getElementById('modal_Prix');
+                                modal.innerHTML = '';
+
+                                // Generate the soins HTML
+                                let soinsHTML = prix.map(item => {
+                                    return `
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <div class="card-body">
+                                                    <ul class="list-group">
+                                                        ${item.codeassurance == 'NONAS' ? `<li class="list-group-item text-center text-white bg-success">` : `<li class="list-group-item active text-center" aria-current="true">`}
+                                                            ${item.codeassurance == 'NONAS' ? 'Patient non assuré' : `${item.assurance}`}
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            Montant Jour : ${formatPriceT(item.montjour)} Fcfa
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            Montant Nuit : ${formatPriceT(item.montnuit)} Fcfa
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            Montant Férier : ${formatPriceT(item.montferie)} Fcfa
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join(''); // Combine all items into a single string
+
+                                // Generate the full modal content
+                                const div = document.createElement('div');
+                                div.innerHTML = `
+                                    <div class="row gx-3">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <div class="card-body">
+                                                    <div class="text-center">
+                                                        <a href="doctors-profile.html" class="d-flex align-items-center flex-column">
+                                                            <img src="{{asset('assets/images/tarif.png')}}" class="img-7x rounded-circle mb-3 border border-3">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        ${soinsHTML}
+                                    </div>
+                                `;
+
+                                // Append the content to the modal
+                                modal.appendChild(div);
+
+                                modal_Prix.style.display = 'block';
+                                message_Prix.style.display = 'none'; // Cacher au départ
+                                loader_Prix.style.display = 'none';
+                            } else {
+
+                                modal_Prix.style.display = 'none';
+                                message_Prix.style.display = 'block'; // Cacher au départ
+                                loader_Prix.style.display = 'none';
+                            }
+
+                        } else {
+                            modal_Prix.style.display = 'none';
+                            message_Prix.style.display = 'block'; // Cacher au départ
+                            loader_Prix.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des données:', error);
+                        modal_Prix.style.display = 'none';
+                        message_Prix.style.display = 'block'; // Cacher au départ
+                        loader_Prix.style.display = 'none';
+                    });
+
             });
         }
 
@@ -754,96 +661,96 @@
             table_examen.ajax.reload(null, false);
         });
 
-        const table_examend = $('.Table_examend').DataTable({
+        // const table_examend = $('.Table_examend').DataTable({
 
-            processing: true,
-            serverSide: false,
-            ajax: function(data, callback) {
-                const date1 = $('#searchDate1').val();
-                const date2 = $('#searchDate2').val();
+        //     processing: true,
+        //     serverSide: false,
+        //     ajax: function(data, callback) {
+        //         const date1 = $('#searchDate1').val();
+        //         const date2 = $('#searchDate2').val();
                 
-                $.ajax({
-                    url: `/api/list_examend_all/${date1}/${date2}`,
-                    type: 'GET',
-                    success: function(response) {
-                        callback({ data: response.data });
-                    },
-                    error: function() {
-                        console.log('Error fetching data. Please check your API or network list_examend_all.');
-                    }
-                });
-            },
-            columns: [
-                { 
-                    data: null, 
-                    render: (data, type, row, meta) => meta.row + 1,
-                    searchable: false,
-                    orderable: false,
-                },
-                { 
-                    data: 'acte', 
-                    render: (data, type, row) => `
-                    <div class="d-flex align-items-center">
-                        <a class="d-flex align-items-center flex-column me-2">
-                            <img src="{{ asset('/assets/images/examen.jpg') }}" class="img-2x rounded-circle border border-1">
-                        </a>
-                        ${data}
-                    </div>`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'patient',
-                    searchable: true,
-                },
-                { 
-                    data: 'medecin', 
-                    render: (data) => `Dr. ${data}`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'nbre',
-                    searchable: true,
-                },
-                { 
-                    data: 'prelevement', 
-                    render: (data) => `${data} Fcfa`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'montant', 
-                    render: (data) => `${data} Fcfa`,
-                    searchable: true, 
-                },
-                { 
-                    data: 'created_at', 
-                    render: (data) => `${formatDateHeure(data)}`,
-                    searchable: true, 
-                },
-                {
-                    data: null,
-                    render: (data, type, row) => `
-                        <div class="d-inline-flex gap-1" style="font-size:10px;">
-                            <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail" id="detail"
-                                data-id="${row.id}"
-                            >
-                                <i class="ri-archive-2-line"></i>
-                            </a>
-                            <a class="btn btn-outline-info btn-sm" id="fiche"
-                                data-id="${row.id}"
-                            >
-                                <i class="ri-file-line"></i>
-                            </a>
-                        </div>
-                    `,
-                    searchable: false,
-                    orderable: false,
-                }
-            ],
-            ...dataTableConfig,
-            initComplete: function(settings, json) {
-                initializeRowEventListenersExamend();
-            },
-        });
+        //         $.ajax({
+        //             url: `/api/list_examend_all/${date1}/${date2}`,
+        //             type: 'GET',
+        //             success: function(response) {
+        //                 callback({ data: response.data });
+        //             },
+        //             error: function() {
+        //                 console.log('Error fetching data. Please check your API or network list_examend_all.');
+        //             }
+        //         });
+        //     },
+        //     columns: [
+        //         { 
+        //             data: null, 
+        //             render: (data, type, row, meta) => meta.row + 1,
+        //             searchable: false,
+        //             orderable: false,
+        //         },
+        //         { 
+        //             data: 'acte', 
+        //             render: (data, type, row) => `
+        //             <div class="d-flex align-items-center">
+        //                 <a class="d-flex align-items-center flex-column me-2">
+        //                     <img src="{{ asset('/assets/images/examen.jpg') }}" class="img-2x rounded-circle border border-1">
+        //                 </a>
+        //                 ${data}
+        //             </div>`,
+        //             searchable: true, 
+        //         },
+        //         { 
+        //             data: 'patient',
+        //             searchable: true,
+        //         },
+        //         { 
+        //             data: 'medecin', 
+        //             render: (data) => `Dr. ${data}`,
+        //             searchable: true, 
+        //         },
+        //         { 
+        //             data: 'nbre',
+        //             searchable: true,
+        //         },
+        //         { 
+        //             data: 'prelevement', 
+        //             render: (data) => `${data} Fcfa`,
+        //             searchable: true, 
+        //         },
+        //         { 
+        //             data: 'montant', 
+        //             render: (data) => `${data} Fcfa`,
+        //             searchable: true, 
+        //         },
+        //         { 
+        //             data: 'created_at', 
+        //             render: (data) => `${formatDateHeure(data)}`,
+        //             searchable: true, 
+        //         },
+        //         {
+        //             data: null,
+        //             render: (data, type, row) => `
+        //                 <div class="d-inline-flex gap-1" style="font-size:10px;">
+        //                     <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail" id="detail"
+        //                         data-id="${row.id}"
+        //                     >
+        //                         <i class="ri-archive-2-line"></i>
+        //                     </a>
+        //                     <a class="btn btn-outline-info btn-sm" id="fiche"
+        //                         data-id="${row.id}"
+        //                     >
+        //                         <i class="ri-file-line"></i>
+        //                     </a>
+        //                 </div>
+        //             `,
+        //             searchable: false,
+        //             orderable: false,
+        //         }
+        //     ],
+        //     ...dataTableConfig,
+        //     initComplete: function(settings, json) {
+        //         initializeRowEventListenersExamend();
+        //     },
+        // });
 
         function initializeRowEventListenersExamend() {
 
@@ -1042,73 +949,119 @@
 
         let cachedExamens = {};
 
-        function select_acte() {
+        function select_type_examen() {
 
-            const selectElement = document.getElementById('acte_id_ex');
-            const selectElementM = document.getElementById('acte_id_exM');
-            const selectElementexd = document.getElementById('typeacte_id_exd');
+            const selectElementexd = $('#typeacte_id_exd');
+            selectElementexd.empty();
 
-            selectElement.innerHTML = '';
-            selectElementM.innerHTML = '';
-            selectElementexd.innerHTML = '';
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Selectionner';
-            selectElement.appendChild(defaultOption);
-
-            const defaultOption2 = document.createElement('option');
-            defaultOption2.value = '';
-            defaultOption2.textContent = 'Selectionner';
-            selectElementexd.appendChild(defaultOption2);
+            const defaultOption = $('<option>', {
+                value: '',
+                text: 'Selectionner',
+            });
+            selectElementexd.append(defaultOption);
 
             $.ajax({
-                url: '/api/list_acte_ex',
+                url: '/api/select_type_examend',
                 method: 'GET',
-                success: function(response) {
-                    data = response.acte;
-                    data.forEach(acte => {
-                        const option1 = document.createElement('option');
-                        option1.value = acte.id; // Ensure 'id' is the correct key
-                        option1.textContent = acte.nom; // Ensure 'nom' is the correct key
-                        selectElement.appendChild(option1);
+                dataType: 'json',
+                success: function(data) {
 
-                        const option2 = document.createElement('option');
-                        option2.value = acte.id;
-                        option2.textContent = acte.nom;
-                        selectElementM.appendChild(option2);
-
-                        const option3 = document.createElement('option');
-                        option3.value = acte.id;
-                        option3.textContent = acte.nom;
-                        selectElementexd.appendChild(option3);
+                    data.type.forEach(item => {
+                        const option = $('<option>', {
+                            value: item.codfamexam,
+                            text: item.nomfamexam,
+                        });
+                        selectElementexd.append(option);
                     });
                 },
                 error: function() {
-                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                    console.error('Failed to fetch data.');
                 }
             });
 
-            selectElementexd.addEventListener('change', function() {
+            selectElementexd.on('change', function() {
+
+                if (this.value == 'B') {
+                    $('#montant_pre_examen').val($('#prix_preleve').val());
+                } else {
+                    $('#montant_pre_examen').val(0);
+                }
+
+
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+                const selectElement = $('#patient_id');
+                const selectedOption = selectElement.find('option:selected');
+                let codeassurance = selectedOption.data('codeassurance');
+
+                let periode = $('#periode').val();
+
                 const id = this.value;
                 if (id) {
                     // Vérifier si les données sont déjà en cache
                     if (cachedExamens[id]) {
+
+                        var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
+
                         afficherExamens(id); // Utiliser les données du cache
                     } else {
-                        const url = '/api/select_examen/' + id;
+                        const url =`/api/select_examen/${id}/${codeassurance}/${periode}`;
                         fetch(url)
                             .then(response => response.json())
                             .then(data => {
-                                // Stocker les données en cache
-                                cachedExamens[id] = data.examen;
-                                afficherExamens(id);
+                                
+                                var preloader = document.getElementById('preloader_ch');
+                                if (preloader) {
+                                    preloader.remove();
+                                }
+
+                                if (data.success) {
+
+                                    cachedExamens[id] = data.examens;
+                                    afficherExamens(id);
+
+                                } else if (data.existep) {
+
+                                    showAlert("ALERT", "Aucun exame n'a été trouvé.", "warning");
+                                    return false;
+                                } else {
+                                    showAlert("ALERT", "Aucun exame n'a été trouvé.", "warning");
+                                    return false;
+                                }
+
+                                
                             })
                             .catch(error => {
+
+                                var preloader = document.getElementById('preloader_ch');
+                                if (preloader) {
+                                    preloader.remove();
+                                }
+
                                 console.error('Erreur lors du chargement des données:', error);
+                                showAlert("ALERT", "Erreur lors du chargement des données.", "error");
+                                return false;
+
                             });
                     }
                 } else {
+
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    showAlert("ALERT", "Erreur lors du chargement des données.", "error");
+
                     const contenuDiv = document.getElementById('contenu_examen');
                     contenuDiv.innerHTML = '';
                     document.getElementById('div_Examen').style.display = "none";
@@ -1145,6 +1098,7 @@
             addSelectExamen(contenuDiv, cachedExamens[id]);
 
             document.getElementById('div_Examen').style.display = "block";
+
         }
 
         function montant_prelevement() {
@@ -1153,172 +1107,11 @@
                 method: 'GET',
                 success: function(response) {
                     data = response.prelevement;
-                    document.getElementById('prix_preleve').value = data.prix;
-                    document.getElementById('montant_pre_examen').value = data.prix;
+                    document.getElementById('prix_preleve').value = formatPriceT(data.prix);
+                    document.getElementById('montant_pre_examen').value = formatPriceT(data.prix);
                 },
                 error: function() {
                     // showAlert('danger', 'Impossible de generer le code automatiquement');
-                }
-            });
-        }
-
-        function calcul_montant_ex() {
-
-            const valeur = parseInt(document.getElementById('valeur_ex').value.replace(/[^0-9]/g, '')) || 0;
-            const prix = parseInt(document.getElementById('prix_ex').value.replace(/[^0-9]/g, '')) || 0;
-
-            const total = valeur * prix; 
-
-            document.getElementById('montant_ex').value = formatPriceT(total);
-        }
-
-        function calcul_montant_exM() {
-
-            const valeur = parseInt(document.getElementById('valeur_exM').value.replace(/[^0-9]/g, '')) || 0;
-            const prix = parseInt(document.getElementById('prix_exM').value.replace(/[^0-9]/g, '')) || 0;
-
-            const total = valeur * prix; 
-
-            document.getElementById('montant_exM').value = formatPriceT(total);
-        }
-
-        function eng_ex()
-        {
-            const id = document.getElementById("acte_id_ex");
-            const nom = document.getElementById("nom_ex");
-            const cotation = document.getElementById("cotation_ex");
-            const valeur = document.getElementById("valeur_ex");
-            const prix = document.getElementById("prix_ex");
-            const montant = document.getElementById("montant_ex");
-
-            if(!id.value.trim() || !nom.value.trim() || !cotation.value.trim() || !valeur.value.trim() || !prix.value.trim() || !montant.value.trim()){
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
-                return false;
-            }
-
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-            // Add the preloader to the body
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-            $.ajax({
-                url: '/api/examen_new',
-                method: 'GET',  // Use 'POST' for data creation
-                data: { 
-                    id: id.value, 
-                    nom: nom.value, 
-                    prix: prix.value ,
-                    cotation: cotation.value, 
-                    valeur: valeur.value, 
-                    montant: montant.value ,
-                },
-                success: function(response) {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    if (response.existe) {
-                        showAlert('Alert', 'Cet Examen existe déjà.','warning');
-                    }else if (response.success) {
-
-                        id.value = '';
-                        nom.value = '';
-                        prix.value = '';
-                        cotation.value = '';
-                        valeur.value = '';
-                        montant.value = '';
-
-                        table_examen.ajax.reload(null, false);
-
-                        showAlert('Succès', 'Opération éffectuée.','success');
-                    } else if (response.error) {
-                        showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
-                    }
-
-                },
-                error: function() {
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
-                }
-            });
-        }
-
-        function eng_exM()
-        {
-            const id = document.getElementById("Id_exM").value;
-            const acte_id = document.getElementById("acte_id_exM");
-            const nom = document.getElementById("nom_exM");
-            const cotation = document.getElementById("cotation_exM");
-            const valeur = document.getElementById("valeur_exM");
-            const prix = document.getElementById("prix_exM");
-            const montant = document.getElementById("montant_exM");
-
-            if(!acte_id.value.trim() || !nom.value.trim() || !cotation.value.trim() || !valeur.value.trim() || !prix.value.trim() || !montant.value.trim()){
-                showAlert('Alert', 'Veuillez remplir tous les champs SVP.','warning');
-                return false;
-            }
-
-            var modal = bootstrap.Modal.getInstance(document.getElementById('MmodifE'));
-            modal.hide();
-
-            var preloader_ch = `
-                <div id="preloader_ch">
-                    <div class="spinner_preloader_ch"></div>
-                </div>
-            `;
-
-            document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-            $.ajax({
-                url: '/api/examen_Modif/'+id,
-                method: 'GET',
-                data: { 
-                    acte_id: acte_id.value, 
-                    nom: nom.value, 
-                    prix: prix.value ,
-                    cotation: cotation.value, 
-                    valeur: valeur.value, 
-                    montant: montant.value,
-                },
-                success: function(response) {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    if (response.existe) {
-
-                        showAlert('Alert', 'Cet Examen existe déjà.','warning');
-
-                    }else if (response.success) {
-
-                        table_examen.ajax.reload(null, false);
-
-                        showAlert('Succès', 'Mise à jour éffectuée.','success');
-                    } else if (response.error) {
-
-                        showAlert('Erreur', 'Une erreur est survenue','error');
-                    }
-
-                },
-                error: function() {
-
-                    var preloader = document.getElementById('preloader_ch');
-                    if (preloader) {
-                        preloader.remove();
-                    }
-
-                    showAlert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.','error');
                 }
             });
         }
@@ -1386,7 +1179,8 @@
                 value: '',
                 text: 'Selectionner',
                 'data-taux': 0,
-                'data-assurer': 'non',
+                'data-assurer': 0,
+                'data-codeassurance': 0,
             });
             selectElement.append(defaultOption);
 
@@ -1400,7 +1194,8 @@
                             value: item.id,
                             text: item.np,
                             'data-taux': item.taux || 0,
-                            'data-assurer': item.assurer,
+                            'data-assurer': item.assure,
+                            'data-codeassurance': item.codeassurance,
                         });
                         selectElement.append(option);
                     });
@@ -1412,7 +1207,12 @@
         }
 
         $('#patient_id').on('change', function() {
-            document.getElementById('select_examen_div').style.display = "block";
+            $('#select_examen_div').hide();
+            $('#select_periode_div').show();
+        });
+
+        $('#periode').on('change', function() {
+            $('#select_examen_div').show();
             rech_dosier(); 
         });
 
@@ -1432,7 +1232,7 @@
                 $('#numcode').val('');
                 if (selectedOption.val()) {
                     const assurer = selectedOption.data('assurer'); // Récupérer data-assurer
-                    if (assurer === 'oui') {
+                    if (assurer === 1) {
                         $('#div_numcode').show();
                     } else {
                         $('#div_numcode').hide();
@@ -1472,7 +1272,7 @@
                             <label class="form-label">Prise en Charge</label>
                             <select class="form-select examen-select-assurer">
                                 ${patientTaux == 0 ? `
-                                    <option selected value="oui">Non</option>
+                                    <option selected value="non">Non</option>
                                 ` : `
                                     <option selected value="oui">Oui</option>
                                     <option value="non">Non</option>
@@ -1486,14 +1286,18 @@
                             <select class="form-select examen-select">
                                 <option value="">Selectionner</option>
                                 ${examens.map(item => 
-                                    `<option value="${item.id}" 
-                                             data-cotation="${item.cotation}" 
-                                             data-valeur="${item.valeur}" 
-                                             data-prix="${item.prix}" 
-                                             data-montant="${item.montant}"
-                                             data-assurer="oui"
-                                             data-montantr="${item.montant.replace(/\./g, '')}">
-                                        ${item.nom}
+                                    `<option value="${item.numexam}" 
+                                            data-cotation="${item.cot}"
+                                            data-codfamexam="${item.codfamexam}"
+                                            data-valeur="${item.valeur}" 
+                                            data-valeur_non_as="${item.valeur_non_as}"
+                                            data-assurer="oui"
+                                            data-tarif="${formatPriceT(item.tarif)}"
+                                            data-tarif_non_as="${formatPriceT(item.tarif_non_as)}"
+                                            data-tarifr="${item.tarif}"
+                                            data-tarif_non_asr="${item.tarif_non_as}"
+                                        >
+                                        ${item.denomination}
                                     </option>`).join('')}
                             </select>
                         </div>
@@ -1556,19 +1360,59 @@
                     selectedOption.setAttribute('data-assurer', selectedValue);
                 }
 
+                if (this.value == 'oui') {
+                    div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-codfamexam')+selectedOption.getAttribute('data-cotation');
+                    div.querySelector('.prix-field').value = selectedOption.getAttribute('data-valeur');
+                    div.querySelector('.montant-field').value = selectedOption.getAttribute('data-tarif');
+
+                } else {
+
+                    div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-codfamexam')+selectedOption.getAttribute('data-cotation');
+                    div.querySelector('.prix-field').value = selectedOption.getAttribute('data-valeur_non_as');
+                    div.querySelector('.montant-field').value = selectedOption.getAttribute('data-tarif_non_as');
+
+                }
+
                 updateMontantTotalExamen();
             });
-
 
             // Event listener pour le select
             const examenSelect = div.querySelector('.examen-select');
             examenSelect.addEventListener('change', function() {
                 const selectedOption = examenSelect.options[examenSelect.selectedIndex];
 
-                // Mettre à jour les champs en fonction de l'examen sélectionné
-                div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-cotation')+selectedOption.getAttribute('data-valeur');
-                div.querySelector('.prix-field').value = selectedOption.getAttribute('data-prix');
-                div.querySelector('.montant-field').value = selectedOption.getAttribute('data-montant');
+                if (selectedOption.getAttribute('data-tarifr') == 0) {
+
+                    examenSelect.value = ''; // Reset the value to null/empty
+                    const event = new Event('change'); // Create a 'change' event
+                    examenSelect.dispatchEvent(event); // Trigger the change event
+                    showAlert("Alert", 'Cet Examen n\'a pas de prix', "info");
+                    return;
+                }
+
+                if (patientTaux > 0) {
+
+                    if (assurerSelect.value == 'oui') {
+
+                        div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-codfamexam')+selectedOption.getAttribute('data-cotation');
+                        div.querySelector('.prix-field').value = selectedOption.getAttribute('data-valeur');
+                        div.querySelector('.montant-field').value = selectedOption.getAttribute('data-tarif');
+
+                    } else {
+
+                        div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-codfamexam')+selectedOption.getAttribute('data-cotation');
+                        div.querySelector('.prix-field').value = selectedOption.getAttribute('data-valeur_non_as');
+                        div.querySelector('.montant-field').value = selectedOption.getAttribute('data-tarif_non_as');
+
+                    }
+
+                } else {
+
+                    div.querySelector('.cotation-field').value = selectedOption.getAttribute('data-codfamexam')+selectedOption.getAttribute('data-cotation');
+                    div.querySelector('.prix-field').value = selectedOption.getAttribute('data-valeur_non_as');
+                    div.querySelector('.montant-field').value = selectedOption.getAttribute('data-tarif_non_as');
+
+                }
 
                 updateMontantTotalExamen();
             });
@@ -1582,22 +1426,31 @@
         }
 
         function updateMontantTotalExamen() {
-            let montantTotal = 0;        // Montant total à payer
-            let montantPatient = 0;      // Montant à la charge du patient
-            let montantAssurance = 0;    // Montant à la charge de l'assurance
+
+            let montantTotal = 0;
+            let montantPatient = 0;
+            let montantAssurance = 0;
+
             const selects = document.querySelectorAll('.examen-select');
             
             const patientTaux = parseInt(document.getElementById('patient_taux').value) || 0;
-            const preleve = parseInt(document.getElementById('montant_pre_examen').value.replace(/\./g, '')) || 0;
+            let preleve = parseInt(document.getElementById('montant_pre_examen').value.replace(/\./g, '')) || 0;
 
             selects.forEach(select => {
 
+                let montant;
                 const selectedOption = select.options[select.selectedIndex];
-                const montant = selectedOption.getAttribute('data-montantr');
                 const assurerSelect = select.closest('.input_group').querySelector('.examen-select-assurer');
                 const assurance = assurerSelect.value;
 
+                if ( assurance == 'oui') {
+                    montant = selectedOption.getAttribute('data-tarifr');
+                } else {
+                    montant = selectedOption.getAttribute('data-tarif_non_asr');
+                }
+
                 if (montant) {
+
                     let montantExamen = parseInt(montant);
 
                     // Appliquer une logique en fonction de l'assurance
@@ -1618,12 +1471,7 @@
 
             // Ajouter le prélèvement au montant total une seule fois après la boucle
             montantTotal += preleve;
-
-            let pre_ass = 0;
-            pre_ass = (preleve * patientTaux) / 100;
-
-            montantAssurance += pre_ass;
-            montantPatient += (preleve - pre_ass);
+            montantPatient += preleve;
 
             // Formater les montants avec des points
             const formatMontant = (montant) => montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -1702,16 +1550,15 @@
             examenSelects.forEach(item => {
                 const selectedOption = item.options[item.selectedIndex];
                 const idExamen = selectedOption.value;
-                const montant = parseInt(selectedOption.dataset.montantr);
 
-                if (!idExamen || isNaN(montant)) {
-                    showAlert("ALERT", 'Aucun Soins Infirmier n\'a été sélectionné.', "warning");
+                if (!idExamen) {
+                    showAlert("ALERT", 'Aucun Examen n\'a été sélectionné.', "warning");
                     formIsValid = false;
                     return false;
                 }
 
                 if (selectedExamenIds.has(idExamen)) {
-                    showAlert("ALERT", 'Vous avez sélectionné le même Soins Infirmier plusieurs fois.', "warning");
+                    showAlert("ALERT", 'Vous avez sélectionné le même Examen plusieurs fois.', "warning");
                     formIsValid = false;
                     return false;
                 }
@@ -1719,7 +1566,6 @@
                 selectedExamenIds.add(idExamen);
                 selectionsExamen.push({
                     id: idExamen,
-                    montant: montant
                 });
             });
 
@@ -1747,19 +1593,31 @@
             const examenSelects = document.querySelectorAll('.examen-select');
             examenSelects.forEach(item => {
 
+                let montant;
                 const selectedOption = item.options[item.selectedIndex];
                 const idExamen = selectedOption.value;
-                // const montant = parseInt(selectedOption.dataset.prix);
+                const examen = selectedOption.textContent.trim();
                 const accepte = selectedOption.dataset.assurer;
+                const cotation = selectedOption.dataset.cotation;
+                const code = selectedOption.dataset.codfamexam;
+
+                if (accepte == 'oui' ) {
+                    montant = parseInt(selectedOption.dataset.tarifr);
+                } else {
+                    montant = parseInt(selectedOption.dataset.tarif_non_asr);
+                }
 
                 selectionsExamen.push({
                     id: idExamen,
-                    // montant: montant
+                    examen: examen,
+                    cotation: cotation,
+                    montant: montant,
                     accepte: accepte,
+                    code: code,
                 });
             });
 
-            const auth_id = {{ Auth::user()->id }};
+            const login = @json(Auth::user()->login);
             const patient_id = $('#patient_id').val();
             const typeacte_id_exd = $('#typeacte_id_exd').val();
             const medecin = $('#medecin').val();
@@ -1812,6 +1670,9 @@
                 return false;
             }
 
+            console.log(selectionsExamen);
+            return false;
+
             var preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
@@ -1833,7 +1694,7 @@
                     acte_id: typeacte_id_exd,
                     medecin: medecin,
                     numcode: numcode || null,
-                    auth_id: auth_id,
+                    login: login,
                 },
                 success: function(response) {
 

@@ -50,6 +50,9 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/select_typesoins', [ApiController::class, 'select_typesoins']);
 	Route::get('/select_category_medicine', [ApiController::class, 'select_category_medicine']);
 	Route::get('/select_produit', [ApiController::class, 'select_produit']);
+	Route::get('/select_type_examen', [ApiController::class, 'select_type_examen']);
+	Route::get('/select_type_examend', [ApiController::class, 'select_type_examend']);
+	Route::get('/prix_examen/{id}', [ApiController::class, 'prix_examen']);
 	// recherche fin
 
 	// insert debut
@@ -103,7 +106,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/select_soinsIn/{id}', [ApisearchController::class, 'select_soinsIn']);
 	Route::get('/list_acte_ex', [ApisearchController::class, 'list_acte_ex']);
 	Route::get('/montant_prelevement', [ApisearchController::class, 'montant_prelevement']);
-	Route::get('/select_examen/{id}', [ApisearchController::class, 'select_examen']);
+	Route::get('/select_examen/{id}/{codeassurance}/{periode}', [ApisearchController::class, 'select_examen']);
 	Route::get('/select_specialite', [ApisearchController::class, 'select_specialite']);
 	Route::get('/select_jour', [ApisearchController::class, 'select_jour']);
 	Route::get('/montant_solde', [ApisearchController::class, 'montant_solde']);

@@ -162,6 +162,14 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueNumExamen()
+    {
+        do {
+            $matricule = random_int(1000000, 9999999);
+        } while (DB::table('examen')->where('numexam', '=', $matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -2124,6 +2132,52 @@ class ApiinsertController extends Controller
         DB::beginTransaction();
 
             try {
+
+                $numExamen = $this->generateUniqueNumExamen();
+
+                if ($request->code_type == 'EXAM') {
+
+                    if ($request->type_examen == 'Y') {
+
+                        $examnYInserted = DB::table('examen')->insert([
+                            'numexam' => 'Y'.$numExamen,
+                            'cot' => 0,
+                            'denomination' => $request->nom,
+                            'codgaran' => $request->code,
+                            'codfamexam' => 'Y',
+                            'fam_acte_bio' => null,
+                            'prix' => 0,
+                        ]);
+
+                        if ($examnYInserted === 0) {
+                            throw new Exception('Erreur lors de l\'insertion dans la table examenY');
+                        }
+
+                    } else if ($request->type_examen == 'Z' || $request->type_examen == 'B') {
+
+                        if ($request->type_examen == 'Z') {
+                            $num = 'Z'.$numExamen;
+                            $cod = 'Z';
+                        } else if ($request->type_examen == 'B') {
+                            $num = 'B'.$numExamen;
+                            $cod = 'B';
+                        }
+                        
+                        $examnZBInserted = DB::table('examen')->insert([
+                            'numexam' => $num,
+                            'cot' => $request->cotation,
+                            'denomination' => $request->nom,
+                            'codgaran' => null,
+                            'codfamexam' => $cod,
+                            'fam_acte_bio' => null,
+                            'prix' => 0,
+                        ]);
+
+                        if ($examnZBInserted === 0) {
+                            throw new Exception('Erreur lors de l\'insertion dans la table examenY');
+                        }
+                    }
+                }
 
                 $garantieInserted = DB::table('garantie')->insert([
                     'codgaran' => $request->code,

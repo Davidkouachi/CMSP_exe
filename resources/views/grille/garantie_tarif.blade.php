@@ -149,6 +149,19 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                    <div class="col-xxl-3 col-lg-4 col-sm-6" id="div_type_examen" style="display: none;">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Type d'examen</label>
+                                                            <select class="form-select select2" id="type_examen">
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xxl-3 col-lg-4 col-sm-6" id="div_cotation" style="display: none;">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Cotation</label>
+                                                            <input type="text" class="form-control" id="cotation" placeholder="Saisie Obligatoire" oninput="this.value = this.value.toUpperCase()" maxlength="3">
+                                                        </div>
+                                                    </div>
                                                     <div class="col-sm-12 mb-3 ">
                                                         <div class="d-flex gap-2 justify-content-center">
                                                             <button id="btn_eng_garantie" class="btn btn-outline-success">
@@ -519,6 +532,7 @@
         select_typegarantie();
         select_assurance();
         select_garantie();
+        select_type_examen();
 
         // $("#btn_eng").on("click", eng);
         // $("#updateBtn").on("click", updatee);
@@ -553,7 +567,7 @@
         //     }
         // });
 
-        var inputs = ['#prixj', '#prixn', '#prixf','#prixjModif', '#prixnModif', '#prixfModif'];
+        var inputs = ['#prixj', '#prixn', '#prixf','#prixjModif', '#prixnModif', '#prixfModif','#cotation'];
         inputs.forEach(function (id) {
             var inputElement = $(id); // Sélectionner l'élément avec jQuery
 
@@ -684,6 +698,59 @@
                     // showAlert('danger', 'Impossible de generer le code automatiquement');
                 }
             });
+
+            selectElement2.on('change', function() {
+
+                $('#type_examen').val('').trigger('change');
+                $('#cotation').val('');
+
+                $('#div_type_examen').hide();
+                $('#div_cotation').hide();
+
+                if (this.value == 'EXAM') {
+                    $('#div_type_examen').show();
+                }
+            });
+
+        }
+
+        function select_type_examen() 
+        {
+            const selectElement2 = $('#type_examen');
+            selectElement2.empty();
+            selectElement2.append($('<option>', {
+                value: '',
+                text: 'Selectionner',
+            }));
+
+            $.ajax({
+                url: '/api/select_type_examen',
+                method: 'GET',
+                success: function(response) {
+                    const data = response.type;
+
+                    data.forEach(function(item) {
+                        selectElement2.append($('<option>', {
+                            value: item.codfamexam,
+                            text: item.nomfamexam,
+                        }));
+                    });
+                },
+                error: function() {
+                    // showAlert('danger', 'Impossible de generer le code automatiquement');
+                }
+            });
+
+            selectElement2.on('change', function() {
+
+                $('#div_cotation').hide();
+                $('#cotation').val('');
+
+                if (this.value == 'Z' || this.value == 'B') {
+                    $('#div_cotation').show();
+                }
+            });
+
         }
 
         const table_typegarantie = $('.Table_typegarantie').DataTable({
@@ -940,9 +1007,28 @@
             const nom = $("#nom_garantie");
             const code_type = $("#codtypgar_garantie");
 
+            const type_examen = $("#type_examen");
+            const cotation = $("#cotation");
+
             if (!nom.val().trim() || !code.val().trim() || !code_type.val().trim()) {
                 showAlert('Alert', 'Veuillez remplir tous les champs.', 'warning');
                 return false;
+            }
+
+            if (code_type.val() == 'EXAM') {
+
+                if (!type_examen.val().trim()) {
+                    showAlert('Alert', 'Veuillez remplir tous les champs.', 'warning');
+                    return false;
+                }
+
+                if (type_examen.val() == 'Z' || type_examen.val() == 'B') {
+
+                    if (!cotation.val().trim()) {
+                        showAlert('Alert', 'Veuillez remplir tous les champs.', 'warning');
+                        return false;
+                    }
+                }
             }
 
             // Show preloader
@@ -961,6 +1047,8 @@
                     nom: nom.val(),
                     code: code.val(),
                     code_type: code_type.val(),
+                    type_examen: type_examen.val(),
+                    cotation: cotation.val(),
                 },
                 success: function(response) {
                     $("#preloader_ch").remove();
@@ -969,11 +1057,18 @@
                         showAlert('Alert', response.message , 'warning');
                     } else if (response.success) {
 
+                        $('#div_type_examen').hide();
+                        $('#div_cotation').hide();
+
                         nom.val('');
                         code.val('');
                         code_type.val('').trigger('change');
 
+                        type_examen.val('').trigger('change');
+                        cotation.val('');
+
                         table_garantie.ajax.reload(null, false);
+                        select_garantie();
                         showAlert('Succès', response.message, 'success');
                     } else if (response.error) {
                         showAlert('Erreur', response.message, 'error');

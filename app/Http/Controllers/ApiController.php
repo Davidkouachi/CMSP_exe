@@ -102,4 +102,79 @@ class ApiController extends Controller
 
         return response()->json(['produit' => $produit]);
     }
+
+    public function select_type_examen()
+    {
+        $type = DB::table('famille_examen')->select('famille_examen.*')->get();
+
+        return response()->json(['type' => $type]);
+    }
+
+    public function select_type_examend()
+    {
+        $type = DB::table('famille_examen')->where('codfamexam', '!=', 'D')->select('famille_examen.*')->get();
+
+        return response()->json(['type' => $type]);
+    }
+
+    public function prix_examen($id)
+    {
+        $examen = DB::table('examen')
+            ->where('numexam', '=', $id)
+            ->select('examen.*')
+            ->first();
+
+        if ($examen->codfamexam != null || $examen->codfamexam != '') {
+            
+            if ($examen->codfamexam == 'Y') {
+
+                if ($examen->codgaran != null || $examen->codgaran != '') {
+                    
+                    $prix = DB::table('tarifs')
+                        ->join('assurance', 'assurance.codeassurance', '=', 'tarifs.codeassurance')
+                        ->where('tarifs.codgaran', '=', $examen->codgaran)
+                        ->select('tarifs.*', 'assurance.libelleassurance as assurance')
+                        ->get();
+
+                    return response()->json(['success' => true, 'prix' => $prix]);
+
+                } else {
+
+                    return response()->json(['existep' => true]);
+                }
+    
+            } else if ( $examen->codfamexam == 'B' || $examen->codfamexam == 'Z' ) {
+
+                if ($examen->cot != null || $examen->cot != '' || $examen->cot != 0) {
+                    
+                    $prix = DB::table('tarifs')
+                        ->join('assurance', 'assurance.codeassurance', '=', 'tarifs.codeassurance')
+                        ->where('tarifs.codgaran', '=', $examen->codfamexam)
+                        ->select('tarifs.*', 'assurance.libelleassurance as assurance')
+                        ->get();
+
+                    foreach ($prix as $value) {
+                        
+                        $value->montjour = $examen->cot * $value->montjour;
+                        $value->montnuit = $examen->cot * $value->montnuit;
+                        $value->montferie = $examen->cot * $value->montferie;
+                    }
+
+                    return response()->json(['success' => true, 'prix' => $prix]);
+
+                } else {
+
+                    return response()->json(['existep' => true]);
+                }
+
+            } else {
+
+                return response()->json(['existep' => true]);
+            }
+
+        } else {
+
+            return response()->json(['existep' => true]);
+        }
+    }
 }

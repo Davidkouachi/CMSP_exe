@@ -492,16 +492,14 @@ class ApilistController extends Controller
 
     public function list_examen_all()
     {
-        $examenQuery = typeacte::join('actes', 'actes.id', '=', 'typeactes.acte_id')
-                            ->where('actes.nom', '=', 'ANALYSE')
-                            ->Orwhere('actes.nom', '=', 'IMAGERIE')
-                            ->select(
-                                'typeactes.*',
-                                'actes.nom as acte',
-                            )
-                            ->orderBy('created_at', 'desc');
-
-        $examen = $examenQuery->get();
+        $examen = DB::table('examen')
+            ->leftJoin('famille_examen', 'examen.codfamexam', '=', 'famille_examen.codfamexam')
+            ->select(
+                'examen.*',
+                'famille_examen.nomfamexam as type',
+            )
+            ->orderBy('denomination', 'asc')
+            ->get();
 
         return response()->json([
             'data' => $examen,

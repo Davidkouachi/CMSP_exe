@@ -432,14 +432,21 @@ class ApiupdateController extends Controller
 
     public function prelevement_Modif(Request $request)
     {
-        $add = prelevement::where('code', '=', '1')->first();
-        $add->prix = $request->prix;
 
-        if ($add->save()) {
+        $updateData_prelevement =[
+            'prix' => str_replace('.', '', $request->prix),
+            'updated_at' => now(),
+        ];
+
+        $prelevementUpdate = DB::table('prelevements')
+                            ->where('code', '=', 1)
+                            ->update($updateData_prelevement);
+
+        if ($prelevementUpdate == 1) {
             return response()->json(['success' => true]);
         }
 
-        return response()->json(['error' => true]);
+        return response()->json(['error' => true]); 
     }
 
     public function update_horaire($id)
