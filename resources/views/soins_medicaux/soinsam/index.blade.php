@@ -1888,7 +1888,7 @@
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
                 doc.setLineWidth(0.5);
-                doc.setTextColor(255, 0, 0);
+                doc.setTextColor(0, 0, 0);
                 // doc.line(10, 35, 200, 35); 
                 const titleR = "FACTURE SOINS AMBULATOIRES";
                 const titleRWidth = doc.getTextWidth(titleR);
@@ -1907,7 +1907,7 @@
                 // Ajouter le texte centré en gras
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
-                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
+                doc.setTextColor(0, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
                 const titleN = "N° "+patient.numfac_soins;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
@@ -2027,6 +2027,7 @@
                     ...(patient.assure == 1 ? 
                         [{ label: "Part assurance", value: formatPriceT(patient.part_assurance) + " Fcfa" }] 
                         : []),
+                    { label: "Remise", value: formatPriceT(patient.remise) + " Fcfa" },
                 ];
 
 

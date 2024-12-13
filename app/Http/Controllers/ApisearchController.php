@@ -428,8 +428,6 @@ class ApisearchController extends Controller
 
         }
 
-        Log::info((array) $examens);
-
         return response()->json(['success' => true, 'examens' => $examens]);
 
     }

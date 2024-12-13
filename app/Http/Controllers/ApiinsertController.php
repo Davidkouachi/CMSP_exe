@@ -170,6 +170,30 @@ class ApiinsertController extends Controller
 
         return $matricule;
     }
+    private function generateUniqueIdBiologie()
+    {
+        do {
+            $matricule = random_int(1000000, 9999999);
+        } while (DB::table('testlaboimagerie')->where('idtestlaboimagerie', '=', 'BIO-'.$matricule)->exists());
+
+        return $matricule;
+    }
+    private function generateUniqueIdImagerie()
+    {
+        do {
+            $matricule = random_int(1000000, 9999999);
+        } while (DB::table('testlaboimagerie')->where('idtestlaboimagerie', '=', 'IMG-'.$matricule)->exists());
+
+        return $matricule;
+    }
+    private function generateUniqueFactureExamen()
+    {
+        do {
+            $matricule = random_int(1000000, 9999999);
+        } while (DB::table('testlaboimagerie')->where('numfacbul', '=', 'FCB'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -1023,7 +1047,7 @@ class ApiinsertController extends Controller
                 'numfac' => 'FCS'.$numfac,
                 'idenregistremetpatient' => $request->patient_id,
                 'montanttotal' => str_replace('.', '', $request->montantTotal),
-                'remise' => 0,
+                'remise' => str_replace('.', '', $request->montantRemise),
                 'type_remise' => 0,
                 'calcul_applique' => 0,
                 'taux_applique' => $tauxEntier,
@@ -1143,84 +1167,106 @@ class ApiinsertController extends Controller
 
     public function new_examend(Request $request)
     {
+
+        Log::info($request->all());
+
         $selections = $request->input('selectionsExamen');
         if (!is_array($selections) || empty($selections)) {
             return response()->json(['json' => true]);
         }
 
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-        ->where('patients.id', '=', $request->patient_id)
-        ->select('patients.*', 'assurances.nom as assurance')
-        ->first();
-
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        if (!$patient) {
-            return response()->json(['error' => true]);
-        }
-
-        $acte = acte::find($request->acte_id);
-
-        if (!$acte) {
-            return response()->json(['error' => true]);
-        }
-
-        $code = $this->generateUniqueMatricule();
-
-        $codeFac = $this->generateUniqueFacture();
-
         DB::beginTransaction();
 
         try {
 
-            $fac = new facture();
-            $fac->code = $codeFac;
-            $fac->statut = 'impayer';
-            $fac->acte = 'EXAMEN';
-            $fac->creer_id = $request->auth_id;
+            $taux = (str_replace('.', '', $request->montantA) / str_replace('.', '', $request->montantT)) * 100;
+            $tauxEntier = intval($taux);
 
-            if (!$fac->save()) {
-                throw new \Exception('Erreur');
+            $numfac = $this->generateUniqueFactureExamen();
+
+            if ($request->acte_id == 'B') {
+                $id = 'BIO-'.$this->generateUniqueIdBiologie();
+                $type = 'analyse';
+            } else {
+                $id = 'IMG-'.$this->generateUniqueIdImagerie();
+                $type = 'imagerie';
             }
 
-            if ($request->numcode != null) {
-                $verf = examen::where('num_bon', '=', $request->numcode)->exists();
-
-                if ($verf) {
-                    return response()->json(['existe' => true]);
-                }
+            if (str_replace('.', '', $request->montantA) > 0) {
+                $mode = 1;
+            } else {
+                $mode = 0;
             }
 
-            $add = new examen();
-            $add->code = $code;
-            $add->statut = 'en cours';
-            $add->num_bon = $request->numcode;
-            $add->part_patient = $request->montantP;
-            $add->part_assurance = $request->montantA;
-            $add->montant = $request->montantT;
-            $add->libelle = '';
-            $add->facture_id = $fac->id;
-            $add->patient_id = $patient->id;
-            $add->acte_id = $acte->id;
-            $add->medecin = $request->medecin;
-            $add->prelevement = $request->montant_pre;
+            $examenInsert = DB::table('testlaboimagerie')->insert([
+                'idtestlaboimagerie' => $id,
+                'idenregistremetpatient' => $request->patient_id,
+                'codemedecin' => null,
+                'typedemande' => $type,
+                'renseigclini' => $request->rensg,
+                'date' => now()->format('Y-m-d'),
+                'heure' => now()->format('H:i:s'),
+                'numfacbul' => 'FCB'.$numfac,
+                'numbon' => $request->numcode,
+                'medicin_traitant' => $request->medecin,
+                'numhospit' => null,
+                'prelevement' => str_replace('.', '', $request->montant_pre),
+                'mode_patient' => $mode,
+            ]);
 
-            if (!$add->save()) {
-                throw new \Exception('Erreur');
+            if ($examenInsert == 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table testlaboimagerie');
             }
 
             foreach ($selections as $value) {
 
-                $adds = new examenpatient();
-                $adds->typeacte_id = $value['id'];
-                $adds->accepte = $value['accepte'];
-                $adds->examen_id = $add->id;
+                $detailInsert = DB::table('detailtestlaboimagerie')->insert([
+                    'idtestlaboimagerie' => $id,
+                    'numexam' => $value['id'],
+                    'denomination' =>  $value['examen'],
+                    'cotation' => $value['cotation'],
+                    'resultat' => $value['accepte'],
+                    'prix' => str_replace('.', '', $value['montant']),
+                ]);
 
-                if (!$adds->save()) {
-                    throw new \Exception('Erreur');
+                if ($detailInsert == 0) {
+                    throw new Exception('Erreur lors de l\'insertion dans la table detailtestlaboimagerie');
                 }
+
+            }
+
+            $patient = DB::table('patient')
+                ->where('patient.idenregistremetpatient', '=', $request->patient_id)
+                ->select('patient.codeassurance as codeassurance')
+                ->first();
+
+            $facturesInserted = DB::table('factures')->insert([
+                'numfac' => 'FCB'.$numfac,
+                'idenregistremetpatient' => $request->patient_id,
+                'montanttotal' => str_replace('.', '', $request->montantT),
+                'remise' => 0,
+                'type_remise' => 0,
+                'calcul_applique' => 0,
+                'taux_applique' => $tauxEntier,
+                'montant_ass' => str_replace('.', '', $request->montantA),
+                'montant_pat' => str_replace('.', '', $request->montantP),
+                'montantregle_ass' => 0,
+                'montantregle_pat' => 0,
+                'montantpat_verser' => 0,
+                'montantpat_remis' => 0,
+                'montantreste_ass' => str_replace('.', '', $request->montantA),
+                'montantreste_pat' => str_replace('.', '', $request->montantP),
+                'solde_ass' => 0,
+                'solde_pat' => 0,
+                'codeassurance' => $patient->codeassurance,
+                'datefacture' => now(),
+                'type_facture' => 4,
+                'timbre_fiscal' => 0,
+                'a_encaisser' => 0,
+            ]);
+
+            if ($facturesInserted == 0) {
+                throw new Exception('Erreur lors de l\'insertion dans la table factures');
             }
 
             DB::commit();
@@ -1229,7 +1275,7 @@ class ApiinsertController extends Controller
         } catch (Exception $e) {
 
             DB::rollback();
-            return response()->json(['error' => true]);
+            return response()->json(['error' => true, 'message' => $e->getMessage()]);
         }
     }
 

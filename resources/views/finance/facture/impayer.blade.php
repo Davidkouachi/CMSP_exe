@@ -126,13 +126,14 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="twoA2" role="tabpanel" aria-labelledby="tab-twoA2"> 
-                                    {{-- <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
                                         <h5 class="card-title">
                                             Examen(s)
                                         </h5>
                                         <div class="d-flex" >
-                                            <a id="btn_refresh_table_Exam" class="btn btn-outline-info ms-auto">
-                                                <i class="ri-loop-left-line"></i>
+                                            <input type="text" id="facture_num_exam" placeholder="N° Facture" class="form-control me-2">
+                                            <a id="btn_refresh_table_Exam" class="btn btn-outline-success ms-auto">
+                                                <i class="ri-search-2-line"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -143,13 +144,14 @@
                                                     <thead>
                                                         <tr>
                                                             <th scope="col">N°</th>
-                                                            <th scope="col">Id facture</th>
+                                                            <th scope="col">N° facture</th>
                                                             <th scope="col">Type d'examen</th>
-                                                            <th scope="col">Part Assurance</th>
-                                                            <th scope="col">Part Patient</th>
                                                             <th scope="col">Prélevement</th>
+                                                            <th scope="col">Montant Examen</th>
                                                             <th scope="col">Montant Total</th>
+                                                            <th scope="col">Part Assurance</th>
                                                             <th scope="col">Montant a payer</th>
+                                                            <th scope="col">Reste à payer</th>
                                                             <th scope="col">Date de création</th>
                                                             <th scope="col">Actions</th>
                                                         </tr>
@@ -159,14 +161,6 @@
                                                 </table>
                                             </div>
                                         </div>
-                                    </div> --}}
-                                    <div class="error-container">
-                                        <h4 class="mb-2 text-primary">Page en cours de dévéloppement...</h4>
-                                        <h5 class="fw-light mb-4">
-                                            Nous travaillons actuellement sur cette page pour vous offrir la meilleure expérience. 
-                                            <br>
-                                            Merci de votre patience !
-                                        </h5>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="twoA3" role="tabpanel" aria-labelledby="tab-twoA3">
@@ -236,9 +230,10 @@
                                                             <th scope="col">Montant Total</th>
                                                             <th scope="col">Montant Produit</th>
                                                             <th scope="col">Montant Soins</th>
+                                                            <th scope="col">Remise</th>
                                                             <th scope="col">Montant a payer</th>
                                                             <th scope="col">Part Assurance</th>
-                                                            <th scope="col">Reste àpayer</th>
+                                                            <th scope="col">Reste à payer</th>
                                                             <th scope="col">Date de création</th>
                                                             <th scope="col">Actions</th>
                                                         </tr>
@@ -317,58 +312,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="Detail_Exam" tabindex="-1" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Examens Demandés
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="table-responsive" id="div_TableP_Exam" style="display: none;">
-                                            <table class="table table-bordered" id="TableP_Exam">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Examen</th>
-                                                        <th>Cotation</th>
-                                                        <th>Prix</th>
-                                                        <th>Accepté ?</th>
-                                                        <th>Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div id="message_TableP_Exam" style="display: none;">
-                                            <p class="text-center" >
-                                                Aucun Produit utilisé pour le moment
-                                            </p>
-                                        </div>
-                                        <div id="div_Table_loaderP_Exam" style="display: none;">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <div class="spinner-border text-warning me-2" role="status" aria-hidden="true"></div>
-                                                <strong>Chargement des données...</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal fade" id="Caisse_Exam" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
@@ -404,10 +347,21 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Reste à payer</label>
+                            <div class="input-group">
+                                <input readonly type="tel" class="form-control" id="input_montant_restant_Exam" placeholder="Saisie Obligatoire">
+                                <span class="input-group-text">Fcfa</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer" id="div_btn_valider_Exam" style="display: none;">
+            <div class="modal-footer" id="div_btn_valider_Exam">
                 <input type="hidden" id="id_code_fac_Exam">
+                <input type="hidden" id="id_Exam">
+                <input type="hidden" id="matricule_Exam">
                 <button data-bs-dismiss="modal" class="btn btn-success" id="btn_valider_Exam" >
                     Validé
                 </button>
@@ -596,7 +550,7 @@
         caisse_verf();
 
         document.getElementById("btn_valider_Cons").addEventListener("click", payer_Cons);
-        // document.getElementById("btn_valider_Exam").addEventListener("click", payer_Exam);
+        document.getElementById("btn_valider_Exam").addEventListener("click", payer_Exam);
         // document.getElementById("btn_valider_Hos").addEventListener("click", payer_Hos);
         document.getElementById("btn_valider_Soinsam").addEventListener("click", payer_Soinsam);
 
@@ -645,40 +599,50 @@
             }
         });
 
-        // document.getElementById('input_montant_verser_Exam').addEventListener('input', function() 
-        // {
-        //     // Nettoyer la valeur entrée en supprimant les caractères non numériques sauf le point
-        //     const rawValue = this.value.replace(/[^0-9]/g, ''); // Supprimer tous les caractères non numériques
+        document.getElementById('input_montant_verser_Exam').addEventListener('input', function() 
+        {
+            let rawValue = this.value.replace(/[^0-9]/g, ''); // Supprimer tous les caractères non numériques
             
-        //     // Ajouter des points pour les milliers
-        //     const formattedValue = formatPrice(rawValue);
+            // Ajouter des points pour les milliers
+            let formattedValue = formatPrice(rawValue);
             
-        //     // Mettre à jour la valeur du champ avec la valeur formatée
-        //     this.value = formattedValue;
+            // Mettre à jour la valeur du champ avec la valeur formatée
+            this.value = formattedValue;
 
-        //     // Convertir la valeur formatée en nombre pour les calculs
-        //     const montantPayer = parseFloat(document.getElementById('input_montant_payer_Exam').value.replace(/\./g, '')) || 0;
-        //     const montantVerser = parseFloat(rawValue) || 0;
+            // Convertir la valeur formatée en nombre pour les calculs
+            let montantPayer = parseFloat(document.getElementById('input_montant_payer_Exam').value.replace(/\./g, '')) || 0;
+            let montantVerser = parseFloat(rawValue) || 0;
 
-        //     // Calculer le montant remis
-        //     const montantRemis = montantVerser - montantPayer;
-        //     document.getElementById('input_montant_remis_Exam').value = `${formatPrice(montantRemis)}`;
+            // Calculer le montant remis
+            let montantRemis = montantVerser - montantPayer;
+            if (montantRemis < 0) {
+                montantRemis = 0;
+            }
+            document.getElementById('input_montant_remis_Exam').value = `${formatPrice(montantRemis)}`;
 
-        //     const btnValider = document.getElementById('div_btn_valider_Exam');
-        //     if (montantRemis >= 0) {
-        //         btnValider.style.display = 'block';
-        //     } else {
-        //         btnValider.style.display = 'none';
-        //     }
-        // });
-        // document.getElementById('input_montant_verser_Exam').addEventListener('keypress', function(event) 
-        // {
-        //     // Permettre uniquement les chiffres et le point
-        //     const key = event.key;
-        //     if (isNaN(key)) {
-        //         event.preventDefault();
-        //     }
-        // });
+            // Calculer le montant restant
+            let montantRestant = montantPayer - montantVerser ;
+            if (montantRestant < 0) {
+                montantRestant = 0 ;
+            }
+            document.getElementById('input_montant_restant_Exam').value = `${formatPrice(montantRestant)}`;
+        });
+        document.getElementById('input_montant_verser_Exam').addEventListener('keypress', function(event) 
+        {
+            // Permettre uniquement les chiffres et le point
+            let  key = event.key;
+            if (isNaN(key)) {
+                event.preventDefault();
+            }
+        });
+        document.getElementById('input_montant_verser_Exam').addEventListener('input', function(event) 
+        {
+            let  inputField = event.target;
+
+            if (inputField.value === '') {
+                inputField.value = '0';
+            }
+        });
 
         // document.getElementById('input_montant_verser_Hos').addEventListener('input', function() 
         // {
@@ -761,121 +725,6 @@
         });
 
         //-----------------------------------------------------------------------
-
-        // const table_exam = $('.Table_Exam').DataTable({
-
-        //     processing: true,
-        //     serverSide: false,
-        //     ajax: {
-        //         url: `/api/list_facture_examen`,
-        //         type: 'GET',
-        //         dataSrc: 'data',
-        //     },
-        //     columns: [
-        //         { 
-        //             data: null, 
-        //             render: (data, type, row, meta) => meta.row + 1,
-        //             searchable: false,
-        //             orderable: false,
-        //         },
-        //         { 
-        //             data: 'code_fac', 
-        //             render: (data, type, row) => `
-        //             <div class="d-flex align-items-center">
-        //                 <a class="d-flex align-items-center flex-column me-2">
-        //                     <img src="{{asset('assets/images/facture.webp')}}" class="img-2x rounded-circle border border-1">
-        //                 </a>
-        //                 ${data}
-        //             </div>`,
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'acte',
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'part_assurance',
-        //             render: (data, type, row) => {
-        //                 const value = data ? data : 0;
-        //                 const color = 'text-warning';
-        //                 return `<span class="${color}">${value} Fcfa</span>`;
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'part_patient',
-        //             render: (data, type, row) => {
-        //                 const value = data ? formatPrice(data) : 0;
-        //                 const color = 'text-warning';
-        //                 return `<span class="${color}">${value} Fcfa</span>`;
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'prelevement',
-        //             render: (data, type, row) => {
-        //                 const value = data ? data : 0;
-        //                 const color = 'text-warning';
-        //                 return `<span class="${color}">${value} Fcfa</span>`;
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'montant',
-        //             render: (data, type, row) => {
-        //                 const value = data ? data : 0;
-        //                 const color = 'text-primary';
-        //                 return `<span class="${color}">${value} Fcfa</span>`;
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: 'total_patient',
-        //             render: (data, type, row) => {
-        //                 const value = data ? formatPrice(data) : 0;
-        //                 const color = 'text-success';
-        //                 return `<span class="${color}">${value} Fcfa</span>`;
-        //             },
-        //             searchable: true,
-        //         },
-        //         { 
-        //             data: 'created_at',
-        //             render: (data, type, row) => {
-        //                 return data ? `${formatDateHeure(data)}` : 'Néant';
-        //             },
-        //             searchable: true,
-        //         },
-        //         {
-        //             data: null,
-        //             render: (data, type, row) => `
-        //                 <div class="d-inline-flex gap-1" style="font-size:10px;">
-        //                     <a class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Caisse_Exam" id="paye_Exam"
-        //                         data-code_fac="${row.code_fac}"
-        //                         data-total_patient="${row.total_patient}"
-        //                     >
-        //                         <i class="ri-hand-coin-line"></i>
-        //                     </a>
-        //                     <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail_Exam" id="detail_Exam"
-        //                         data-id="${row.id}"
-        //                     >
-        //                         <i class="ri-archive-2-line"></i>
-        //                     </a>
-        //                     <a class="btn btn-outline-info btn-sm" id="fiche_Exam"
-        //                         data-id="${row.id}"
-        //                     >
-        //                         <i class="ri-file-line"></i>
-        //                     </a>
-        //                 </div>
-        //             `,
-        //             searchable: false,
-        //             orderable: false,
-        //         },
-        //     ],
-        //     ...dataTableConfig,
-        //     initComplete: function(settings, json) {
-        //         initExam();
-        //     },
-        // });
 
         // const table_hos = $('.Table_Hos').DataTable({
 
@@ -1219,6 +1068,20 @@
             return age;
         }
 
+        function formatDateImp(dateString) {
+            const date = new Date(dateString);
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+            
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`; // Format as dd/mm/yyyy hh:mm:ss
+        }
+
         // $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         //     // Optionnel : Recharger les données associées à l'onglet sélectionné
         //     const activeTab = $(e.target).attr('href'); // ID de l'onglet actif
@@ -1520,21 +1383,6 @@
 
             yPos = 10;
 
-            function formatDateImp(dateString) {
-                const date = new Date(dateString);
-                
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                const year = date.getFullYear();
-                
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`; // Format as dd/mm/yyyy hh:mm:ss
-            }
-
-
             function drawConsultationSection(yPos) {
                 rightMargin = 15;
                 leftMargin = 15;
@@ -1776,480 +1624,574 @@
 
         //-----------------------------------------------------------------------
 
-        // function payer_Exam()
-        // {
-        //     const auth_id = {{ Auth::user()->id }};
-        //     const code_fac = document.getElementById("id_code_fac_Exam").value;
-        //     const montant_verser = document.getElementById("input_montant_verser_Exam");
-        //     const montant_remis = document.getElementById("input_montant_remis_Exam");
-
-        //     var preloader_ch = `
-        //         <div id="preloader_ch">
-        //             <div class="spinner_preloader_ch"></div>
-        //         </div>
-        //     `;
-        //     // Add the preloader to the body
-        //     document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-        //     if(!montant_verser.value.trim() || !montant_remis.value.trim()){
-        //         var preloader = document.getElementById('preloader_ch');
-        //         if (preloader) {
-        //             preloader.remove();
-        //         }
-        //         showAlert('Alert', 'Impossible d\'éffectuée le paiement.','error');
-        //         return false;
-        //     }
-
-        //     $.ajax({
-        //         url: '/api/facture_payer_examen/' + code_fac,
-        //         method: 'GET',
-        //         data: { 
-        //             montant_verser: montant_verser.value, 
-        //             montant_remis: montant_remis.value,
-        //             auth_id: auth_id,
-        //         },
-        //         success: function(response) {
-
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-
-        //             caisse_verf();
-
-        //             if (response.success) {
-
-        //                 const examen = response.examen;
-        //                 const facture = response.facture;
-        //                 const patient = response.patient;
-        //                 const acte = response.acte;
-        //                 const examenpatient = response.examenpatient;
-
-        //                 table_exam.ajax.reload(null, false);
-
-        //                 generatePDFInvoice_Exam(examen, facture, patient, acte, examenpatient);
-
-        //                 showAlert('Succès', 'Paiement éffectuée.','success');
-
-        //             } else if (response.error) {
-        //                 showAlert('Alert', 'Une erreur est survenue lors du paiement, Veuillez ressayer.','error');
-        //             } else if (response.caisse_fermer) {
-        //                 showAlert('Alert', 'La caisse est actuellement fermer, Veuillez ouvrir la caisse avant d\'éffectuer un encaissement.','info');
-        //             }
-
-        //         },
-        //         error: function(xhr, status, error) {
-        //             var preloader = document.getElementById('preloader_ch');
-        //             if (preloader) {
-        //                 preloader.remove();
-        //             }
-        //             showAlert('Alert', 'Une erreur est survenue lors du paiement.','error');
-        //         }
-        //     });
-        // }
-
-        // function initExam() {
-
-        //     $('.Table_Exam').on('click', '#paye_Exam', function() {
-        //         const code_fac = $(this).data('code_fac');
-        //         const total_patient = $(this).data('total_patient');
-
-        //         document.getElementById('input_montant_payer_Exam').value = `${formatPrice(total_patient)} Fcfa`;
-        //         document.getElementById('input_montant_verser_Exam').value = '';
-        //         document.getElementById('input_montant_remis_Exam').value = '0 Fcfa';
-        //         document.getElementById('id_code_fac_Exam').value = `${code_fac}`;
-        //     });
-
-        //     $('.Table_Exam').on('click', '#detail_Exam', function() {
-        //         const id = $(this).data('id');
-
-        //         const tableBodyP = document.querySelector('#TableP_Exam tbody');
-        //         const messageDivP = document.getElementById('message_TableP_Exam');
-        //         const tableDivP = document.getElementById('div_TableP_Exam');
-        //         const loaderDivP = document.getElementById('div_Table_loaderP_Exam');
-
-        //         messageDivP.style.display = 'none';
-        //         tableDivP.style.display = 'none';
-        //         loaderDivP.style.display = 'block';
-
-        //         fetch(`/api/list_facture_exam_d/${id}`) // API endpoint
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 // Access the 'chambre' array from the API response
-        //                 const factureds = data.factured;
-        //                 const sumMontantEx = data.sumMontantEx;
-
-        //                 // Clear any existing rows in the table body
-        //                 tableBodyP.innerHTML = '';
-
-        //                 if (factureds.length > 0) {
-
-        //                     loaderDivP.style.display = 'none';
-        //                     messageDivP.style.display = 'none';
-        //                     tableDivP.style.display = 'block';
-
-        //                     // Loop through each item in the chambre array
-        //                     factureds.forEach((item, index) => {
-        //                         // Create a new row
-        //                         const row = document.createElement('tr');
-        //                         // Create and append cells to the row based on your table's structure
-        //                         row.innerHTML = `
-        //                             <td>
-        //                                 <h6>${item.nom_ex}</h6>
-        //                             </td>
-        //                             <td>
-        //                                 <h6>${item.cotation_ex}${item.valeur_ex}</h6>
-        //                             </td>
-        //                             <td>
-        //                                 <h6>${item.prix_ex} Fcfa</h6>
-        //                             </td>
-        //                             <td>
-        //                                 <h6>${item.accepte}</h6>
-        //                             </td>
-        //                             <td>
-        //                                 <h6>${item.montant_ex} Fcfa</h6>
-        //                             </td>
-        //                         `;
-        //                         // Append the row to the table body
-        //                         tableBodyP.appendChild(row);
-
-        //                     });
-
-        //                     const row2 = document.createElement('tr');
-        //                     row2.innerHTML = `
-        //                         <td colspan="3">&nbsp;</td>
-        //                         <td colspan="2" >
-        //                             <h5 class="mt-4 text-success">
-        //                                 Total : ${formatPriceT(sumMontantEx)} Fcfa
-        //                             </h5>
-        //                         </td>
-        //                     `;
-        //                     tableBodyP.appendChild(row2);
-
-        //                     const row3 = document.createElement('tr');
-        //                     row3.innerHTML = `
-        //                         <td colspan="5">
-        //                             <h6 class="text-danger">NOTE</h6>
-        //                             <p class="small m-0">
-        //                                 Le Montant Total des examens  ajouter au montant du prélevement.
-        //                             </p>
-        //                         </td>
-        //                     `;
-
-        //                     tableBodyP.appendChild(row3);
-
-        //                 } else {
-        //                     loaderDivP.style.display = 'none';
-        //                     messageDivP.style.display = 'block';
-        //                     tableDivP.style.display = 'none';
-        //                 }
-        //             })
-        //             .catch(error => {
-        //                 console.error('Erreur lors du chargement des données:', error);
-        //                 loaderDivD.style.display = 'none';
-        //                 messageDivD.style.display = 'block';
-        //                 tableDivD.style.display = 'none';
-        //             });
-        //     });
-
-        //     $('.Table_Exam').on('click', '#fiche_Exam', function() {
-
-        //         var preloader_ch = `
-        //             <div id="preloader_ch">
-        //                 <div class="spinner_preloader_ch"></div>
-        //             </div>
-        //         `;
-        //         // Add the preloader to the body
-        //         document.body.insertAdjacentHTML('beforeend', preloader_ch);
-
-        //         const id = $(this).data('id');
-
-        //         fetch(`/api/detail_examen/${id}`) // API endpoint
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 // Access the 'chambre' array from the API response
-        //                 const examen = data.examen;
-        //                 const facture = data.facture;
-        //                 const patient = data.patient;
-        //                 const acte = data.acte;
-        //                 const examenpatient = data.examenpatient;
-
-        //                 var preloader = document.getElementById('preloader_ch');
-        //                 if (preloader) {
-        //                     preloader.remove();
-        //                 }
-
-        //                 generatePDFInvoice_Exam(examen, facture, patient, acte, examenpatient);
-
-        //             })
-        //             .catch(error => {
-        //                 console.error('Erreur lors du chargement des données:', error);
-        //             });
-        //     });
-        // }
-
-        // $('#btn_refresh_table_Exam').on('click', function () {
-        //     table_exam.ajax.reload(null, false); 
-        // });
-
-        // function generatePDFInvoice_Exam(examen, facture, patient, acte, examenpatient) 
-        // {
-        //     const { jsPDF } = window.jspdf;
-        //     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-
-        //     const pdfFilename = "EXAMEN Facture N°" + facture.code + " du " + formatDateHeure(facture.created_at);
-        //     doc.setProperties({
-        //         title: pdfFilename,
-        //     });
-
-        //     let yPos = 10;
-
-        //     function drawConsultationSection(yPos) {
-        //         rightMargin = 15;
-        //         leftMargin = 15;
-        //         pdfWidth = doc.internal.pageSize.getWidth();
-
-        //         if (facture.statut == 'payer') {
-        //             const titlea = "Payer";
-        //             doc.setFontSize(100);
-        //             doc.setTextColor(174, 255, 165);
-        //             doc.setFont("Helvetica", "bold");
-        //             doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-        //         }else{
-        //             const titlea = "Impayer";
-        //             doc.setFontSize(100);
-        //             doc.setTextColor(252, 173, 159);
-        //             doc.setFont("Helvetica", "bold");
-        //             doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-        //         }
-
-        //         const logoSrc = "{{asset('assets/images/logo.png')}}";
-        //         const logoWidth = 22;
-        //         const logoHeight = 22;
-        //         doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
-
-        //         // Informations de l'entreprise
-        //         doc.setFontSize(10);
-        //         doc.setTextColor(0, 0, 0);
-        //         doc.setFont("Helvetica", "bold");
-        //         // Texte de l'entreprise
-        //         const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
-        //         const titleWidth = doc.getTextWidth(title);
-        //         const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
-        //         doc.text(title, titleX, yPos);
-        //         // Texte de l'adresse
-        //         doc.setFont("Helvetica", "normal");
-        //         const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
-        //         const addressWidth = doc.getTextWidth(address);
-        //         const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
-        //         doc.text(address, addressX, (yPos + 5));
-        //         // Texte du téléphone
-        //         const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
-        //         const phoneWidth = doc.getTextWidth(phone);
-        //         const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
-        //         doc.text(phone, phoneX, (yPos + 10));
-        //         doc.setFontSize(10);
-        //         doc.setFont("Helvetica", "normal");
-        //         const examenDate = new Date(examen.created_at);
-        //         // Formatter la date et l'heure séparément
-        //         const formattedDate = examenDate.toLocaleDateString(); // Formater la date
-        //         const formattedTime = examenDate.toLocaleTimeString();
-        //         doc.text("Date: " + formattedDate, 15, (yPos + 25));
-        //         doc.text("Heure: " + formattedTime, 15, (yPos + 30));
-
-        //         //Ligne de séparation
-        //         doc.setFontSize(15);
-        //         doc.setFont("Helvetica", "bold");
-        //         doc.setLineWidth(0.5);
-        //         doc.setTextColor(0, 0, 0);
-        //         // doc.line(10, 35, 200, 35); 
-        //         let titleR;
-
-        //         if (facture.statut == 'payer') {
-        //             titleR = "RECU DE PAIEMENT";
-        //         } else {
-        //             titleR = "FACTURE EXAMEN";
-        //         }
-
-        //         const titleRWidth = doc.getTextWidth(titleR);
-        //         const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
-        //         // Définir le padding
-        //         const paddingh = 0; // Padding vertical
-        //         const paddingw = 8; // Padding horizontal
-        //         // Calculer les dimensions du rectangle
-        //         const rectX = titleRX - paddingw; // X du rectangle
-        //         const rectY = (yPos + 18) - paddingh; // Y du rectangle
-        //         const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
-        //         const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
-        //         // Définir la couleur pour le cadre (noir)
-        //         doc.setDrawColor(0, 0, 0);
-        //         doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
-        //         // Ajouter le texte centré en gras
-        //         doc.setFontSize(15);
-        //         doc.setFont("Helvetica", "bold");
-        //         doc.setTextColor(0, 0, 0); // Couleur du texte rouge
-        //         doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-        //         const titleN = "N° "+facture.code;
-        //         doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
-
-        //         doc.setFontSize(10);
-        //         doc.setFont("Helvetica", "bold");
-        //         doc.setTextColor(0, 0, 0);
-        //         const numDossier = "N° Dossier : P-"+ patient.matricule;
-        //         const numDossierWidth = doc.getTextWidth(numDossier);
-        //         doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
-
-        //         yPoss = (yPos + 50);
-
-        //         const typeInfo = [
-        //             { label: "Type d'examen", value: acte.nom },
-        //             { label: "Prélevement", value: examen.prelevement +" Fcfa" },
-        //         ];
-
-        //         typeInfo.forEach(info => {
-        //             doc.setFontSize(8);
-        //             doc.setFont("Helvetica", "bold");
-        //             doc.text(info.label, leftMargin + 100, yPoss);
-        //             doc.setFont("Helvetica", "normal");
-        //             doc.text(": " + info.value, leftMargin + 135, yPoss);
-        //             yPoss += 7;
-        //         });
-
-        //         yPoss = (yPos + 50);
-
-        //         const patientInfo = [
-        //             { label: "Nom et Prénoms", value: patient.np },
-        //             { label: "Assurer", value: patient.assurer },
-        //             { label: "Age", value: patient.age+" an(s)" },
-        //             { label: "Domicile", value: patient.adresse },
-        //             { label: "Contact", value: "+225 "+patient.tel }
-        //         ];
-
-        //         if (patient.assurer == 'oui') {
-        //             patientInfo.push(
-        //                 { label: "Assurance", value: patient.assurance },
-        //                 { label: "Matricule", value: patient.matricule_assurance },
-        //             );
-        //         }
-
-        //         patientInfo.forEach(info => {
-        //             doc.setFontSize(8);
-        //             doc.setFont("Helvetica", "bold");
-        //             doc.text(info.label, leftMargin, yPoss);
-        //             doc.setFont("Helvetica", "normal");
-        //             doc.text(": " + info.value, leftMargin + 35, yPoss);
-        //             yPoss += 7;
-        //         });
-
-        //         const donneeTables = examenpatient;
-        //         let yPossT = yPoss + 5; // Initialisation de la position Y pour le tableau des soins
-
-        //         const totalProduit = donneeTables.reduce((sum, item) => sum + parseInt(item.montant_ex.replace(/[^0-9]/g, '') || 0), 0);
-
-        //         // Tableau dynamique pour les détails des soins infirmiers
-        //         doc.autoTable({
-        //             startY: yPossT,
-        //             head: [['N°', 'Examen', 'Cotation', 'Prix', 'Accepté ?', 'Total']],
-        //             body: donneeTables.map((item, index) => [
-        //                 index + 1,
-        //                 item.nom_ex,
-        //                 item.cotation_ex+""+item.valeur_ex,
-        //                 item.prix_ex + " Fcfa",
-        //                 item.accepte,
-        //                 item.montant_ex + " Fcfa",
-        //             ]),
-        //             theme: 'striped',
-        //             foot: [[
-        //                 { content: 'Totals', colSpan: 5, styles: { halign: 'center', fontStyle: 'bold' } },
-        //                 { content: formatPrice(totalProduit) + " Fcfa", styles: { fontStyle: 'bold' } },
-        //             ]]
-        //         });
-
-        //         yPoss = doc.autoTable.previous.finalY || yPossT + 15;
-        //         yPoss = yPoss + 15;
-
-        //         if (yPoss + 35 > doc.internal.pageSize.height) {
-        //             doc.addPage();
-        //             yPoss = 20;
-        //         }
-
-        //         const compteInfo = [
-        //             { label: "Total", value: examen.montant+" Fcfa"},
-        //             { label: "Part assurance", value: examen.part_assurance+" Fcfa"},
-        //         ];
-
-        //         if (patient.taux !== null) {
-        //             compteInfo.push({ label: "Taux", value: patient.taux + "%" });
-        //         }
-
-        //         compteInfo.forEach(info => {
-        //             doc.setFontSize(9);
-        //             doc.setFont("Helvetica", "bold");
-        //             doc.text(info.label, leftMargin + 110, yPoss);
-        //             doc.setFont("Helvetica", "normal");
-        //             doc.text(": " + info.value, leftMargin + 142, yPoss);
-        //             yPoss += 7;
-        //         });
-
-        //         doc.setFontSize(11);
-        //         doc.setFont("Helvetica", "bold");
-        //         doc.text('Montant à payer', leftMargin + 110, yPoss);
-        //         doc.setFont("Helvetica", "bold");
-        //         doc.text(": "+examen.part_patient+" Fcfa", leftMargin + 142, yPoss);
-
-        //             if (facture.statut == 'payer') {
-        //                 const finalY = doc.autoTable.previous.finalY || yPossT + 10;
-
-        //                 // Ajuster yPoss à la fin du tableau pour le placement des totaux
-        //                 yPoss = finalY + 15;
-
-        //                 // Déclarer finalInfo comme un tableau vide
-        //                 const finalInfo = [];
-                        
-                        
-        //                     finalInfo.push(
-        //                         { label: "Montant Verser", value: facture.montant_verser },
-        //                         { label: "Montant Remis", value: facture.montant_remis },
-        //                         { label: "Reste a payer", value: facture.montant_restant },
-        //                         );
-                        
-
-        //                 // Boucler à travers finalInfo pour afficher les informations
-        //                 finalInfo.forEach(info => {
-        //                     doc.setFontSize(9);
-        //                     doc.setFont("Helvetica", "bold");
-        //                     doc.text(info.label, leftMargin, yPoss);
-        //                     doc.setFont("Helvetica", "normal");
-        //                     doc.text(": " + info.value + " Fcfa", leftMargin + 30, yPoss);
-        //                     yPoss += 7;
-        //                 });
-        //             }
-
-        //     }
-
-        //     function addFooter() {
-        //         // Add footer with current date and page number in X/Y format
-        //         const pageCount = doc.internal.getNumberOfPages();
-        //         const footerY = doc.internal.pageSize.getHeight() - 2; // 10 mm from the bottom
-
-        //         for (let i = 1; i <= pageCount; i++) {
-        //             doc.setPage(i);
-        //             doc.setFontSize(8);
-        //             doc.setTextColor(0, 0, 0);
-        //             const pageText = `Page ${i} sur ${pageCount}`;
-        //             const pageTextWidth = doc.getTextWidth(pageText);
-        //             const centerX = (doc.internal.pageSize.getWidth() - pageTextWidth) / 2;
-        //             doc.text(pageText, centerX, footerY);
-        //             doc.text("Imprimé le : " + new Date().toLocaleDateString() + " à " + new Date().toLocaleTimeString(), 15, footerY); // Left-aligned
-        //         }
-        //     }
-
-        //     drawConsultationSection(yPos);
-
-        //     addFooter();
-
-        //     doc.output('dataurlnewwindow');
-        // }
+        function payer_Exam()
+        {
+            const login = @json(Auth::user()->login);
+            const id = document.getElementById("id_Exam").value;
+            const matricule = document.getElementById("matricule_Exam").value;
+            const numfac = document.getElementById("id_code_fac_Exam").value;
+            const montant_verser = document.getElementById("input_montant_verser_Exam");
+            const montant_remis = document.getElementById("input_montant_remis_Exam");
+            const montant_restant = document.getElementById("input_montant_restant_Exam");
+            const montant = document.getElementById("input_montant_payer_Exam");
+
+            if(!montant_verser.value.trim() || !montant_remis.value.trim() || !montant_restant.value.trim() || !montant.value.trim()){
+                showAlert('Alert', 'Impossible d\'éffectuée le paiement.','error');
+                return false;
+            }
+
+            var preloader_ch = `
+                <div id="preloader_ch">
+                    <div class="spinner_preloader_ch"></div>
+                </div>
+            `;
+            // Add the preloader to the body
+            document.body.insertAdjacentHTML('beforeend', preloader_ch);
+
+            $.ajax({
+                url: '/api/facture_payer_examen/' + numfac,
+                method: 'GET',
+                data: { 
+                    id: id, 
+                    matricule: matricule, 
+                    montant: montant.value, 
+                    montant_verser: montant_verser.value, 
+                    montant_remis: montant_remis.value,
+                    montant_restant: montant_restant.value,
+                    login: login,
+                },
+                success: function(response) {
+
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+
+                    caisse_verf();
+
+                    if (response.success) {
+
+                        document.getElementById("facture_num_exam").value = '';
+                        table_exam.clear().draw();
+
+                        const examen = response.examen;
+                        const facture = response.facture;
+                        const sumMontantEx = response.sumMontantEx;
+
+                        generatePDFInvoice_Exam(examen, facture, sumMontantEx);
+
+                        showAlert('Succès', 'Paiement éffectuée.','success');
+
+                    } else if (response.error) {
+                        showAlert('Alert', 'Une erreur est survenue lors du paiement, Veuillez ressayer.','error');
+                    } else if (response.caisse_fermer) {
+                        showAlert('Alert', 'La caisse est actuellement fermer, Veuillez ouvrir la caisse avant d\'éffectuer un encaissement.','info');
+                    }
+
+                },
+                error: function(xhr, status, error) {
+                    var preloader = document.getElementById('preloader_ch');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+                    showAlert('Alert', 'Une erreur est survenue lors du paiement.','error');
+                }
+            });
+        }
+
+        const table_exam = $('.Table_Exam').DataTable({
+
+            processing: false,
+            serverSide: false,
+            deferLoading: true,
+            ajax: function(data, callback) {
+
+                const numfac = $('#facture_num_exam').val();
+
+                if (!numfac) {
+                    return;
+                }
+
+                var preloader_ch = `
+                    <div id="preloader_ch">
+                        <div class="spinner_preloader_ch"></div>
+                    </div>
+                `;
+                // Add the preloader to the body
+                document.body.insertAdjacentHTML('beforeend', preloader_ch);
+                
+                $.ajax({
+                    url: `/api/list_facture_examen/${numfac}`,
+                    type: 'GET',
+
+                    success: function(response) {
+                        var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
+                        // Supprimez ou cachez les données de la DataTable en cas d'erreur
+                        table_cons.clear().draw();
+                        // Supprimer ou cacher les données de la DataTable au besoin
+                        if (response.status === 'success') {
+                            // Vérifier si la facture est totalement payée ou non
+                            if (response.data.part_patient_reste === 0) {
+                                showAlert('Information', 'La facture est déjà totalement réglée.', 'success');
+                            } else {
+                                callback({ data: [response.data] });
+                                showAlert('Information', `Facture trouvée. Montant restant à régler : ${formatPriceT(response.data.part_patient_reste)} Fcfa.`, 'info');
+                            }
+                            // Ajouter les données à la DataTable
+                        } else if (response.status === 'error') {
+                            // Gérer les messages d'erreur dans le cas d'un succès avec message d'erreur
+                            showAlert('Attention', response.message, 'warning');
+                            // callback({ data: [] });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        var preloader = document.getElementById('preloader_ch');
+                        if (preloader) {
+                            preloader.remove();
+                        }
+                        // Supprimez ou cachez les données de la DataTable en cas d'erreur
+                        callback({ data: [] });
+                        // Gestion des erreurs avec messages
+                        let errorMessage = 'Une erreur est survenue.';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error; // Message d'erreur spécifique
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Facture introuvable.';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Erreur interne du serveur. Veuillez réessayer plus tard.';
+                        }
+
+                        // Afficher le message d'erreur à l'utilisateur
+                        showAlert('Alert', errorMessage ,'info');
+
+                        // Log pour le développeur
+                        // console.error(`Erreur: ${error}`);
+                        // console.error(`Status: ${status}`);
+                        // console.error(`Response:`, xhr.responseJSON);
+                    }
+                });
+            },
+            columns: [
+                { 
+                    data: null, 
+                    render: (data, type, row, meta) => meta.row + 1,
+                    searchable: false,
+                    orderable: false,
+                },
+                { 
+                    data: 'numfac', 
+                    render: (data, type, row) => `
+                    <div class="d-flex align-items-center">
+                        <a class="d-flex align-items-center flex-column me-2">
+                            <img src="{{asset('assets/images/facture.webp')}}" class="img-2x rounded-circle border border-1">
+                        </a>
+                        ${data}
+                    </div>`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'typedemande',
+                    render: (data, type, row) => `
+                        <span class="badge ${data === 'analyse' ? 'bg-danger' : 'bg-primary'}">
+                            ${data}
+                        </span> `,
+                    searchable: true,
+                },
+                {
+                    data: 'prelevement',
+                    render: (data, type, row) => {
+                        const value = data ? data : 0;
+                        const color = 'text-dark';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'montant_examen',
+                    render: (data, type, row) => {
+                        const value = data ? formatPrice(data) : 0;
+                        const color = 'text-primary';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'montant_total',
+                    render: (data, type, row) => {
+                        const value = data ? data : 0;
+                        const color = 'text-primary';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'part_assurance',
+                    render: (data, type, row) => {
+                        const value = data ? data : 0;
+                        const color = 'text-warning';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'part_patient',
+                    render: (data, type, row) => {
+                        const value = data ? formatPrice(data) : 0;
+                        const color = 'text-success';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'part_patient_reste',
+                    render: (data, type, row) => {
+                        const value = data ? formatPrice(data) : 0;
+                        const color = 'text-danger';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                { 
+                    data: 'date',
+                    render: (data, type, row) => {
+                        return data ? `${formatDate(data)} à ${row.heure}` : 'Néant';
+                    },
+                    searchable: true,
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => `
+                        <div class="d-inline-flex gap-1" style="font-size:10px;">
+                            <a class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Caisse_Exam" id="paye_Exam"
+                                data-id="${row.id}"
+                                data-numfac="${row.numfac}"
+                                data-reste="${row.part_patient_reste}"
+                                data-matricule="${row.matricule}"
+                            >
+                                <i class="ri-hand-coin-line"></i>
+                            </a>
+                        </div>
+                    `,
+                    searchable: false,
+                    orderable: false,
+                },
+            ],
+            searching: false,
+            ...dataTableConfig,
+            initComplete: function(settings, json) {
+                initExam();
+            },
+        });
+
+        $('.Table_Exam').on('draw.dt', function() {
+            initExam();
+        });
+
+        function initExam() {
+
+            $('.Table_Exam').on('click', '#paye_Exam', function() {
+                const id = $(this).data('id');
+                const numfac = $(this).data('numfac');
+                const matricule = $(this).data('matricule');
+                const reste = $(this).data('reste');
+                
+                document.getElementById('input_montant_payer_Exam').value = `${formatPrice(reste) || 0}`;
+                document.getElementById('input_montant_verser_Exam').value = '0';
+                document.getElementById('input_montant_remis_Exam').value = '0';
+                document.getElementById('id_code_fac_Exam').value = `${numfac}`;
+                document.getElementById('id_Exam').value = `${id}`;
+                document.getElementById('matricule_Exam').value = `${matricule}`;
+                document.getElementById('input_montant_restant_Exam').value = `${formatPrice(reste) || 0}`;
+            });
+        }
+
+        $('#btn_refresh_table_Exam').on('click', function () {
+            table_exam.ajax.reload(null, false); 
+        });
+
+        function generatePDFInvoice_Exam(examen, facture, sumMontantEx) 
+        {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+            const pdfFilename = "Examen Facture N°" + facture.numfacbul + " du " + formatDate(facture.date);
+            doc.setProperties({
+                title: pdfFilename,
+            });
+
+            let yPos = 10;
+
+            function drawConsultationSection(yPos) {
+                rightMargin = 15;
+                leftMargin = 15;
+                pdfWidth = doc.internal.pageSize.getWidth();
+
+                const titlea = "RECU";
+                doc.setFontSize(100);
+                doc.setTextColor(242, 242, 242); // Gray color for background effect
+                doc.setFont("Helvetica", "bold");
+                doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
+
+                const logoSrc = "{{asset('assets/images/logo.png')}}";
+                const logoWidth = 22;
+                const logoHeight = 22;
+                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
+
+                // Informations de l'entreprise
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("Helvetica", "bold");
+                // Texte de l'entreprise
+                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
+                const titleWidth = doc.getTextWidth(title);
+                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
+                doc.text(title, titleX, yPos);
+                // Texte de l'adresse
+                doc.setFont("Helvetica", "normal");
+                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
+                const addressWidth = doc.getTextWidth(address);
+                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
+                doc.text(address, addressX, (yPos + 5));
+                // Texte du téléphone
+                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
+                const phoneWidth = doc.getTextWidth(phone);
+                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
+                doc.text(phone, phoneX, (yPos + 10));
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "normal");
+                const examenDate = new Date(facture.date);
+                // Formatter la date et l'heure séparément
+                const formattedDate = examenDate.toLocaleDateString(); // Formater la date
+                // const formattedTime = examenDate.toLocaleTimeString();
+                doc.text("Date: " + formattedDate, 15, (yPos + 25));
+                doc.text("Heure: " + facture.heure, 15, (yPos + 30));
+
+                //Ligne de séparation
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setLineWidth(0.5);
+                doc.setTextColor(0, 0, 0);
+                // doc.line(10, 35, 200, 35); 
+                const titleR = "RECU DE PAIEMENT";
+                const titleRWidth = doc.getTextWidth(titleR);
+                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
+                // Définir le padding
+                const paddingh = 0; // Padding vertical
+                const paddingw = 8; // Padding horizontal
+                // Calculer les dimensions du rectangle
+                const rectX = titleRX - paddingw; // X du rectangle
+                const rectY = (yPos + 18) - paddingh; // Y du rectangle
+                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
+                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
+                // Définir la couleur pour le cadre (noir)
+                doc.setDrawColor(0, 0, 0);
+                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
+                // Ajouter le texte centré en gras
+                doc.setFontSize(15);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0); // Couleur du texte rouge
+                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
+                const titleN = "N° "+facture.numrecu;
+                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
+
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDossier = "N° Dossier : "+ facture.numdossier;
+                const numDossierWidth = doc.getTextWidth(numDossier);
+                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
+
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDate = "Date de paiement : "+ formatDateImp(facture.datereglt_pat) ;
+                const numDateWidth = doc.getTextWidth(numDate);
+                doc.text(numDate, (doc.internal.pageSize.getWidth() - numDateWidth) / 2, yPos + 40);    
+
+                yPoss = (yPos + 50);
+
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
+
+                const patientInfo = [
+                    { 
+                        label: "Nom et Prénoms", 
+                        value: facture.nom_patient.length > 25 
+                            ? facture.nom_patient.substring(0, 25) + '...' 
+                            : facture.nom_patient 
+                    },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
+                ];
+
+                if (facture.assure == 1) {
+                    patientInfo.push(
+                        { 
+                            label: "Assurance", 
+                            value: facture.assurance.length > 25 
+                                ? facture.assurance.substring(0, 25) + '...' 
+                                : facture.assurance 
+                        },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
+                    );
+                }
+
+                patientInfo.push(
+                    { label: "libelle", value: facture.renseigclini || 'Aucun' },
+                );
+
+                patientInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss = (yPos + 50);
+
+                const typeInfo = [];
+
+                if (facture.num_bon && facture.num_bon !== "" && facture.num_bon !== null ) {
+                    typeInfo.push({ label: "N° prise en charge", value: facture.numbon == null ? 'Aucun' : facture.numbon });
+                }
+
+                let medecin; 
+
+                if (facture.nom_medecin == null) {
+                    medecin = facture.medicin_traitant;
+                } else {
+                    medecin = facture.nom_medecin;
+                }
+
+                typeInfo.push(
+                    { label: "N° FACTURE", value: facture.numfacbul },
+                    { label: "Id Examen", value: facture.idtestlaboimagerie },
+                    { 
+                        label: "Medecin", 
+                        value: medecin.length > 20 
+                            ? 'Dr. '+medecin.substring(0, 20) + '...' 
+                            : 'Dr. '+medecin 
+                    },
+                    { label: "Type d'examen", value: facture.typedemande },
+                );
+
+                typeInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin + 100, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 135, yPoss);
+                    yPoss += 7;
+                });
+
+                yPoss += 30;
+
+                const donneeTables = examen;
+                let yPossT = yPoss + 10; // Initialisation de la position Y pour le tableau des soins
+
+                // Tableau dynamique pour les détails des soins infirmiers
+                doc.autoTable({
+                    startY: yPossT,
+                    head: [['N°', 'Examen', 'Montant', 'Accepté ?']],
+                    body: donneeTables.map((item, index) => [
+                        index + 1,
+                        item.examen,
+                        formatPriceT(item.prix),
+                        item.resultat == null || item.resultat == '' ? `Néant` : item.resultat,
+                    ]),
+                    theme: 'striped',
+                    foot: [[
+                        { content: 'Totals', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+                        { content: formatPriceT(sumMontantEx) + " Fcfa", styles: { fontStyle: 'bold' } },
+                    ]]
+                });
+
+                yPoss = doc.autoTable.previous.finalY || yPossT + 10;
+                yPoss = yPoss + 5;
+
+                const compteInfo = [
+                    { label: "Prélevement", value: formatPriceT(facture.prelevement)+ " Fcfa" },
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa"},
+                    ...(facture.assure == 1 ? 
+                            [{ label: "Part assurance", value: formatPriceT(facture.part_assurance) + " Fcfa" }] 
+                            : []),
+                ];
+
+                if (facture.assure == 1 ) {
+                    compteInfo.push({ label: "Taux", value: facture.taux + "%" });
+                }
+
+                compteInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(info.label, leftMargin + 110, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 142, yPoss);
+                    yPoss += 7;
+                });
+                doc.setFontSize(11);
+                doc.setFont("Helvetica", "bold");
+                doc.text('Montant à payer', leftMargin + 110, yPoss);
+                doc.setFont("Helvetica", "bold");
+                doc.text(": "+formatPriceT(facture.part_patient)+" Fcfa", leftMargin + 142, yPoss);
+
+
+                yPoss = doc.autoTable.previous.finalY || yPossT + 10;
+                yPoss = yPoss + 5;
+
+                const payerInfo = [
+                    { label: "Montant Verser", value: (formatPriceT(facture.montant_verser) || '0')+" Fcfa" },
+                    { label: "Montant Remis", value: (formatPriceT(facture.montant_remis) || '0')+" Fcfa" },
+                    { label: "Reste a payé", value: (formatPriceT(facture.montant_restant) || '0')+" Fcfa" },
+                ];
+
+                payerInfo.forEach(info => {
+                    doc.setFontSize(9);
+                    doc.setFont("Helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(info.label, leftMargin, yPoss);
+                    doc.setFont("Helvetica", "normal");
+                    doc.text(": " + info.value, leftMargin + 35, yPoss);
+                    yPoss += 7;
+                });
+
+            }
+
+            function addFooter() {
+                // Add footer with current date and page number in X/Y format
+                const pageCount = doc.internal.getNumberOfPages();
+                const footerY = doc.internal.pageSize.getHeight() - 2; // 10 mm from the bottom
+
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(0, 0, 0);
+                    const pageText = `Page ${i} sur ${pageCount}`;
+                    const pageTextWidth = doc.getTextWidth(pageText);
+                    const centerX = (doc.internal.pageSize.getWidth() - pageTextWidth) / 2;
+                    doc.text(pageText, centerX, footerY);
+                    doc.text("Imprimé le : " + new Date().toLocaleDateString() + " à " + new Date().toLocaleTimeString(), 15, footerY); // Left-aligned
+                }
+            }
+
+            drawConsultationSection(yPos);
+
+            addFooter();
+
+            doc.output('dataurlnewwindow');
+        }
 
         //-----------------------------------------------------------------------
 
@@ -3110,7 +3052,7 @@
                     data: 'prototal',
                     render: (data, type, row) => {
                         const value = data ? formatPrice(data) : 0;
-                        const color = 'text-warning';
+                        const color = 'text-primary';
                         return `<span class="${color}">${value} Fcfa</span>`;
                     },
                     searchable: true,
@@ -3119,7 +3061,16 @@
                     data: 'stotal',
                     render: (data, type, row) => {
                         const value = data ? formatPrice(data) : 0;
-                        const color = 'text-warning';
+                        const color = 'text-primary';
+                        return `<span class="${color}">${value} Fcfa</span>`;
+                    },
+                    searchable: true,
+                },
+                {
+                    data: 'remise',
+                    render: (data, type, row) => {
+                        const value = data ? formatPrice(data) : 0;
+                        const color = 'text-danger';
                         return `<span class="${color}">${value} Fcfa</span>`;
                     },
                     searchable: true,
@@ -3210,279 +3161,8 @@
             table_soinsam.ajax.reload(null, false); 
         });
 
-        function generatePDFInvoice_Soinsam(soinspatient, facture, patient, typesoins, soins, produit) 
+        function generatePDFInvoice(patient, soins, produit) 
         {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-
-            const pdfFilename = "SOINS AMBULATOIRE Facture N°" + facture.code + " du " + formatDateHeure(facture.created_at);
-            doc.setProperties({
-                title: pdfFilename,
-            });
-
-            let yPos = 10;
-
-            function drawConsultationSection(yPos) {
-                rightMargin = 15;
-                leftMargin = 15;
-                pdfWidth = doc.internal.pageSize.getWidth();
-
-                if (facture.statut == 'payer') {
-                    const titlea = "Payer";
-                    doc.setFontSize(100);
-                    doc.setTextColor(174, 255, 165);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-                }else{
-                    const titlea = "Impayer";
-                    doc.setFontSize(100);
-                    doc.setTextColor(252, 173, 159);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(titlea, 120, yPos + 120, { align: 'center', angle: 40 });
-                }
-
-                const logoSrc = "{{asset('assets/images/logo.png')}}";
-                const logoWidth = 22;
-                const logoHeight = 22;
-                doc.addImage(logoSrc, 'PNG', leftMargin, yPos - 7, logoWidth, logoHeight);
-
-                // Informations de l'entreprise
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("Helvetica", "bold");
-                // Texte de l'entreprise
-                const title = "ESPACE MEDICO SOCIAL LA PYRAMIDE DU COMPLEXE";
-                const titleWidth = doc.getTextWidth(title);
-                const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
-                doc.text(title, titleX, yPos);
-                // Texte de l'adresse
-                doc.setFont("Helvetica", "normal");
-                const address = "Abidjan Yopougon Selmer, Non loin du complexe sportif Jesse-Jackson - 04 BP 1523";
-                const addressWidth = doc.getTextWidth(address);
-                const addressX = (doc.internal.pageSize.getWidth() - addressWidth) / 2;
-                doc.text(address, addressX, (yPos + 5));
-                // Texte du téléphone
-                const phone = "Tél.: 20 24 44 70 / 20 21 71 92 - Cel.: 01 01 01 63 43";
-                const phoneWidth = doc.getTextWidth(phone);
-                const phoneX = (doc.internal.pageSize.getWidth() - phoneWidth) / 2;
-                doc.text(phone, phoneX, (yPos + 10));
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "normal");
-                const spatientDate = new Date(soinspatient.created_at);
-                // Formatter la date et l'heure séparément
-                const formattedDate = spatientDate.toLocaleDateString(); // Formater la date
-                const formattedTime = spatientDate.toLocaleTimeString();
-                doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
-
-                //Ligne de séparation
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setLineWidth(0.5);
-                doc.setTextColor(0, 0, 0);
-                // doc.line(10, 35, 200, 35); 
-
-                let titleR;
-
-                if (facture.statut == 'payer') {
-                    titleR = "RECU DE PAIEMENT";
-                }else{
-                    titleR = "FACTURE SOINS AMBULATOIRES";
-                }
-
-                const titleRWidth = doc.getTextWidth(titleR);
-                const titleRX = (doc.internal.pageSize.getWidth() - titleRWidth) / 2;
-                // Définir le padding
-                const paddingh = 0; // Padding vertical
-                const paddingw = 8; // Padding horizontal
-                // Calculer les dimensions du rectangle
-                const rectX = titleRX - paddingw; // X du rectangle
-                const rectY = (yPos + 18) - paddingh; // Y du rectangle
-                const rectWidth = titleRWidth + (paddingw * 2); // Largeur du rectangle
-                const rectHeight = 15 + (paddingh * 2); // Hauteur du rectangle
-                // Définir la couleur pour le cadre (noir)
-                doc.setDrawColor(0, 0, 0);
-                doc.rect(rectX, rectY, rectWidth, rectHeight); // Dessiner le rectangle
-                // Ajouter le texte centré en gras
-                doc.setFontSize(15);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(0, 0, 0); // Couleur du texte rouge
-                doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+facture.code;
-                doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
-
-                doc.setFontSize(10);
-                doc.setFont("Helvetica", "bold");
-                doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
-                const numDossierWidth = doc.getTextWidth(numDossier);
-                doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
-
-                yPoss = (yPos + 50);
-
-                const patientInfo = [
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age+" an(s)" },
-                    { label: "Domicile", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel }
-                ];
-
-                if (patient.assurer == 'oui') {
-                    patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
-                    );
-                }
-
-                patientInfo.forEach(info => {
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 35, yPoss);
-                    yPoss += 7;
-                });
-
-                yPoss = (yPos + 50);
-
-                const typeInfo = [
-                    { label: "Type de Soins", value: typesoins.nom },
-                    { label: "Soins Infirmiers", value: soins.length },
-                    { label: "Produits Utilisés", value: produit.length },
-                    { label: "Total", value: soinspatient.montant ? soinspatient.montant + " Fcfa" : "0 Fcfa" },
-                    ...(soinspatient.part_assurance.replace(/[^0-9]/g, '') > 0 ? 
-                        [{ label: "Part assurance", value: soinspatient.part_assurance + " Fcfa" }] 
-                        : []),
-                    { label: "Remise", value: soinspatient.remise ? soinspatient.remise + " Fcfa" : "0 Fcfa" }
-                ];
-
-                if (patient.taux !== null) {
-                    typeInfo.push({ label: "Taux", value: patient.taux + "%" });
-                }
-
-                typeInfo.push({ label: "Montant à payer", value: soinspatient.part_patient +" Fcfa" });
-
-                typeInfo.forEach(info => {
-                    doc.setFontSize(8);
-                    doc.setFont("Helvetica", "bold");
-                    doc.text(info.label, leftMargin + 100, yPoss);
-                    doc.setFont("Helvetica", "normal");
-                    doc.text(": " + info.value, leftMargin + 135, yPoss);
-                    yPoss += 7;
-                });
-
-                const donneeTables = soins;
-                let yPossT = yPoss + 5; // Initialisation de la position Y pour le tableau des soins
-
-                const totalsi = donneeTables.reduce((sum, item) => sum + parseInt(item.prix_si.replace(/[^0-9]/g, '') || 0), 0);
-
-                // Tableau dynamique pour les détails des soins infirmiers
-                doc.autoTable({
-                    startY: yPossT,
-                    head: [['N°', 'Nom du Soins Infirmiers', 'Prix Unitaire']],
-                    body: donneeTables.map((item, index) => [
-                        index + 1,
-                        item.nom_si,
-                        item.prix_si + " Fcfa",
-                    ]),
-                    theme: 'striped',
-                    foot: [[
-                        { content: 'Totals', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-                        { content: formatPrice(totalsi) + " Fcfa", styles: { fontStyle: 'bold' } },
-                    ]]
-                });
-
-                // Récupérer la position Y de la dernière ligne du tableau
-                yPoss = doc.autoTable.previous.finalY || yPossT + 10;
-                yPoss = yPoss + 10;
-
-                // Répéter le processus pour les produits
-                const donneeTable = produit;
-                yPossT = yPoss; // Ajuster la position Y pour le tableau des produits
-
-                const totalsoins = donneeTable.reduce((sum, item) => sum + parseInt(item.montant.replace(/[^0-9]/g, '') || 0), 0);
-
-                doc.autoTable({
-                    startY: yPossT,
-                    head: [['N°', 'Nom du produit utilisé', 'Quantité', 'Prix Unitaire', 'Montant']],
-                    body: donneeTable.map((item, index) => [
-                        index + 1,
-                        item.nom_pro,
-                        item.quantite_pro,
-                        item.prix_pro + " Fcfa",
-                        item.montant + " Fcfa",
-                    ]),
-                    theme: 'striped',
-                    foot: [[
-                        { content: 'Totals', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold' } },
-                        { content: formatPrice(totalsoins) + " Fcfa", styles: { fontStyle: 'bold' } },
-                    ]]
-                });
-
-                if (facture.statut == 'payer') {
-                    yPoss = doc.autoTable.previous.finalY || yPossT + 10;
-                    yPoss = yPoss + 10;
-
-                    if (yPoss + 30 > doc.internal.pageSize.height) {
-                        doc.addPage();
-                        yPoss = 20;
-                    }
-                    
-                    const totalMontant = parseInt(soinspatient.part_patient.replace(/[^0-9]/g, ''));
-                    const montantVerser = parseInt(facture.montant_verser.replace(/[^0-9]/g, ''));
-                    const montantRemis = parseInt(facture.montant_remis.replace(/[^0-9]/g, ''));
-                    const resteAPayer = Math.max(montantVerser - (totalMontant + montantRemis), 0);
-
-                        doc.setFontSize(10);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text('Montant Versé', leftMargin + 110, yPoss);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text(": " + facture.montant_verser + " Fcfa", leftMargin + 150, yPoss);
-                        yPoss += 7;
-
-                        doc.setFontSize(10);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text('Montant Remis', leftMargin + 110, yPoss);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text(": " + facture.montant_remis + " Fcfa", leftMargin + 150, yPoss);
-                        yPoss += 7;
-
-                        // Display Reste à Payer
-                        doc.setFontSize(10);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text('Reste à Payer', leftMargin + 110, yPoss);
-                        doc.setFont("Helvetica", "bold");
-                        doc.text(": " + resteAPayer + " Fcfa", leftMargin + 150, yPoss);
-                }
-
-            }
-
-            function addFooter() {
-                // Add footer with current date and page number in X/Y format
-                const pageCount = doc.internal.getNumberOfPages();
-                const footerY = doc.internal.pageSize.getHeight() - 2; // 10 mm from the bottom
-
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(8);
-                    doc.setTextColor(0, 0, 0);
-                    const pageText = `Page ${i} sur ${pageCount}`;
-                    const pageTextWidth = doc.getTextWidth(pageText);
-                    const centerX = (doc.internal.pageSize.getWidth() - pageTextWidth) / 2;
-                    doc.text(pageText, centerX, footerY);
-                    doc.text("Imprimé le : " + new Date().toLocaleDateString() + " à " + new Date().toLocaleTimeString(), 15, footerY); // Left-aligned
-                }
-            }
-
-            drawConsultationSection(yPos);
-
-            addFooter();
-
-            doc.output('dataurlnewwindow');
-        }
-
-        function generatePDFInvoice(patient, soins, produit) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
@@ -3498,7 +3178,7 @@
                 leftMargin = 15;
                 pdfWidth = doc.internal.pageSize.getWidth();
 
-                const titlea = "Facture";
+                const titlea = "RECU";
                 doc.setFontSize(100);
                 doc.setTextColor(242, 242, 242); // Gray color for background effect
                 doc.setFont("Helvetica", "bold");
@@ -3573,7 +3253,14 @@
                 const numDossierWidth = doc.getTextWidth(numDossier);
                 doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
 
-                yPoss = (yPos + 40);
+                doc.setFontSize(10);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                const numDate = "Date de paiement : "+ formatDateImp(patient.datereglt_pat) ;
+                const numDateWidth = doc.getTextWidth(numDate);
+                doc.text(numDate, (doc.internal.pageSize.getWidth() - numDateWidth) / 2, yPos + 40);      
+
+                yPoss = (yPos + 50);
 
                 const patientInfo = [
                     { 
@@ -3603,7 +3290,7 @@
                     yPoss += 7;
                 });
 
-                yPoss = (yPos + 40);
+                yPoss = (yPos + 50);
 
                 const typeInfo = [];
 
@@ -3626,7 +3313,7 @@
                 }
 
                 const donneeTables = soins;
-                let yPossT = yPoss + 15; 
+                let yPossT = yPoss + 25; 
 
                 // const totalsi = donneeTables.reduce((sum, item) => sum + parseInt(item.price.replace(/[^0-9]/g, '') || 0), 0);
 

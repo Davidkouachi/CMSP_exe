@@ -229,21 +229,21 @@ class ApistatController extends Controller
     public function statistique_examen()
     {
         $today = Carbon::today();
-        $ida = acte::where('nom', '=', 'ANALYSE')->first();
-        $idi = acte::where('nom', '=', 'IMAGERIE')->first();
 
-        $imagerie_day = examen::where('acte_id', '=', $idi->id)
-                            ->whereDate('created_at', '=', $today)
-                            ->count();
+        $ida = DB::table('testlaboimagerie')
+            ->where('typedemande', '=', 'analyse')
+            ->whereDate('date', '=', $today)
+            ->count();
 
-        $analyse_day = examen::where('acte_id', '=', $ida->id)
-                            ->whereDate('created_at', '=', $today)
-                            ->count();
+        $idi = DB::table('testlaboimagerie')
+            ->where('typedemande', '=', 'imagerie')
+            ->whereDate('date', '=', $today)
+            ->count();
 
         // Return the results as JSON
         return response()->json([
-            'nbre_analyse_day' => $analyse_day ?? 0,
-            'nbre_imagerie_day' => $imagerie_day ?? 0,
+            'nbre_analyse_day' => $ida ?? 0,
+            'nbre_imagerie_day' => $idi ?? 0,
         ]);
     }
 

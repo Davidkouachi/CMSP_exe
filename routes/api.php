@@ -246,9 +246,9 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/list_facture_hos', [ApilistfactureController::class, 'list_facture_hos']);
 	Route::get('/list_facture_hos_all/{date1}/{date2}/{statut}', [ApilistfactureController::class, 'list_facture_hos_all']);
 	Route::get('/list_facture_soinsam/{numfac}', [ApilistfactureController::class, 'list_facture_soinsam']);
-	Route::get('/list_facture_soinsam_all/{date1}/{date2}/{statut}', [ApilistfactureController::class, 'list_facture_soinsam_all']);
-	Route::get('/list_facture_examen', [ApilistfactureController::class, 'list_facture_examen']);
-	Route::get('/list_facture_examen_all/{date1}/{date2}/{statut}', [ApilistfactureController::class, 'list_facture_examen_all']);
+	Route::get('/list_facture_soinsam_all/{date1}/{date2}', [ApilistfactureController::class, 'list_facture_soinsam_all']);
+	Route::get('/list_facture_examen/{numfac}', [ApilistfactureController::class, 'list_facture_examen']);
+	Route::get('/list_facture_examen_all/{date1}/{date2}', [ApilistfactureController::class, 'list_facture_examen_all']);
 	// List facture fin
 
 	// List facture detail debut
@@ -261,7 +261,7 @@ Route::middleware(['web','statutchambre','dateRdv'])->group(function () {
 	Route::get('/facture_payer/{numfac}', [ApiinsertfactureController::class, 'facture_payer']);
 	Route::get('/facture_payer_hos/{code_fac}', [ApiinsertfactureController::class, 'facture_payer_hos']);
 	Route::get('/facture_payer_soinsam/{numfac}', [ApiinsertfactureController::class, 'facture_payer_soinsam']);
-	Route::get('/facture_payer_examen/{code_fac}', [ApiinsertfactureController::class, 'facture_payer_examen']);
+	Route::get('/facture_payer_examen/{numfac}', [ApiinsertfactureController::class, 'facture_payer_examen']);
 	// paiement facture fin
 
 	// PDF debut

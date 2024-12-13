@@ -245,36 +245,52 @@ class ApilistfactureController extends Controller
         }
     }
 
-    public function list_facture_soinsam_all($date1, $date2,$statut)
+    public function list_facture_soinsam_all($date1, $date2)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $spatientQuery = soinspatient::join('factures', 'factures.id','=','soinspatients.facture_id')
-                                ->whereBetween('factures.created_at', [$date1, $date2])
-                                ->select(
-                                    'soinspatients.*',
-                                    'factures.code as code_fac',
-                                    'factures.statut as statut_fac',
-                                    'factures.montant_verser as montant_verser',
-                                    'factures.montant_remis as montant_remis',
-                                )->orderBy('soinspatients.created_at', 'desc');
-        if ($statut !== 'tous') {
-            $spatientQuery->where('factures.statut', '=', $statut);
-        }
+        $facture = DB::table('soins_medicaux')
+            ->join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+            ->join('dossierpatient', 'soins_medicaux.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('factures', 'soins_medicaux.numfac_soins', '=', 'factures.numfac')
+            ->whereBetween('soins_medicaux.date_soin', [$date1, $date2])
+            ->select(
+                'soins_medicaux.id_soins as id_soins',
+                'soins_medicaux.date_soin as date',
+                'soins_medicaux.numfac_soins as numfac',
+                'dossierpatient.numdossier as numdossier',
+                'dossierpatient.idenregistremetpatient as matricule_patient',
+                'factures.montanttotal as montant',
+                'factures.remise as remise',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+            )
+            ->orderBy('soins_medicaux.date_soin', 'desc')
+            ->get();
 
-        $soinspatient = $spatientQuery->get();
+        foreach ($facture as $value) {
 
-        foreach ($soinspatient as $value) {
-            $produittotal = sp_produit::where('soinspatient_id', '=', $value->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
+            if ($value->part_patient == $value->part_patient_regler) {
+                $value->statut_regle = 'Oui';
+            } else {
+                $value->statut_regle = 'Non';
+            }
+
+            // $value->part_patient_reste = abs($value->part_patient - $value->part_patient_regler);
+            $value->part_patient_reste = max(0, $value->part_patient - $value->part_patient_regler);
+
+            $produittotal = DB::table('soins_medicaux_itemmedics')
+                ->where('id_soins', '=', $value->id_soins)
+                ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
                 ->first();
 
             $value->prototal = $produittotal->total ?? 0;
 
-            // Total des soins
-            $soinstotal = sp_soins::where('soinspatient_id', '=', $value->id)
-                ->select(DB::raw('COALESCE(SUM(REPLACE(montant, ".", "") + 0), 0) as total'))
+            $soinstotal = DB::table('soins_medicaux_itemsoins')
+                ->where('id_soins', '=', $value->id_soins)
+                ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
                 ->first();
 
             $value->stotal = $soinstotal->total ?? 0;
@@ -282,86 +298,135 @@ class ApilistfactureController extends Controller
         }
 
         return response()->json([
-            'data' => $soinspatient,
+            'data' => $facture,
         ]);
     }
 
-    public function list_facture_examen()
+    public function list_facture_examen($numfac)
     {
-        $examen = examen::join('factures', 'factures.id', '=', 'examens.facture_id')
-                            ->join('actes', 'actes.id', '=', 'examens.acte_id')
-                            ->where('factures.statut', '=', 'impayer')
-                            ->select(
-                                'examens.*',
-                                'actes.nom as acte',
-                                'factures.code as code_fac',
-                                'factures.statut as statut_fac',
-                            )
-                            ->orderBy('created_at', 'desc')
-                            ->get();
 
-        foreach ($examen as $value) {
-            $nbre = examenpatient::where('examen_id', '=', $value->id)->count();
-            $value->nbre =  $nbre ?? 0;
+        $facture = DB::table('testlaboimagerie')
+            ->join('factures', 'testlaboimagerie.numfacbul', '=', 'factures.numfac')
+            ->where('testlaboimagerie.numfacbul', '=', $numfac)
+            ->select(
+                'testlaboimagerie.idtestlaboimagerie as id',
+                'testlaboimagerie.typedemande as typedemande',
+                'testlaboimagerie.date as date',
+                'testlaboimagerie.heure as heure',
+                'testlaboimagerie.numfacbul as numfac',
+                'testlaboimagerie.prelevement as prelevement',
+                'testlaboimagerie.idenregistremetpatient as matricule',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+                'factures.montanttotal as montant_total',
+            )
+            ->first();
 
-            $partPatient = str_replace('.', '', $value->part_patient);
-            $prelevement = str_replace('.', '', $value->prelevement);
+        if ($facture) {
 
-            // Conversion en entier
-            $partPatient = (int)$partPatient;
-            $prelevement = (int)$prelevement;
+            $examen = DB::table('detailtestlaboimagerie')
+                ->where('idtestlaboimagerie', '=', $facture->id)
+                ->select(
+                    'detailtestlaboimagerie.denomination as examen',
+                    'detailtestlaboimagerie.resultat as resultat',
+                    'detailtestlaboimagerie.prix as prix',
+                )
+                ->get();
 
-            $value->total_patient = $partPatient;
+            $sumMontantEx = $examen->sum(function ($item) {
+                $montantEx = str_replace('.', '', $item->prix);
+                return (int) $montantEx;
+            });
 
-            $value->part_patient = $partPatient - $prelevement;
+            $facture->montant_examen = $sumMontantEx;
+
+            $facture->part_patient_regler = $facture->part_patient_regler ?? 0;
+
+            $facture->part_patient_reste = max(0, $facture->part_patient - $facture->part_patient_regler);
+
+            if ($facture->part_patient_reste === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'La facture est déjà totalement réglée.'
+                ], 200); // 200 car ce n'est pas une erreur technique
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $facture
+            ], 200);
+
+        } else {
+            // Aucun résultat trouvé
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Facture introuvable.'
+            ], 404);
         }
-
-        return response()->json([
-            'data' => $examen,
-        ]);
     }
 
-    public function list_facture_examen_all($date1, $date2,$statut)
+    public function list_facture_examen_all($date1, $date2)
     {
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
-        
-        $examenQuery = examen::join('factures', 'factures.id', '=', 'examens.facture_id')
-                            ->join('actes', 'actes.id', '=', 'examens.acte_id')
-                            ->whereBetween('factures.created_at', [$date1, $date2])
-                            ->select(
-                                'examens.*',
-                                'actes.nom as acte',
-                                'factures.code as code_fac',
-                                'factures.statut as statut_fac',
-                            )
-                            ->orderBy('factures.created_at', 'desc');
 
-        if ($statut !== 'tous') {
-            $examenQuery->where('factures.statut', '=', $statut);
-        }
+        $facture = DB::table('testlaboimagerie')
+            ->join('patient', 'testlaboimagerie.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'patient.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->join('medecin', 'testlaboimagerie.codemedecin', '=', 'medecin.codemedecin')
+            ->join('factures', 'testlaboimagerie.numfacbul', '=', 'factures.numfac')
+            ->whereBetween('testlaboimagerie.date', [$date1, $date2])
+            ->select(
+                'testlaboimagerie.idtestlaboimagerie as id',
+                'testlaboimagerie.idenregistremetpatient as matricule_patient',
+                'testlaboimagerie.typedemande as typedemande',
+                'testlaboimagerie.date as date',
+                'testlaboimagerie.heure as heure',
+                'testlaboimagerie.numfacbul as numfac',
+                'testlaboimagerie.prelevement as prelevement',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'medecin.nomprenomsmed as nom_medecin',
+                'factures.montanttotal as montant',
+                'factures.remise as remise',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+            )
+            ->orderBy('testlaboimagerie.date', 'desc')
+            ->get();
 
-        $examen = $examenQuery->get();
+        foreach ($facture as $value) {
 
-        foreach ($examen as $value) {
-            $nbre = examenpatient::where('examen_id', '=', $value->id)->count();
-            $value->nbre =  $nbre ?? 0;
+            if ($value->part_patient == $value->part_patient_regler) {
+                $value->statut_regle = 'Oui';
+            } else {
+                $value->statut_regle = 'Non';
+            }
 
-            $partPatient = str_replace('.', '', $value->part_patient);
-            $prelevement = str_replace('.', '', $value->prelevement);
+            $value->part_patient_reste = abs($value->part_patient - $value->part_patient_regler);
 
-            // Conversion en entier
-            $partPatient = (int)$partPatient;
-            $prelevement = (int)$prelevement;
+            $examen = DB::table('detailtestlaboimagerie')
+                ->where('idtestlaboimagerie', '=', $value->id)
+                ->select(
+                    'detailtestlaboimagerie.denomination as examen',
+                    'detailtestlaboimagerie.resultat as resultat',
+                    'detailtestlaboimagerie.prix as prix',
+                )
+                ->get();
 
-            // Calcul de la somme
-            $value->total_patient = $partPatient;
+            $sumMontantEx = $examen->sum(function ($item) {
+                $montantEx = str_replace('.', '', $item->prix);
+                return (int) $montantEx;
+            });
 
-            $value->part_patient = $partPatient - $prelevement;
+            $value->montant_examen = $sumMontantEx;
         }
 
         return response()->json([
-            'data' => $examen,
+            'data' => $facture,
         ]);
     }
 

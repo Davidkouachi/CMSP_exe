@@ -58,6 +58,14 @@ class ApilistController extends Controller
     {
         return number_format($number, 0, '', '.');
     }
+    private function generateUniqueMatriculeDossierDC()
+    {
+        do {
+            $matricule = random_int(100000, 999999);
+        } while (DB::table('dossierpatient')->where('numdossier', '=', 'DC'.$matricule)->exists());
+
+        return $matricule;
+    }
 
 
 
@@ -329,7 +337,6 @@ class ApilistController extends Controller
 
     public function list_patient_all()
     {
-
         $patients = DB::table('patient')
             ->leftJoin('societeassure', 'patient.codesocieteassure', '=', 'societeassure.codesocieteassure')
             ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
@@ -346,6 +353,39 @@ class ApilistController extends Controller
             )
             ->orderBy('patient.dateenregistrement','desc')
             ->get();
+
+        foreach ($patients as $value) {
+
+            DB::beginTransaction();
+
+            try {
+
+                $verf_dossierDC = DB::table('dossierpatient')
+                ->where('idenregistremetpatient', '=', $value->idenregistremetpatient)
+                ->where('codetypedossier', '=', 'DC')
+                ->exists();
+
+                if (!$verf_dossierDC) {
+
+                    $numdossier_new = $this->generateUniqueMatriculeDossierDC();
+
+                    $dossierPatientInserted = DB::table('dossierpatient')->insert([
+                        'numdossier' => 'DC'.$numdossier_new,
+                        'idenregistremetpatient' => $value->idenregistremetpatient,
+                        'datecrea' => now(),
+                        'codetypedossier' => 'DC',
+                    ]);
+
+                    if ($dossierPatientInserted === 0) {
+                        throw new Exception('Erreur lors de l\'insertion dans la table dossierpatient');
+                    }
+                }
+
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollback();
+            }
+        }
 
         return response()->json([
             'data' => $patients,
@@ -435,22 +475,17 @@ class ApilistController extends Controller
 
     public function detail_soinam($id)
     {
-
+            
         $produittotal = DB::table('soins_medicaux_itemmedics')
             ->where('id_soins', '=', $id)
             ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
             ->first();
-
-        $prototal = $produittotal->total ?? 0;
 
         // Total des soins
         $soinstotal = DB::table('soins_medicaux_itemsoins')
             ->where('id_soins', '=', $id)
             ->select(DB::raw('COALESCE(SUM(REPLACE(price, ".", "") + 0), 0) as total'))
             ->first();
-
-        $stotal = $soinstotal->total ?? 0;
-
 
         $soins = DB::table('soins_medicaux_itemsoins')
             ->where('id_soins', '=', $id)
@@ -463,12 +498,50 @@ class ApilistController extends Controller
             ->select('soins_medicaux_itemmedics.*','medicine.price as priceu')
             ->get();
 
+        $patient = DB::table('soins_medicaux')
+            ->Join('factures', 'factures.numfac', '=', 'soins_medicaux.numfac_soins')
+            ->Join('patient', 'patient.idenregistremetpatient', '=', 'soins_medicaux.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'dossierpatient.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->where('soins_medicaux.id_soins', '=', $id)
+            ->select(
+                'soins_medicaux.*',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as tel_patient',
+                'patient.assure as assure',
+                'patient.datenaispatient as datenais',
+                'patient.telpatient as telpatient',
+                'patient.matriculeassure as matriculeassure',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montantregle_pat as part_patient_regler',
+                'factures.numrecu as numrecu',
+                'factures.datereglt_pat as datereglt_pat',
+                'factures.montantpat_verser as montant_verser',
+                'factures.montantpat_remis as montant_remis',
+                'factures.montantreste_pat as montant_restant',
+            )
+            ->first();
+
+        $patient->nbre_soins = DB::table('soins_medicaux_itemsoins')
+            ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+        $patient->nbre_produit = DB::table('soins_medicaux_itemmedics')
+            ->where('id_soins', '=', $patient->id_soins)->count() ?: 0;
+
+        $patient->prototal = $produittotal->total ?? 0;
+        $patient->stotal = $soinstotal->total ?? 0;
+
         return response()->json([
-            'prototal' => $prototal,
-            'stotal' => $stotal,
+            'patient' =>$patient,
             'soins' => $soins,
             'produit' => $produit,
         ]);
+
     }
 
     public function list_societe_all()
@@ -511,19 +584,27 @@ class ApilistController extends Controller
         $date1 = Carbon::parse($date1)->startOfDay();
         $date2 = Carbon::parse($date2)->endOfDay();
 
-        $examen = examen::join('patients', 'patients.id', '=', 'examens.patient_id')
-                            ->join('actes', 'actes.id', '=', 'examens.acte_id')
-                            ->whereBetween('examens.created_at', [$date1, $date2])
-                            ->select(
-                                'examens.*',
-                                'actes.nom as acte',
-                                'patients.np as patient',
-                            )
-                            ->orderBy('examens.created_at', 'desc')
-                            ->get();
+        $examen = DB::table('testlaboimagerie')
+            ->join('patient', 'patient.idenregistremetpatient', '=', 'testlaboimagerie.idenregistremetpatient')
+            ->leftjoin('medecin', 'testlaboimagerie.codemedecin', '=', 'medecin.codemedecin')
+            ->join('factures', 'testlaboimagerie.numfacbul', '=', 'factures.numfac')
+            ->whereBetween('testlaboimagerie.date', [$date1, $date2])
+            ->select(
+                'testlaboimagerie.*',
+                'patient.nomprenomspatient as patient',
+                'patient.assure as assure',
+                'medecin.nomprenomsmed as medecin',
+                'factures.montanttotal as montant',
+            )
+            ->orderBy('testlaboimagerie.date', 'desc')
+            ->get();
 
         foreach ($examen as $value) {
-            $nbre = examenpatient::where('examen_id', '=', $value->id)->count();
+
+            $nbre = DB::table('detailtestlaboimagerie')
+                    ->where('idtestlaboimagerie', '=', $value->idtestlaboimagerie)
+                    ->count();
+
             $value->nbre =  $nbre ?? 0;
         }
 
@@ -534,55 +615,58 @@ class ApilistController extends Controller
 
     public function detail_examen($id)
     {
-        $examen = examen::find($id);
 
-        $facture = facture::find($examen->facture_id);
+        $facture = DB::table('testlaboimagerie')
+            ->join('patient', 'testlaboimagerie.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
+            ->leftjoin('dossierpatient', 'patient.idenregistremetpatient', '=', 'dossierpatient.idenregistremetpatient')
+            ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
+            ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->leftjoin('medecin', 'testlaboimagerie.codemedecin', '=', 'medecin.codemedecin')
+            ->join('factures', 'testlaboimagerie.numfacbul', '=', 'factures.numfac')
+            ->where('testlaboimagerie.idtestlaboimagerie', '=', $id)
+            ->select(
+                'testlaboimagerie.*',
+                'dossierpatient.numdossier as numdossier',
+                'patient.nomprenomspatient as nom_patient',
+                'patient.telpatient as telpatient',
+                'patient.assure as assure',
+                'patient.datenaispatient as datenais',
+                'patient.matriculeassure as matriculeassure',
+                'medecin.nomprenomsmed as nom_medecin',
+                'factures.remise as remise',
+                'assurance.libelleassurance as assurance',
+                'tauxcouvertureassure.valeurtaux as taux',
+                'factures.montant_ass as part_assurance',
+                'factures.montant_pat as part_patient',
+                'factures.montanttotal as montant',
+                'factures.montantregle_pat as part_patient_regler',
+                'factures.numrecu as numrecu',
+                'factures.datereglt_pat as datereglt_pat',
+                'factures.montantpat_verser as montant_verser',
+                'factures.montantpat_remis as montant_remis',
+                'factures.montantreste_pat as montant_restant',
+            )
+            ->first();
 
-        $total_amount = intval(str_replace('.', '', $facture->montant_verser));
-        $paid_amount = intval(str_replace('.', '', $examen->part_patient));
-        $remis_amount = intval(str_replace('.', '', $facture->montant_remis));
-        $pre_amount = intval(str_replace('.', '', $examen->prelevement));
+        $examen = DB::table('detailtestlaboimagerie')
+            ->where('idtestlaboimagerie', '=', $id)
+            ->select(
+                'detailtestlaboimagerie.denomination as examen',
+                'detailtestlaboimagerie.resultat as resultat',
+                'detailtestlaboimagerie.prix as prix',
+            )
+            ->get();
 
-        $remaining_amount = max(0, $total_amount - ($paid_amount + $remis_amount + $pre_amount));
-
-        function formatWithPeriods($number) {
-        return number_format($number, 0, '', '.');
-        }
-
-        $facture->montant_restant = formatWithPeriods($remaining_amount);
-
-        $patient = patient::leftjoin('assurances', 'assurances.id', '=', 'patients.assurance_id')
-        ->leftjoin('tauxes', 'tauxes.id', '=', 'patients.taux_id')
-        ->where('patients.id', '=', $examen->patient_id)
-        ->select('patients.*', 'assurances.nom as assurance', 'tauxes.taux as taux')
-        ->first();
-
-        if ($patient) {
-            $patient->age = $patient->datenais ? Carbon::parse($patient->datenais)->age : 0;
-        }
-
-        $acte = acte::find($examen->acte_id);
-
-        $examenpatient = examenpatient::join('typeactes', 'typeactes.id', '=', 'examenpatients.typeacte_id')
-                            ->where('examenpatients.examen_id', '=', $id)
-                            ->select(
-                                'examenpatients.*',
-                                'typeactes.nom as nom_ex',
-                                'typeactes.prix as prix_ex',
-                                'typeactes.cotation as cotation_ex',
-                                'typeactes.valeur as valeur_ex',
-                                'typeactes.montant as montant_ex',
-                            )
-                            ->orderBy('examenpatients.created_at', 'desc')
-                            ->get();
+        $sumMontantEx = $examen->sum(function ($item) {
+            $montantEx = str_replace('.', '', $item->prix);
+            return (int) $montantEx;
+        });
 
         
         return response()->json([
-            'examen' => $examen,
             'facture' => $facture,
-            'patient' => $patient,
-            'acte' => $acte,
-            'examenpatient' => $examenpatient,
+            'examen' => $examen,
+            'sumMontantEx' => $sumMontantEx,
         ]);
     }
 

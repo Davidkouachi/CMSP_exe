@@ -1406,6 +1406,7 @@ class ApipdfController extends Controller
             ->leftjoin('dossierpatient', 'dossierpatient.idenregistremetpatient', '=', 'patient.idenregistremetpatient')
             ->leftJoin('tauxcouvertureassure', 'patient.idtauxcouv', '=', 'tauxcouvertureassure.idtauxcouv')
             ->leftJoin('assurance', 'patient.codeassurance', '=', 'assurance.codeassurance')
+            ->Join('factures', 'soins_medicaux.numfac_soins', '=', 'factures.numfac')
             ->where('soins_medicaux.id_soins', '=', $id)
             ->select(
                 'soins_medicaux.*',
@@ -1418,6 +1419,7 @@ class ApipdfController extends Controller
                 'patient.matriculeassure as matriculeassure',
                 'assurance.libelleassurance as assurance',
                 'tauxcouvertureassure.valeurtaux as taux',
+                'factures.remise as remise',
             )
             ->first();
 

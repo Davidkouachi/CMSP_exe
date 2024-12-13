@@ -25,8 +25,9 @@
             <div class="card mb-3 bg-3">
                 <div class="card-body" style="background: rgba(0, 0, 0, 0.7);">
                     <div class="py-4 px-3 text-white">
-                        <h6>Bienvenue,</h6>
-                        <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2>
+                        <h5>EXAMENS,</h5>
+                        {{-- <h2>{{Auth::user()->sexe.'. '.Auth::user()->name}}</h2> --}}
+                        <p>Services / Examens</p>
                         <h5>Les statistiques d'aujourd'hui.</h5>
                         <div class="mt-4 d-flex gap-3">
                             <div class="d-flex align-items-center">
@@ -130,7 +131,10 @@
                                         <div class="col-xxl-3 col-lg-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Medecin</label>
-                                                <input type="text" class="form-control" id="medecin" autocomplete="off" placeholder="saisie obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">Dr</span>
+                                                    <input type="text" class="form-control" id="medecin" autocomplete="off" placeholder="saisie obligatoire" oninput="this.value = this.value.toUpperCase()">
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-xxl-3 col-lg-4 col-sm-6" id="div_numcode" style="display: none;">
@@ -140,6 +144,12 @@
                                                     <span class="input-group-text">N°</span>
                                                     <input type="text" class="form-control" id="numcode" autocomplete="off" placeholder="facultatif">
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Renseignement Clinique</label>
+                                                <input type="text" class="form-control" id="rensg" autocomplete="off" placeholder="saisie obligatoire" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>
                                     </div>
@@ -248,12 +258,13 @@
                                             <div class="card-body">
                                                 <div class="">
                                                     <div class="table-responsive">
-                                                        <table id="Table_day" class="table table-hover table-sm Table_examend">
+                                                        <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_examend">
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
                                                                     <th scope="col">Type d'examen</th>
                                                                     <th scope="col">Patient</th>
+                                                                    <th scope="col">Assurer ?</th>
                                                                     <th scope="col">Médecin</th>
                                                                     <th scope="col">Nombre d'examen</th>
                                                                     <th scope="col">Prélevement</th>
@@ -289,7 +300,7 @@
                                             <div class="card-body">
                                                 <div class="">
                                                     <div class="table-responsive">
-                                                        <table id="Table_day" class="table table-hover table-sm Table_examen">
+                                                        <table id="Table_day" class="table align-middle table-hover m-0 truncate Table_examen">
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">N°</th>
@@ -392,10 +403,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Examen</th>
-                                                        <th>Cotation</th>
-                                                        <th>Prix</th>
+                                                        <th>Montant</th>
                                                         <th>Accepté ?</th>
-                                                        <th>Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -480,6 +489,10 @@
 
         ['prix_preleve'].forEach(id => {
             document.getElementById(id).addEventListener('input', formatPriceInput);
+            document.getElementById(id).addEventListener('keypress', allowOnlyNumbers);
+        });
+
+        ['numcode'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', allowOnlyNumbers);
         });
 
@@ -661,96 +674,107 @@
             table_examen.ajax.reload(null, false);
         });
 
-        // const table_examend = $('.Table_examend').DataTable({
+        const table_examend = $('.Table_examend').DataTable({
 
-        //     processing: true,
-        //     serverSide: false,
-        //     ajax: function(data, callback) {
-        //         const date1 = $('#searchDate1').val();
-        //         const date2 = $('#searchDate2').val();
+            processing: true,
+            serverSide: false,
+            ajax: function(data, callback) {
+                const date1 = $('#searchDate1').val();
+                const date2 = $('#searchDate2').val();
                 
-        //         $.ajax({
-        //             url: `/api/list_examend_all/${date1}/${date2}`,
-        //             type: 'GET',
-        //             success: function(response) {
-        //                 callback({ data: response.data });
-        //             },
-        //             error: function() {
-        //                 console.log('Error fetching data. Please check your API or network list_examend_all.');
-        //             }
-        //         });
-        //     },
-        //     columns: [
-        //         { 
-        //             data: null, 
-        //             render: (data, type, row, meta) => meta.row + 1,
-        //             searchable: false,
-        //             orderable: false,
-        //         },
-        //         { 
-        //             data: 'acte', 
-        //             render: (data, type, row) => `
-        //             <div class="d-flex align-items-center">
-        //                 <a class="d-flex align-items-center flex-column me-2">
-        //                     <img src="{{ asset('/assets/images/examen.jpg') }}" class="img-2x rounded-circle border border-1">
-        //                 </a>
-        //                 ${data}
-        //             </div>`,
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'patient',
-        //             searchable: true,
-        //         },
-        //         { 
-        //             data: 'medecin', 
-        //             render: (data) => `Dr. ${data}`,
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'nbre',
-        //             searchable: true,
-        //         },
-        //         { 
-        //             data: 'prelevement', 
-        //             render: (data) => `${data} Fcfa`,
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'montant', 
-        //             render: (data) => `${data} Fcfa`,
-        //             searchable: true, 
-        //         },
-        //         { 
-        //             data: 'created_at', 
-        //             render: (data) => `${formatDateHeure(data)}`,
-        //             searchable: true, 
-        //         },
-        //         {
-        //             data: null,
-        //             render: (data, type, row) => `
-        //                 <div class="d-inline-flex gap-1" style="font-size:10px;">
-        //                     <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail" id="detail"
-        //                         data-id="${row.id}"
-        //                     >
-        //                         <i class="ri-archive-2-line"></i>
-        //                     </a>
-        //                     <a class="btn btn-outline-info btn-sm" id="fiche"
-        //                         data-id="${row.id}"
-        //                     >
-        //                         <i class="ri-file-line"></i>
-        //                     </a>
-        //                 </div>
-        //             `,
-        //             searchable: false,
-        //             orderable: false,
-        //         }
-        //     ],
-        //     ...dataTableConfig,
-        //     initComplete: function(settings, json) {
-        //         initializeRowEventListenersExamend();
-        //     },
-        // });
+                $.ajax({
+                    url: `/api/list_examend_all/${date1}/${date2}`,
+                    type: 'GET',
+                    success: function(response) {
+                        callback({ data: response.data });
+                    },
+                    error: function() {
+                        console.log('Error fetching data. Please check your API or network list_examend_all.');
+                    }
+                });
+            },
+            columns: [
+                { 
+                    data: null, 
+                    render: (data, type, row, meta) => meta.row + 1,
+                    searchable: false,
+                    orderable: false,
+                },
+                { 
+                    data: 'typedemande', 
+                    render: (data, type, row) => `
+                    <div class="d-flex align-items-center">
+                        <a class="d-flex align-items-center flex-column me-2">
+                            <img src="{{ asset('/assets/images/examen.jpg') }}" class="img-2x rounded-circle border border-1">
+                        </a>
+                        <span class="badge ${data === 'analyse' ? 'bg-danger' : 'bg-primary'}">
+                            ${data}
+                        </span>
+                    </div>`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'patient',
+                    searchable: true,
+                },
+                { 
+                    data: 'assure', 
+                    render: (data, type, row) => `
+                        <span class="badge ${data == 1 ? 'bg-success' : 'bg-danger'}">
+                            ${data == 1 ? 'Oui' : 'Non'}
+                        </span>
+                    `,
+                    searchable: true, 
+                },
+                { 
+                    data: 'codemedecin', 
+                    render: (data, type, row) => `${data == null ? `${row.medicin_traitant}` : `${row.medecin}`}`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'nbre',
+                    searchable: true,
+                },
+                { 
+                    data: 'prelevement', 
+                    render: (data) => `${formatPriceT(data)} Fcfa`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'montant', 
+                    render: (data) => `${formatPriceT(data)} Fcfa`,
+                    searchable: true, 
+                },
+                { 
+                    data: 'date', 
+                    render: (data, type, row) => `${formatDate(data)} à ${row.heure}`,
+                    searchable: true, 
+                },
+                {
+                    data: null,
+                    render: (data, type, row) => `
+                        <div class="d-inline-flex gap-1" style="font-size:10px;">
+                            <a class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#Detail" id="detail"
+                                data-id="${row.idtestlaboimagerie}"
+                            >
+                                <i class="ri-archive-2-line"></i>
+                            </a>
+                            <a class="btn btn-outline-info btn-sm" id="fiche"
+                                data-id="${row.idtestlaboimagerie}"
+                            >
+                                <i class="ri-file-line"></i>
+                            </a>
+                        </div>
+                    `,
+                    searchable: false,
+                    orderable: false,
+                }
+            ],
+            ...dataTableConfig,
+            initComplete: function(settings, json) {
+                initializeRowEventListenersExamend();
+            },
+        });
 
         function initializeRowEventListenersExamend() {
 
@@ -789,19 +813,15 @@
                                 // Create and append cells to the row based on your table's structure
                                 row.innerHTML = `
                                     <td>
-                                        <h6>${item.nom_ex}</h6>
+                                        <h6>${item.examen}</h6>
                                     </td>
                                     <td>
-                                        <h6>${item.cotation_ex}${item.valeur_ex}</h6>
+                                        <h6>${formatPriceT(item.prix)} Fcfa</h6>
                                     </td>
                                     <td>
-                                        <h6>${item.prix_ex} Fcfa</h6>
-                                    </td>
-                                    <td>
-                                        <h6>${item.accepte}</h6>
-                                    </td>
-                                    <td>
-                                        <h6>${item.montant_ex} Fcfa</h6>
+                                        <h6>
+                                            ${item.resultat == null || item.resultat == '' ? `Néant` : item.resultat }
+                                        </h6>
                                     </td>
                                 `;
                                 // Append the row to the table body
@@ -811,7 +831,7 @@
 
                             const row2 = document.createElement('tr');
                             row2.innerHTML = `
-                                <td colspan="3">&nbsp;</td>
+                                <td colspan="1">&nbsp;</td>
                                 <td colspan="2" >
                                     <h5 class="mt-4 text-success">
                                         Total : ${formatPriceT(sumMontantEx)} Fcfa
@@ -825,7 +845,7 @@
                                 <td colspan="5">
                                     <h6 class="text-danger">NOTE</h6>
                                     <p class="small m-0">
-                                        Le Montant Total des examens  ajouter au montant du prélevement.
+                                        Montant total de la facture = Montant Total examens + montant du prélevement.
                                     </p>
                                 </td>
                             `;
@@ -861,18 +881,16 @@
                     .then(response => response.json())
                     .then(data => {
                         // Access the 'chambre' array from the API response
-                        const examen = data.examen;
                         const facture = data.facture;
-                        const patient = data.patient;
-                        const acte = data.acte;
-                        const examenpatient = data.examenpatient;
+                        const examen = data.examen;
+                        const sumMontantEx = data.sumMontantEx;
 
                         var preloader = document.getElementById('preloader_ch');
                         if (preloader) {
                             preloader.remove();
                         }
 
-                        generatePDFInvoice(examen, facture, patient, acte, examenpatient);
+                        generatePDFInvoice(examen, facture, sumMontantEx);
 
                     })
                     .catch(error => {
@@ -1291,7 +1309,11 @@
                                             data-codfamexam="${item.codfamexam}"
                                             data-valeur="${item.valeur}" 
                                             data-valeur_non_as="${item.valeur_non_as}"
-                                            data-assurer="oui"
+                                            ${patientTaux == 0 ? `
+                                                data-assurer="non"
+                                            ` : `
+                                                data-assurer="oui"
+                                            `}
                                             data-tarif="${formatPriceT(item.tarif)}"
                                             data-tarif_non_as="${formatPriceT(item.tarif_non_as)}"
                                             data-tarifr="${item.tarif}"
@@ -1517,6 +1539,23 @@
         //             });
         // }
 
+        function calculateAge(dateString) 
+        {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            // Vérifie si l'anniversaire n'est pas encore passé cette année
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            return age;
+        }
+
         function CalculMontant() {
 
             const patient_id = $('#patient_id').val();
@@ -1621,6 +1660,7 @@
             const patient_id = $('#patient_id').val();
             const typeacte_id_exd = $('#typeacte_id_exd').val();
             const medecin = $('#medecin').val();
+            const rensg = $('#rensg').val();
 
             if (patient_id == '') {
                 showAlert("ALERT", 'Veuillez sélectionner un Patient.', "warning");
@@ -1670,9 +1710,6 @@
                 return false;
             }
 
-            console.log(selectionsExamen);
-            return false;
-
             var preloader_ch = `
                 <div id="preloader_ch">
                     <div class="spinner_preloader_ch"></div>
@@ -1694,6 +1731,7 @@
                     acte_id: typeacte_id_exd,
                     medecin: medecin,
                     numcode: numcode || null,
+                    rensg: rensg || null,
                     login: login,
                 },
                 success: function(response) {
@@ -1705,18 +1743,23 @@
                     
                     if (response.success) {
 
-                        $('#patient_id').val('').trigger('change');
+                        Statistique();
 
-                        document.getElementById('typeacte_id_exd').value = "";
-                        document.getElementById('medecin').value = "";
-                        document.getElementById('numcode').value = "";
-                        document.getElementById('select_examen_div').style.display = "none";
-                        document.getElementById('div_Examen').style.display = "none";
-                        document.getElementById('div_numcode').style.display = "none";
+                        $('#patient_id').val('').trigger('change');
+                        $('#periode').val('').trigger('change');
+                        $('#typeacte_id_exd').val('').trigger('change');
+
+                        $('#medecin').val('');
+                        $('#numcode').val('');
+                        $('#rensg').val('');
+                        $('#select_examen_div').hide();
+                        $('#div_Examen').hide();
+                        $('#div_numcode').hide();
+                        $('#select_periode_div').hide();
 
                         table_examend.ajax.reload(null, false);   
 
-                        showAlert("ALERT", 'Enregistrement éffectué', "success");
+                        showAlert("ALERT", 'Opération éffectué', "success");
 
                         var newTab = new bootstrap.Tab(document.getElementById('tab-oneAAAD'));
                         newTab.show();
@@ -1741,11 +1784,12 @@
             });
         };
 
-        function generatePDFInvoice(examen, facture, patient, acte, examenpatient) {
+        function generatePDFInvoice(examen, facture, sumMontantEx) 
+        {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
-            const pdfFilename = "Examen Facture N°" + facture.code + " du " + formatDateHeure(facture.created_at);
+            const pdfFilename = "Examen Facture N°" + facture.numfacbul + " du " + formatDate(facture.date);
             doc.setProperties({
                 title: pdfFilename,
             });
@@ -1790,18 +1834,18 @@
                 doc.text(phone, phoneX, (yPos + 10));
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "normal");
-                const examenDate = new Date(examen.created_at);
+                const examenDate = new Date(facture.date);
                 // Formatter la date et l'heure séparément
                 const formattedDate = examenDate.toLocaleDateString(); // Formater la date
-                const formattedTime = examenDate.toLocaleTimeString();
+                // const formattedTime = examenDate.toLocaleTimeString();
                 doc.text("Date: " + formattedDate, 15, (yPos + 25));
-                doc.text("Heure: " + formattedTime, 15, (yPos + 30));
+                doc.text("Heure: " + facture.heure, 15, (yPos + 30));
 
                 //Ligne de séparation
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
                 doc.setLineWidth(0.5);
-                doc.setTextColor(255, 0, 0);
+                doc.setTextColor(0, 0, 0);
                 // doc.line(10, 35, 200, 35); 
                 const titleR = "FACTURE EXAMEN";
                 const titleRWidth = doc.getTextWidth(titleR);
@@ -1820,37 +1864,59 @@
                 // Ajouter le texte centré en gras
                 doc.setFontSize(15);
                 doc.setFont("Helvetica", "bold");
-                doc.setTextColor(255, 0, 0); // Couleur du texte rouge
+                doc.setTextColor(0, 0, 0); // Couleur du texte rouge
                 doc.text(titleR, titleRX, (yPos + 25)); // Positionner le texte
-                const titleN = "N° "+facture.code;
+                const titleN = "N° "+facture.numfacbul;
                 doc.text(titleN, (doc.internal.pageSize.getWidth() - doc.getTextWidth(titleN)) / 2, (yPos + 31));
 
                 doc.setFontSize(10);
                 doc.setFont("Helvetica", "bold");
                 doc.setTextColor(0, 0, 0);
-                const numDossier = "N° Dossier : P-"+ patient.matricule;
+                const numDossier = "N° Dossier : "+ facture.numdossier;
                 const numDossierWidth = doc.getTextWidth(numDossier);
                 doc.text(numDossier, pdfWidth - rightMargin - numDossierWidth, yPos + 28);
 
-                yPoss = (yPos + 40);
+                yPoss = (yPos + 50);
+
+                let assurer;
+
+                if (facture.assure == 1) {
+                    assurer = 'Oui';
+                } else {
+                    assurer = 'Non';
+                }
 
                 const patientInfo = [
-                    { label: "Nom et Prénoms", value: patient.np },
-                    { label: "Assurer", value: patient.assurer },
-                    { label: "Age", value: patient.age+" an(s)" },
-                    { label: "Domicile", value: patient.adresse },
-                    { label: "Contact", value: "+225 "+patient.tel }
+                    { 
+                        label: "Nom et Prénoms", 
+                        value: facture.nom_patient.length > 25 
+                            ? facture.nom_patient.substring(0, 25) + '...' 
+                            : facture.nom_patient 
+                    },
+                    { label: "Assurer", value: assurer },
+                    { label: "Age", value: calculateAge(facture.datenais)+" an(s)" },
+                    { label: "Contact", value: facture.telpatient }
                 ];
 
-                if (patient.assurer == 'oui') {
+                if (facture.assure == 1) {
                     patientInfo.push(
-                        { label: "Assurance", value: patient.assurance },
-                        { label: "Matricule", value: patient.matricule_assurance },
+                        { 
+                            label: "Assurance", 
+                            value: facture.assurance.length > 25 
+                                ? facture.assurance.substring(0, 25) + '...' 
+                                : facture.assurance 
+                        },
+                        { label: "Matricule", value: facture.matriculeassure },
+                        { label: "N° de Bon", value: facture.numbon || 'Aucun' },
                     );
                 }
 
+                patientInfo.push(
+                    { label: "libelle", value: facture.renseigclini || 'Aucun' },
+                );
+
                 patientInfo.forEach(info => {
-                    doc.setFontSize(8);
+                    doc.setFontSize(9);
                     doc.setFont("Helvetica", "bold");
                     doc.text(info.label, leftMargin, yPoss);
                     doc.setFont("Helvetica", "normal");
@@ -1858,20 +1924,35 @@
                     yPoss += 7;
                 });
 
-                yPoss = (yPos + 40);
+                yPoss = (yPos + 50);
 
                 const typeInfo = [];
 
-                if (examen.num_bon && examen.num_bon !== "") {
-                    typeInfo.push({ label: "N° prise en charge", value: examen.num_bon });
+                if (facture.num_bon && facture.num_bon !== "" && facture.num_bon !== null ) {
+                    typeInfo.push({ label: "N° prise en charge", value: facture.numbon == null ? 'Aucun' : facture.numbon });
+                }
+
+                let medecin; 
+
+                if (facture.nom_medecin == null) {
+                    medecin = facture.medicin_traitant;
+                } else {
+                    medecin = facture.nom_medecin;
                 }
 
                 typeInfo.push(
-                    { label: "Type d'examen", value: acte.nom },
+                    { label: "Id Examen", value: facture.idtestlaboimagerie },
+                    { 
+                        label: "Medecin", 
+                        value: medecin.length > 20 
+                            ? 'Dr. '+medecin.substring(0, 20) + '...' 
+                            : 'Dr. '+medecin 
+                    },
+                    { label: "Type d'examen", value: facture.typedemande },
                 );
 
                 typeInfo.forEach(info => {
-                    doc.setFontSize(8);
+                    doc.setFontSize(9);
                     doc.setFont("Helvetica", "bold");
                     doc.text(info.label, leftMargin + 100, yPoss);
                     doc.setFont("Helvetica", "normal");
@@ -1881,37 +1962,39 @@
 
                 yPoss += 30;
 
-                const donneeTables = examenpatient;
+                const donneeTables = examen;
                 let yPossT = yPoss + 10; // Initialisation de la position Y pour le tableau des soins
 
                 // Tableau dynamique pour les détails des soins infirmiers
                 doc.autoTable({
                     startY: yPossT,
-                    head: [['N°', 'Examen', 'Cotation', 'Prix', 'Accepté ?', 'Total']],
+                    head: [['N°', 'Examen', 'Montant', 'Accepté ?']],
                     body: donneeTables.map((item, index) => [
                         index + 1,
-                        item.nom_ex,
-                        item.cotation_ex+""+item.valeur_ex,
-                        item.prix_ex + " Fcfa",
-                        item.accepte,
-                        item.montant_ex + " Fcfa",
+                        item.examen,
+                        formatPriceT(item.prix),
+                        item.resultat == null || item.resultat == '' ? `Néant` : item.resultat,
                     ]),
                     theme: 'striped',
+                    foot: [[
+                        { content: 'Totals', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+                        { content: formatPriceT(sumMontantEx) + " Fcfa", styles: { fontStyle: 'bold' } },
+                    ]]
                 });
 
                 yPoss = doc.autoTable.previous.finalY || yPossT + 10;
                 yPoss = yPoss + 5;
 
                 const compteInfo = [
-                    { label: "Montant Total", value: examen.montant+" Fcfa"},
-                    ...(examen.part_assurance.replace(/[^0-9]/g, '') > 0 ? 
-                            [{ label: "Part assurance", value: examen.part_assurance + " Fcfa" }] 
+                    { label: "Montant Total", value: formatPriceT(facture.montant)+" Fcfa"},
+                    ...(facture.assure == 1 ? 
+                            [{ label: "Part assurance", value: formatPriceT(facture.part_assurance) + " Fcfa" }] 
                             : []),
-                    { label: "Prélevement", value: examen.prelevement+ " Fcfa" }
+                    { label: "Prélevement", value: formatPriceT(facture.prelevement)+ " Fcfa" }
                 ];
 
-                if (patient.taux !== null) {
-                    compteInfo.push({ label: "Taux", value: patient.taux + "%" });
+                if (facture.assure == 1 ) {
+                    compteInfo.push({ label: "Taux", value: facture.taux + "%" });
                 }
 
                 compteInfo.forEach(info => {
@@ -1926,7 +2009,7 @@
                 doc.setFont("Helvetica", "bold");
                 doc.text('Montant à payer', leftMargin + 110, yPoss);
                 doc.setFont("Helvetica", "bold");
-                doc.text(": "+examen.part_patient+" Fcfa", leftMargin + 142, yPoss);
+                doc.text(": "+formatPriceT(facture.part_patient)+" Fcfa", leftMargin + 142, yPoss);
 
             }
 
